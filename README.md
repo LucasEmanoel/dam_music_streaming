@@ -62,16 +62,16 @@ O projeto, suas entregas, documentos e seus artefatos foram desenvolvidos pelas 
         <img src="https://avatars.githubusercontent.com/u/43378517" width="100px;" alt="Foto do Lucas Emanoel no GitHub"/><br>
         <div align="center">
           <p>Lucas Emanoel</p>
-          <p>lucas@ufape.edu.br</p>
+          <p>lucas2014.barros@gmail.com</p>
         </div>
       </a>
     </td>
     <td align="center">
       <a href="#">
-        <img src="https://miro.medium.com/max/360/0*1SkS3mSorArvY9kS.jpg" width="100px;" alt="Foto do Alvaro Miguel no GitHub"/><br>
+        <img src="https://avatars.githubusercontent.com/u/49320611" width="100px;" alt="Foto do Alvaro Miguel no GitHub"/><br>
         <div align="center">
           <p>Álvaro Miguel</p>
-          <p>alvaro@ufape.edu.br</p>
+          <p>alvaromgueiros@gmail.com</p>
         </div>
       </a>
     </td>

@@ -13,7 +13,6 @@ class PlaylistListView extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
 
-    final vm = Provider.of<PlaylistViewModel>(context, listen: false);
     final theme = Theme.of(context);
 
     return Consumer<PlaylistViewModel>(
@@ -26,7 +25,7 @@ class PlaylistListView extends StatelessWidget{
             ),
             actions: [
               IconButton(
-                icon: Icon(Icons.add, color: theme.iconTheme.color),
+                icon: Icon(Icons.add, color: theme.iconTheme.color, size: 25,),
                 onPressed: () {
                   vm.startEditing();
                   vm.setStackIndex(1);
@@ -40,51 +39,33 @@ class PlaylistListView extends StatelessWidget{
               itemCount: vm.playlists.length,
               itemBuilder: (context, index) {
                 final playlist = vm.playlists[index];
-                Color color = theme.cardColor;
                 return Container(
-                  padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                  child: Slidable(
-                    key: ValueKey(playlist.id),
-                    endActionPane: ActionPane(
-                      motion: ScrollMotion(),
-                      extentRatio: 0.25,
-                      children: [
-                        SlidableAction(
-                          backgroundColor: theme.colorScheme.error,
-                          foregroundColor: theme.colorScheme.onError,
-                          icon: Icons.delete,
-                          label: 'Delete', onPressed: (BuildContext context) {  },
-                        ),
-                      ],
-                    ),
-                    child: Card(
-                      color: theme.cardColor,
-                      child: ListTile(
-                        leading: Image.network(
-                          playlist.urlCover,
-                          width: 50,
-                          height: 50,
-                          fit: BoxFit.cover,
-
-                          errorBuilder: (context, error, stackTrace) {
-                            return const SizedBox(
-                              width: 50,
-                              height: 50,
-                              child: Icon(Icons.error_outline, color: Colors.red),
-                            );
-                          },
-
-                        ),
-                        title: Text(playlist.title),
-                        subtitle: Text(
-                          playlist.author,
-                          style: const TextStyle(color: Color(0xFFB7B0B0)),
-                        ),
-                        onTap: () async {
-                          vm.startEditing(playlist: playlist); //depois vou remover, esperando aprender fazer req em api
-                          vm.setStackIndex(1);
+                  child: Card(
+                    color: theme.cardColor,
+                    child: ListTile(
+                      leading: Image.network(
+                        playlist.urlCover,
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const SizedBox(
+                            width: 50,
+                            height: 50,
+                            child: Icon(Icons.error_outline, color: Colors.red),
+                          );
                         },
                       ),
+                      title: Text(playlist.title),
+                      subtitle: Text(
+                        playlist.author,
+                        style: const TextStyle(color: Color(0xFFB7B0B0)),
+                      ),
+                      trailing: const Icon(Icons.arrow_forward_ios, size: 20,),
+                      onTap: () async {
+                        vm.startView(playlist: playlist);
+                        vm.setStackIndex(2);
+                      },
                     ),
                   ),
                 );

@@ -14,6 +14,7 @@ class PlaylistEntryView extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
+
     final theme = Theme.of(context);
 
     return Consumer<PlaylistViewModel>(
@@ -23,7 +24,7 @@ class PlaylistEntryView extends StatelessWidget{
           _descController.text = vm.entityBeingEdited!.author;
         }
 
-        File coverPlaylistFile = File(join(vm.docsDir.path, "playlist_cover"));
+        File coverPlaylistFile = File(join(vm.docsDir.path, "playlist_cover")); //vamos salvar localmente e colocar e mapear com banco
 
         if (!coverPlaylistFile.existsSync() && vm.entityBeingEdited?.id != null) {
           coverPlaylistFile = File(join(vm.docsDir.path, vm.entityBeingEdited!.id.toString()));
@@ -90,22 +91,37 @@ class PlaylistEntryView extends StatelessWidget{
                                   color: Colors.grey.shade600,
                             ),
                           ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: GestureDetector(
-                              onTap: () => _selectCoverPlaylist(context, vm),
-                              child: CircleAvatar(
-                                radius: 20,
-                                backgroundColor: theme.colorScheme.primary,
-                                child: Icon(
-                                  Icons.edit,
-                                  color: Colors.white,
+                          Stack(
+                            children: [
+                              CircleAvatar(
+                                radius: 80,
+                                backgroundColor: Colors.grey.shade300,
+                                backgroundImage: coverPlaylistFile.existsSync() ? FileImage(coverPlaylistFile) : null,
+                                child: coverPlaylistFile.existsSync()
+                                    ? null
+                                    : Icon(
+                                  Icons.music_note,
+                                  size: 50,
+                                  color: Colors.grey.shade600,
                                 ),
                               ),
-                            ),
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: GestureDetector(
+                                  onTap: () => _selectCoverPlaylist(context, vm),
+                                  child: CircleAvatar(
+                                    radius: 20,
+                                    backgroundColor: theme.colorScheme.primary,
+                                    child: Icon(
+                                      Icons.edit,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-
                           const SizedBox(height: 32),
                           CustomInputField(
                             controller: _nameController,

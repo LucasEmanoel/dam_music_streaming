@@ -9,6 +9,7 @@ class LightTheme {
 
     //playlists
     cardColor: Color(0xFFF5F5F5),
+    
     //Inputs
     dividerColor: Colors.grey[400],
     colorScheme: const ColorScheme.light(

@@ -40,10 +40,10 @@ class HarmonyApp extends StatelessWidget {
 
           body: const TabBarView(
             children: [
+              Center(child: Text("Home")),
+              Center(child: Text("Search")),
+              Center(child: Text("Tocando")),
               Playlist(),
-              Center(child: Text("Pesquisar")), // Widget de exemplo
-              Center(child: Text("Tocando")),     // Widget de exemplo
-              Center(child: Text("Playlists")),   // Widget de exemplo
             ],
           ),
           bottomNavigationBar: TabBar(

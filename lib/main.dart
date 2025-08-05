@@ -7,7 +7,8 @@ import 'ui/playlists/widgets/playlists_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const HarmonyApp());
+  Directory docsDir = await startMeUp();
+  runApp(HarmonyApp(docsDir: docsDir));
 }
 
 Future<Directory> startMeUp() async {
@@ -15,7 +16,9 @@ Future<Directory> startMeUp() async {
 }
 
 class HarmonyApp extends StatelessWidget {
-  const HarmonyApp({super.key});
+  final Directory _docsDir;
+
+  const HarmonyApp({super.key, required Directory docsDir}) : _docsDir = docsDir;
 
   @override
   Widget build(BuildContext context) {
@@ -38,12 +41,12 @@ class HarmonyApp extends StatelessWidget {
 
           ),
 
-          body: const TabBarView(
+          body: TabBarView(
             children: [
               Center(child: Text("Home")),
               Center(child: Text("Search")),
               Center(child: Text("Tocando")),
-              Playlist(),
+              Playlist(docsDir: _docsDir),
             ],
           ),
           bottomNavigationBar: TabBar(

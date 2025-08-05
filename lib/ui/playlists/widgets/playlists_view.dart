@@ -6,14 +6,15 @@ import "playlists_list_view.dart";
 import "playlists_entry_view.dart";
 
 class Playlist extends StatelessWidget {
+  final Directory _docsDir;
 
-  const Playlist({super.key});
+  const Playlist({super.key, required Directory docsDir}) : _docsDir = docsDir;
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<PlaylistViewModel>(
       create: (context) {
-        final vm = PlaylistViewModel();
+        final vm = PlaylistViewModel(_docsDir);
         vm.loadPlaylists();
         return vm;
       },
@@ -23,7 +24,7 @@ class Playlist extends StatelessWidget {
             index: vm.stackIndex,
             children: [
               PlaylistListView(),
-              //PlaylistEntryView(),
+              PlaylistEntryView(),
             ],
           );
         },

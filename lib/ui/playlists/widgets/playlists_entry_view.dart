@@ -79,18 +79,6 @@ class PlaylistEntryView extends StatelessWidget{
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          CircleAvatar(
-                            radius: 80,
-                            backgroundColor: Colors.grey.shade300,
-                            backgroundImage: coverPlaylistFile.existsSync() ? FileImage(coverPlaylistFile) : null,
-                            child: coverPlaylistFile.existsSync() //TODO: sempre isso vai ter um valor, falar com thais
-                                ? null
-                                : Icon(
-                                  Icons.music_note,
-                                  size: 50,
-                                  color: Colors.grey.shade600,
-                            ),
-                          ),
                           Stack(
                             children: [
                               CircleAvatar(

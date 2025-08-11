@@ -3,6 +3,7 @@ import 'package:dam_music_streaming/ui/core/ui/svg_icon.dart';
 import "package:flutter/material.dart";
 import "package:path_provider/path_provider.dart";
 import 'dart:io';
+import 'ui/core/themes/light.dart';
 import 'ui/playlists/widgets/playlists_view.dart';
 
 void main() async {
@@ -27,23 +28,22 @@ class HarmonyApp extends StatelessWidget {
       home: DefaultTabController(
         length: 4,
         child: Scaffold(
-          appBar: AppBar(
-            title: Padding(padding: const EdgeInsets.symmetric(),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                SvgIcon(assetName: 'assets/icons/Logo.svg', size: 40,),
-                SizedBox(width: 4),
-                Text("Harmony"),
-              ],
-            ),
-            )
-
-          ),
-
           body: TabBarView(
             children: [
-              Center(child: Text("Home")),
+              Scaffold(
+                  appBar: AppBar(
+                    toolbarHeight: 70,
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      SvgIcon(assetName: 'assets/icons/Logo.svg', size: 40),
+                      const SizedBox(width: 6),
+                      const Text("Harmony"),
+                    ],
+                  ),
+                ),
+                body: const Center(child: Text("Home")),
+              ),
               Center(child: Text("Search")),
               Center(child: Text("Tocando")),
               Playlist(docsDir: _docsDir),

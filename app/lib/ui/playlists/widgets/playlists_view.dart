@@ -1,5 +1,5 @@
 import "dart:io";
-import "package:dam_music_streaming/ui/playlists/widgets/playlist_music_list.dart";
+import "package:dam_music_streaming/ui/playlists/widgets/playlist_songs.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 import "../view_model/playlist_view_model.dart";

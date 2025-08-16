@@ -1,6 +1,4 @@
-import 'dart:io';
 
-import 'package:dam_music_streaming/data/services/playlist_service.dart';
 import 'package:dam_music_streaming/ui/core/ui/info_tile.dart';
 import 'package:dam_music_streaming/ui/core/ui/svg_icon.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +6,6 @@ import 'package:provider/provider.dart';
 
 import '../../../domain/models/playlist_data.dart';
 import '../view_model/playlist_view_model.dart';
-import "package:path/path.dart";
 
 class PlaylistSongs extends StatelessWidget {
   const PlaylistSongs({super.key});

@@ -3,7 +3,6 @@ import 'package:dam_music_streaming/domain/models/playlist_data.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
-import "package:path/path.dart";
 
 import '../../../data/repositories/playlist_repository.dart';
 
@@ -15,8 +14,7 @@ class PlaylistViewModel extends ChangeNotifier {
   final PlaylistRepository repository = PlaylistRepository();
 
   int _stackIndex = 0;
-  bool _isLoading = false;
-
+  
   List<PlaylistData> _playlists = [];
   PlaylistData? entityBeingVisualized;
   PlaylistData? entityBeingEdited;

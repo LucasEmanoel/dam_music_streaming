@@ -1,4 +1,3 @@
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
@@ -35,8 +34,8 @@ class InfoTile extends StatelessWidget {
         ),
       ),
 
-      title: Text(title ?? ''),
-      subtitle: Text(subtitle ?? ''),
+      title: Text(title),
+      subtitle: Text(subtitle),
       contentPadding: EdgeInsets.only(left: 7),
       trailing: trailing,
       onTap: onTap,

@@ -1,10 +1,7 @@
-import "dart:io" show File;
-import "package:path/path.dart";
 import "package:dam_music_streaming/domain/models/playlist_data.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 
-import "../../../data/services/playlist_service.dart";
 import "../../core/ui/info_tile.dart";
 import "../view_model/playlist_view_model.dart";
 
@@ -23,7 +20,7 @@ class PlaylistListView extends StatelessWidget{
           appBar: AppBar(
             title: const Text(
               'Minhas Playlists',
-              style: const TextStyle(color: Color(0xFFB7B0B0), fontSize: 18),
+              style: TextStyle(color: Color(0xFFB7B0B0), fontSize: 18),
             ),
             actions: [
               IconButton(
@@ -70,6 +67,8 @@ class PlaylistListView extends StatelessWidget{
 
   //TODO: colocar para gerar um component de modal universal, ai poderemos abrir em varias telas.
   void _showPlaylistActions(BuildContext context, PlaylistViewModel vm, PlaylistData playlist) {
+    vm.entityBeingVisualized = playlist;
+
     showModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(
@@ -122,6 +121,7 @@ class PlaylistListView extends StatelessWidget{
                 icon: Icons.delete_outline,
                 text: 'Deletar playlist',
                 onTap: () {
+                  print(playlist.toMap());
                   Navigator.pop(context);
                   vm.deletePlaylist(playlist.id!);
                 },
@@ -141,7 +141,6 @@ class PlaylistListView extends StatelessWidget{
         required VoidCallback onTap,
       }
       ){
-    final theme = Theme.of(context);
     return Container(
       margin: EdgeInsets.all(5),
       decoration: BoxDecoration(
@@ -168,8 +167,8 @@ class PlaylistListView extends StatelessWidget{
 
   //TODO: Vou usar S3, entao nao vai precisar dessa complexidade de path.
   Future<void> _editPlaylist(BuildContext context, PlaylistData playlist, PlaylistViewModel vm) async {
-    final avatarFile = File(join(vm.docsDir.path, "playlist_cover"));
-    if (avatarFile.existsSync()) avatarFile.deleteSync();
+    //final avatarFile = File(join(vm.docsDir.path, "playlist_cover"));
+    //if (avatarFile.existsSync()) avatarFile.deleteSync();
     //vm.startEditing(contact: await ContactsRepository.db.get(contact.id!));
     //var playlistDto = await PlaylistApiService.getById(playlist.id!);
     vm.startEditing(playlist: playlist);

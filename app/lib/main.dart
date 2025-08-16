@@ -3,7 +3,6 @@ import 'package:dam_music_streaming/ui/core/ui/svg_icon.dart';
 import "package:flutter/material.dart";
 import "package:path_provider/path_provider.dart";
 import 'dart:io';
-import 'ui/core/themes/light.dart';
 import 'ui/playlists/widgets/playlists_view.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';

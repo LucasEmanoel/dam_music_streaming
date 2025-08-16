@@ -1,5 +1,4 @@
 import 'package:dam_music_streaming/data/services/playlist_service.dart';
-import 'package:dam_music_streaming/ui/playlists/widgets/playlists_view.dart';
 
 import '../../domain/models/playlist_data.dart';
 import '../dto/playlist_dto.dart';

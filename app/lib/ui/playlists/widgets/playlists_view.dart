@@ -6,10 +6,10 @@ import "../view_model/playlist_view_model.dart";
 import "playlists_list_view.dart";
 import "playlists_entry_view.dart";
 
-class Playlist extends StatelessWidget {
+class PlaylistsView extends StatelessWidget {
   final Directory _docsDir;
 
-  const Playlist({super.key, required Directory docsDir}) : _docsDir = docsDir;
+  const PlaylistsView({super.key, required Directory docsDir}) : _docsDir = docsDir;
 
   @override
   Widget build(BuildContext context) {

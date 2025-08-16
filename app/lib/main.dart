@@ -46,7 +46,7 @@ class HarmonyApp extends StatelessWidget {
               ),
               Center(child: Text("Search")),
               Center(child: Text("Tocando")),
-              Playlist(docsDir: _docsDir),
+              PlaylistsView(docsDir: _docsDir),
             ],
           ),
           bottomNavigationBar: TabBar(

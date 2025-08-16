@@ -1,95 +1,64 @@
 import 'dart:convert';
+import 'package:dam_music_streaming/data/repositories/playlist_repository.dart';
+import 'package:dio/dio.dart';
 
 import 'package:dam_music_streaming/data/dto/playlist_dto.dart';
-import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
+
+import '../../ui/core/config/api_config.dart';
 
 class PlaylistApiService {
-  static final String _baseUrl = "https://68917f0f447ff4f11fbcb402.mockapi.io";
 
-  static Future<List<PlaylistDto>> listAll() async{
-    final url = Uri.parse('$_baseUrl/playlists');
+  final Dio _dio;
+  final String baseUrl;
+  String? _token; //vou mover isso para um service de auth
 
-    try{
-      final res = await http.get(url);
-
-      if(res.statusCode == 200) {
-        final List<dynamic> jsonList = jsonDecode(res.body);
-        return jsonList
-            .map((map) => PlaylistDto.fromMap(map as Map<String, dynamic>))
-            .toList();
-      } else {
-
-        throw Exception('Falha no parsing do json');
-      }
-    } catch(e) {
-      print('erro na req: $e');
-      throw Exception('Err: $e');
+  PlaylistApiService({Dio? dio, this.baseUrl = ApiConfig.baseUrl})
+    : _dio = dio ??
+    Dio(
+      BaseOptions(
+        baseUrl: baseUrl,
+        connectTimeout: const Duration(seconds: 5),
+        receiveTimeout: const Duration(seconds: 10),
+        sendTimeout: const Duration(seconds: 10)
+      )
+    ) 
+    {
+      _dio.interceptors.add(InterceptorsWrapper(
+        onRequest: (options, handler) {
+          if (_token != null && _token!.isNotEmpty) {
+            options.headers['Autorization'] = 'Bearer $_token';
+          }
+          handler.next(options);
+        }
+      ));
     }
+
+    Future<List<PlaylistDto>> fetchPlaylists() async{
+    final response = await _dio.get('/playlists');
+    final List<dynamic> jsonList = response.data;
+
+    return jsonList
+        .map((map) => PlaylistDto.fromMap(map as Map<String, dynamic>))
+        .toList();
   }
 
-  static Future<PlaylistDto> getById(String id) async {
-    final url = Uri.parse('$_baseUrl/playlists/$id');
-    try {
-      final res = await http.get(url);
-
-      if (res.statusCode == 200) {
-        return PlaylistDto.fromMap(jsonDecode(res.body));
-      } else {
-        throw Exception('Falha ao carregar playlist por ID');
-      }
-    } catch (e) {
-      throw Exception('Erro na requisição: $e');
-    }
+  Future<PlaylistDto> getById(String id) async {
+    final response = await _dio.get('/playlists/$id');
+    return PlaylistDto.fromMap(response.data);
   }
 
-  static Future<PlaylistDto> create(PlaylistDto playlist) async {
-    final url = Uri.parse('$_baseUrl/playlists');
-    try {
-      final res = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(playlist.toMap()),
-      );
-
-      if (res.statusCode == 201) {
-        return PlaylistDto.fromMap(jsonDecode(res.body));
-      } else {
-        throw Exception('Falha ao criar playlist');
-      }
-    } catch (e) {
-      throw Exception('Erro na requisição: $e');
-    }
+  Future<PlaylistDto> create(PlaylistDto playlist) async {
+    final response = await _dio.post('/playlists', data: playlist.toMap());
+    return PlaylistDto.fromMap(response.data);
   }
 
-  static Future<PlaylistDto> update(String id, PlaylistDto playlist) async {
-    final url = Uri.parse('$_baseUrl/playlists/$id');
-    try {
-      final res = await http.put(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(playlist.toMap()),
-      );
-
-      if (res.statusCode == 200) {
-        return PlaylistDto.fromMap(jsonDecode(res.body));
-      } else {
-        throw Exception('Falha ao atualizar playlist');
-      }
-    } catch (e) {
-      throw Exception('Erro na requisição: $e');
-    }
+  Future<PlaylistDto> update(String id, PlaylistDto playlist) async {
+    final response = await _dio.put('/playlists/$id', data: playlist.toMap());
+    return PlaylistDto.fromMap(response.data);
   }
 
-  static Future<void> delete(String id) async {
-    final url = Uri.parse('$_baseUrl/playlists/$id');
-    try {
-      final res = await http.delete(url);
-
-      if (res.statusCode != 200) {
-        throw Exception('Falha ao deletar playlist');
-      }
-    } catch (e) {
-      throw Exception('Erro na requisição: $e');
-    }
+  Future<void> delete(String id) async {
+    await _dio.delete('/playlists/$id');
   }
 }

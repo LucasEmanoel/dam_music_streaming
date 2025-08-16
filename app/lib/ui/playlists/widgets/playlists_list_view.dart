@@ -171,8 +171,8 @@ class PlaylistListView extends StatelessWidget{
     final avatarFile = File(join(vm.docsDir.path, "playlist_cover"));
     if (avatarFile.existsSync()) avatarFile.deleteSync();
     //vm.startEditing(contact: await ContactsRepository.db.get(contact.id!));
-    var playlistDto = await PlaylistApiService.getById(playlist.id!);
-    vm.startEditing(playlist: PlaylistData.fromDto(playlistDto));
+    //var playlistDto = await PlaylistApiService.getById(playlist.id!);
+    vm.startEditing(playlist: playlist);
     vm.setStackIndex(1);
   }
 }

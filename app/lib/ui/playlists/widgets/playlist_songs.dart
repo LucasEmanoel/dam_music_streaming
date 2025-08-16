@@ -28,7 +28,7 @@ class PlaylistSongs extends StatelessWidget {
             elevation: 0,
             backgroundColor: theme.scaffoldBackgroundColor,
             leading: IconButton(
-              icon: Icon(Icons.arrow_back_ios_new, color: theme.iconTheme.color, size: 25,),
+              icon: Icon(Icons.arrow_back, color: theme.iconTheme.color, size: 25,),
               onPressed: () {
                 vm.setStackIndex(0);
               },

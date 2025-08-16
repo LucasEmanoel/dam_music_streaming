@@ -5,10 +5,15 @@ import "package:path_provider/path_provider.dart";
 import 'dart:io';
 import 'ui/core/themes/light.dart';
 import 'ui/playlists/widgets/playlists_view.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Directory docsDir = await startMeUp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(HarmonyApp(docsDir: docsDir));
 }
 

@@ -1,6 +1,6 @@
-import 'package:dam_music_streaming/data/dto/playlist_dto.dart';
-import 'package:dam_music_streaming/data/services/playlist_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dam_music_streaming/domain/models/playlist_data.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import "package:path/path.dart";
@@ -9,12 +9,18 @@ import '../../../data/repositories/playlist_repository.dart';
 
 class PlaylistViewModel extends ChangeNotifier {
 
+  final FirebaseStorage  _firestore = FirebaseStorage.instance;
+  //final storageRef = FirebaseStorage.instance.ref();
+
   final PlaylistRepository repository = PlaylistRepository();
 
   int _stackIndex = 0;
+  bool _isLoading = false;
+
   List<PlaylistData> _playlists = [];
   PlaylistData? entityBeingVisualized;
   PlaylistData? entityBeingEdited;
+  File? _pickedImageFile;
   final Directory docsDir;
 
   PlaylistViewModel(this.docsDir);
@@ -22,7 +28,6 @@ class PlaylistViewModel extends ChangeNotifier {
   Future<void> loadPlaylists() async {
     try {
       _playlists = await repository.getPlaylists();
-      print(_playlists);
     } catch (e) {
       print('error: $e');
     } finally {
@@ -34,18 +39,26 @@ class PlaylistViewModel extends ChangeNotifier {
     if (entityBeingEdited == null) return;
 
     try {
-      PlaylistData savedPlaylist;
-      if (entityBeingEdited!.id == null || entityBeingEdited!.id!.isEmpty) {
-        savedPlaylist = await repository.createPlaylist(entityBeingEdited!);
-      } else {
-        savedPlaylist = await repository.updatePlaylist(
-            entityBeingEdited!.id!, entityBeingEdited!);
+      final savedPlaylist = (entityBeingEdited!.id == null || entityBeingEdited!.id!.isEmpty)
+          ? await repository.createPlaylist(entityBeingEdited!)
+          : await repository.updatePlaylist(entityBeingEdited!.id!, entityBeingEdited!);
+
+      if (_pickedImageFile != null) {
+        final playlistId = savedPlaylist.id ?? FirebaseFirestore.instance.collection('temp').doc().id;
+
+        final ref = _firestore.ref('playlist_covers/$playlistId.jpg');
+        final uploadTask = await ref.putFile(_pickedImageFile!);
+
+        final imageUrl = await uploadTask.ref.getDownloadURL();
+        savedPlaylist.urlCover = imageUrl;
       }
-      _renameTempCover(savedPlaylist.id!);
+
+      await repository.updatePlaylist(savedPlaylist.id!, savedPlaylist);
+      await loadPlaylists();
     } catch (e) {
       print('error ao salvar: $e');
     } finally {
-      await loadPlaylists();
+      _pickedImageFile = null;
       setStackIndex(0);
     }
   }
@@ -54,9 +67,8 @@ class PlaylistViewModel extends ChangeNotifier {
     if (entityBeingVisualized == null) return;
 
     try {
-      final avatarFile = File(join(docsDir.path, id.toString()));
-      if (avatarFile.existsSync()) avatarFile.deleteSync();
-
+      final ref = _firestore.ref('playlist_covers/$id.jpg');
+      await ref.delete().catchError((e) => print("Imagem não encontrada para deletar: $e"));
       await repository.deletePlaylist(id);
       await loadPlaylists();
     } catch (e) {
@@ -68,13 +80,19 @@ class PlaylistViewModel extends ChangeNotifier {
 
   int get stackIndex => _stackIndex;
   List<PlaylistData> get playlists => _playlists;
+  File? get pickedImageFile => _pickedImageFile;
 
   void setStackIndex(int index) {
     _stackIndex = index;
+    if (index == 0) {
+      entityBeingEdited = null;
+      _pickedImageFile = null;
+    }
     notifyListeners();
   }
 
   void startEditing({PlaylistData? playlist}) {
+    _pickedImageFile = null;
     entityBeingEdited = playlist ??
         PlaylistData(
             title: '', author: '', urlCover: '', numSongs: 0, description: '');
@@ -88,11 +106,8 @@ class PlaylistViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _renameTempCover(String id) {
-    final coverFile = File(join(docsDir.path, "playlist_cover"));
-    if (coverFile.existsSync()) {
-      coverFile.renameSync(join(docsDir.path, id.toString()));
-    }
+  void setPickedImage(File? file) {
+    _pickedImageFile = file;
   }
 
   void triggerRebuild() {

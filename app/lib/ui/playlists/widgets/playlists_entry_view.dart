@@ -22,14 +22,11 @@ class PlaylistEntryView extends StatelessWidget{
 
     return Consumer<PlaylistViewModel>(
       builder: (context, vm, child) {
-        if (vm.entityBeingEdited != null) {
-          _nameController.text = vm.entityBeingEdited!.title ?? '';
-          _descController.text = vm.entityBeingEdited!.description ?? '';
-        }
-        File coverPlaylistFile = File(join(vm.docsDir.path, "playlist_cover")); //vamos salvar localmente e colocar e mapear com banco
+        final entity = vm.entityBeingEdited;
 
-        if (!coverPlaylistFile.existsSync() && vm.entityBeingEdited?.id != null) {
-          coverPlaylistFile = File(join(vm.docsDir.path, vm.entityBeingEdited!.id));
+        if (entity != null) {
+          _nameController.text = entity.title ?? '';
+          _descController.text = entity.description ?? '';
         }
 
         return Scaffold(
@@ -82,7 +79,8 @@ class PlaylistEntryView extends StatelessWidget{
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           ImageRoundEdit(
-                            coverPlaylistFile: coverPlaylistFile,
+                            localImageFile: vm.pickedImageFile,
+                            networkImageUrl: vm.entityBeingEdited?.urlCover,
                             onTap: () => _selectCoverPlaylist(context, vm),
                           ),
                           const SizedBox(height: 32),
@@ -130,11 +128,13 @@ class PlaylistEntryView extends StatelessWidget{
                 GestureDetector(
                   child: Text("Take a picture"),
                   onTap: () async {
-                    final image = await ImagePicker().pickImage(source: ImageSource.camera);
+                    final image = await ImagePicker().pickImage(source: ImageSource.camera, imageQuality: 80);
                     if (image != null) {
                       final file = File(image.path);
-                      final dir = vm.docsDir;
-                      await file.copy(join(dir.path, "playlist_cover"));
+                      vm.setPickedImage(File(image.path));
+                      //final dir = vm.docsDir;
+                      //await file.copy(join(dir.path, "playlist_cover"));
+                      //final uploadTask = storageRef.putFile(_coverPlaylistFile!);
                       vm.triggerRebuild();
                     }
                     Navigator.of(ctx).pop();
@@ -147,8 +147,9 @@ class PlaylistEntryView extends StatelessWidget{
                     final image = await ImagePicker().pickImage(source: ImageSource.gallery);
                     if (image != null) {
                       final file = File(image.path);
-                      final dir = vm.docsDir;
-                      await file.copy(join(dir.path, "playlist_cover"));
+                      vm.setPickedImage(File(image.path));
+                      //final dir = vm.docsDir;
+                      //await file.copy(join(dir.path, "playlist_cover"));
                       vm.triggerRebuild();
                     }
                     Navigator.of(ctx).pop();

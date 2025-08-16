@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "940448057923",
+    "project_id": "harmony-5110f",
+    "storage_bucket": "harmony-5110f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:940448057923:android:31da43646c8154a7dda2f6",
+        "android_client_info": {
+          "package_name": "com.example.dam_music_streaming"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJvjgF-yJsFPrxn2GImAZRkcMURWG8T00"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

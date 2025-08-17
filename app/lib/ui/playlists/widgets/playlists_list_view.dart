@@ -1,9 +1,15 @@
+import "dart:io";
+
 import "package:dam_music_streaming/domain/models/playlist_data.dart";
 import "package:flutter/material.dart";
+import "package:image_picker/image_picker.dart";
 import "package:provider/provider.dart";
 
+import "../../core/ui/confirm_dialog.dart";
 import "../../core/ui/info_tile.dart";
 import "../view_model/playlist_view_model.dart";
+
+
 
 class PlaylistListView extends StatelessWidget{
 
@@ -37,7 +43,6 @@ class PlaylistListView extends StatelessWidget{
 
           body: ListView.builder(
               shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
               itemCount: vm.playlists.length,
               itemBuilder: (context, index) {
                 final playlist = vm.playlists[index];
@@ -121,9 +126,8 @@ class PlaylistListView extends StatelessWidget{
                 icon: Icons.delete_outline,
                 text: 'Deletar playlist',
                 onTap: () {
-                  print(playlist.toMap());
                   Navigator.pop(context);
-                  vm.deletePlaylist(playlist.id!);
+                  _showDeleteDialog(context, vm);
                 },
               ),
             ],
@@ -173,5 +177,21 @@ class PlaylistListView extends StatelessWidget{
     //var playlistDto = await PlaylistApiService.getById(playlist.id!);
     vm.startEditing(playlist: playlist);
     vm.setStackIndex(1);
+  }
+
+  void _showDeleteDialog(BuildContext context, PlaylistViewModel vm) {
+    showDialog(
+      context: context,
+      builder: (ctx) => ConfirmationDialog(
+        title: "Atenção!",
+        content: "Apagar a playlist irá remover permanentemente essa seleção do sistema. Essa ação não é reversível.",
+        txtBtn: "Apagar",
+        corBtn: Color(0xFFFF3951),
+        onConfirm: () {
+          vm.deletePlaylist(vm.entityBeingVisualized!.id!);
+          print("Playlist apagada!");
+        },
+      ),
+    );
   }
 }

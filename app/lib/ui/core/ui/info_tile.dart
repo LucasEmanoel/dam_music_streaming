@@ -21,17 +21,28 @@ class InfoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final bool hasImage = imageUrl != null && imageUrl!.isNotEmpty;
+
     return ListTile(
       leading: Container(
         width: 50,
         height: 50,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8.0),
-          image: DecorationImage(
-            image: NetworkImage(imageUrl ?? ''),
-            fit: BoxFit.cover,
-          ),
+          image: hasImage 
+              ? DecorationImage(
+                  image: NetworkImage(imageUrl!), // Mostra a imagem da URL
+                  fit: BoxFit.cover,
+                )
+              : null,
+              color: hasImage ? null : Colors.grey[800],
         ),
+        child: hasImage
+          ? null
+          : Center(
+            child: Icon(Icons.music_note_outlined, size: 30, color: Colors.white),
+          )
       ),
 
       title: Text(title),

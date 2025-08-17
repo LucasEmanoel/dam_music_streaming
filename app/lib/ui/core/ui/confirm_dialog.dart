@@ -1,5 +1,6 @@
 // lib/components/confirmation_dialog.dart
 
+import 'package:dam_music_streaming/ui/core/ui/svg_icon.dart';
 import 'package:flutter/material.dart';
 
 class ConfirmationDialog extends StatelessWidget {
@@ -26,11 +27,7 @@ class ConfirmationDialog extends StatelessWidget {
       ),
       title: Column(
         children: [
-          Icon(
-            Icons.warning,
-            color: Color(0xFFE6A919),
-            size: 48,
-          ),
+          SvgIcon(assetName: 'assets/icons/Warning.svg', size: 48,color: Color(0xFFE6A919),),
           SizedBox(height: 10),
           Text(
             title,

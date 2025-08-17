@@ -1,4 +1,5 @@
 
+import 'package:dam_music_streaming/ui/core/ui/svg_icon.dart';
 import 'package:flutter/material.dart';
 
 class InfoTile extends StatelessWidget {
@@ -41,7 +42,7 @@ class InfoTile extends StatelessWidget {
         child: hasImage
           ? null
           : Center(
-            child: Icon(Icons.music_note_outlined, size: 30, color: Colors.white),
+            child: SvgIcon(assetName: 'assets/icons/Music.svg', size: 30,color: Colors.white,) 
           )
       ),
 

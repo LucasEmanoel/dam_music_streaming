@@ -1,6 +1,7 @@
 import "dart:io";
 
 import "package:dam_music_streaming/domain/models/playlist_data.dart";
+import "package:dam_music_streaming/ui/core/ui/svg_icon.dart";
 import "package:flutter/material.dart";
 import "package:image_picker/image_picker.dart";
 import "package:provider/provider.dart";
@@ -94,12 +95,12 @@ class PlaylistListView extends StatelessWidget{
               SizedBox(height: 20),
               _buildOptionItem(
                   context,
-                  icon: Icons.person_outline,
+                  icon: 'Profile',
                   text: 'Ver Author',
                   onTap: () {}),
               _buildOptionItem(
                   context,
-                  icon: Icons.music_note_outlined,
+                  icon: 'Music',
                   text: 'Ver Musicas',
                   onTap: () {
                     Navigator.pop(context);
@@ -108,7 +109,7 @@ class PlaylistListView extends StatelessWidget{
                   }),
               _buildOptionItem(
                 context,
-                icon: Icons.edit_outlined,
+                icon: 'Edit',
                 text: 'Editar playlist',
                 onTap: () {
                   Navigator.pop(context);
@@ -117,13 +118,13 @@ class PlaylistListView extends StatelessWidget{
               ),
               _buildOptionItem(
                   context,
-                  icon: Icons.playlist_add,
+                  icon: 'Fila',
                   text: 'Adicionar a fila de reprodução',
                   onTap: () {}),
               _buildOptionItem(
                 context,
                 btnColor: Colors.red,
-                icon: Icons.delete_outline,
+                icon: 'Cancel',
                 text: 'Deletar playlist',
                 onTap: () {
                   Navigator.pop(context);
@@ -139,7 +140,7 @@ class PlaylistListView extends StatelessWidget{
 
   Widget _buildOptionItem(
       BuildContext context,
-      { required IconData icon,
+      { required String icon,
         Color? btnColor,
         required String text,
         required VoidCallback onTap,
@@ -160,7 +161,7 @@ class PlaylistListView extends StatelessWidget{
         onPressed: onTap,
         child: Row(
           children: [
-            Icon(icon),
+            SvgIcon(assetName: 'assets/icons/$icon.svg', size: 22),
             SizedBox(width: 15),
             Text(text),
           ],

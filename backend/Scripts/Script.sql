@@ -1,0 +1,1 @@
+UPDATE playlist SET author_id = 1 WHERE id = 1;

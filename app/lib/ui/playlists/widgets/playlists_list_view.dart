@@ -1,5 +1,5 @@
 import "package:dam_music_streaming/domain/models/playlist_data.dart";
-import "package:dam_music_streaming/ui/core/ui/svg_icon.dart";
+import "package:dam_music_streaming/ui/core/ui/button_sheet.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 
@@ -67,7 +67,7 @@ class PlaylistListView extends StatelessWidget{
       },
     );
   }
-
+  
   //TODO: colocar para gerar um component de modal universal, ai poderemos abrir em varias telas.
   void _showPlaylistActions(BuildContext context, PlaylistViewModel vm, PlaylistData playlist) {
     vm.entityBeingVisualized = playlist;
@@ -90,13 +90,11 @@ class PlaylistListView extends StatelessWidget{
                 subtitle: playlist.description ?? '',
               ),
               SizedBox(height: 20),
-              _buildOptionItem(
-                  context,
+              ButtonCustomSheet(
                   icon: 'Profile',
                   text: 'Ver Author',
                   onTap: () {}),
-              _buildOptionItem(
-                  context,
+              ButtonCustomSheet(
                   icon: 'Music',
                   text: 'Ver Musicas',
                   onTap: () {
@@ -104,8 +102,7 @@ class PlaylistListView extends StatelessWidget{
                     vm.startView(playlist: playlist);
                     vm.setStackIndex(2);
                   }),
-              _buildOptionItem(
-                context,
+              ButtonCustomSheet(
                 icon: 'Edit',
                 text: 'Editar playlist',
                 onTap: () {
@@ -113,13 +110,12 @@ class PlaylistListView extends StatelessWidget{
                   _editPlaylist(context, playlist, vm);
                 },
               ),
-              _buildOptionItem(
-                  context,
+              ButtonCustomSheet(
                   icon: 'Fila',
+                  iconColor: Colors.green,
                   text: 'Adicionar a fila de reprodução',
                   onTap: () {}),
-              _buildOptionItem(
-                context,
+              ButtonCustomSheet(
                 btnColor: Colors.red,
                 icon: 'Cancel',
                 text: 'Deletar playlist',
@@ -132,39 +128,6 @@ class PlaylistListView extends StatelessWidget{
           ),
         );
       },
-    );
-  }
-
-  Widget _buildOptionItem(
-      BuildContext context,
-      {
-        required String icon,
-        Color? btnColor,
-        required String text,
-        required VoidCallback onTap,
-      }
-      ){
-    return Container(
-      margin: EdgeInsets.all(5),
-      decoration: BoxDecoration(
-        color: btnColor,
-        border: Border.all(color: Colors.black),
-        borderRadius: BorderRadius.circular(16),
-
-      ),
-      child: TextButton(
-        style: TextButton.styleFrom(
-          foregroundColor: Colors.black
-        ),
-        onPressed: onTap,
-        child: Row(
-          children: [
-            SvgIcon(assetName: 'assets/icons/$icon.svg', size: 22),
-            SizedBox(width: 15),
-            Text(text),
-          ],
-        ),
-      ),
     );
   }
 

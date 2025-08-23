@@ -47,7 +47,10 @@ class InfoTile extends StatelessWidget {
       ),
 
       title: Text(title),
-      subtitle: Text(subtitle),
+      subtitle: Text(subtitle,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
       contentPadding: EdgeInsets.only(left: 7),
       trailing: trailing,
       onTap: onTap,

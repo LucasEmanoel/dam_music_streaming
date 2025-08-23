@@ -1,9 +1,6 @@
-import "dart:io";
-
 import "package:dam_music_streaming/domain/models/playlist_data.dart";
 import "package:dam_music_streaming/ui/core/ui/svg_icon.dart";
 import "package:flutter/material.dart";
-import "package:image_picker/image_picker.dart";
 import "package:provider/provider.dart";
 
 import "../../core/ui/confirm_dialog.dart";
@@ -52,7 +49,7 @@ class PlaylistListView extends StatelessWidget{
                     child: InfoTile(
                         imageUrl: playlist.urlCover ?? '',
                         title: playlist.title ?? '',
-                        subtitle: playlist.author ?? '',
+                        subtitle: playlist.description ?? '',
                         onTap: () {
                           vm.startView(playlist: playlist);
                           vm.setStackIndex(2);
@@ -90,7 +87,7 @@ class PlaylistListView extends StatelessWidget{
               InfoTile(
                 imageUrl: playlist.urlCover ?? '',
                 title: playlist.title ?? '',
-                subtitle: playlist.author ?? '',
+                subtitle: playlist.description ?? '',
               ),
               SizedBox(height: 20),
               _buildOptionItem(
@@ -140,7 +137,8 @@ class PlaylistListView extends StatelessWidget{
 
   Widget _buildOptionItem(
       BuildContext context,
-      { required String icon,
+      {
+        required String icon,
         Color? btnColor,
         required String text,
         required VoidCallback onTap,
@@ -170,12 +168,7 @@ class PlaylistListView extends StatelessWidget{
     );
   }
 
-  //TODO: Vou usar S3, entao nao vai precisar dessa complexidade de path.
   Future<void> _editPlaylist(BuildContext context, PlaylistData playlist, PlaylistViewModel vm) async {
-    //final avatarFile = File(join(vm.docsDir.path, "playlist_cover"));
-    //if (avatarFile.existsSync()) avatarFile.deleteSync();
-    //vm.startEditing(contact: await ContactsRepository.db.get(contact.id!));
-    //var playlistDto = await PlaylistApiService.getById(playlist.id!);
     vm.startEditing(playlist: playlist);
     vm.setStackIndex(1);
   }
@@ -186,10 +179,11 @@ class PlaylistListView extends StatelessWidget{
       builder: (ctx) => ConfirmationDialog(
         title: "Atenção!",
         content: "Apagar a playlist irá remover permanentemente essa seleção do sistema. Essa ação não é reversível.",
+        // cancelara sempre vou deixar cinza
         txtBtn: "Apagar",
         corBtn: Color(0xFFFF3951),
         onConfirm: () {
-          vm.deletePlaylist(vm.entityBeingVisualized!.id!);
+          vm.deletePlaylist(vm.entityBeingVisualized?.id ?? -1);
           print("Playlist apagada!");
         },
       ),

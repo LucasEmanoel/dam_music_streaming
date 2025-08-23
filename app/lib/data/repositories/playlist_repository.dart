@@ -11,7 +11,7 @@ class PlaylistRepository {
     return playlists.map((dto) => PlaylistData.fromDto(dto)).toList();
   }
 
-  Future<PlaylistData> getPlaylistById(String id) async {
+  Future<PlaylistData> getPlaylistById(int id) async {
     final PlaylistDto dto = await api.getById(id);
     return PlaylistData.fromDto(dto);
   }
@@ -22,13 +22,13 @@ class PlaylistRepository {
     return PlaylistData.fromDto(createdDto);
   }
 
-  Future<PlaylistData> updatePlaylist(String id, PlaylistData playlist) async {
+  Future<PlaylistData> updatePlaylist(int id, PlaylistData playlist) async {
     final PlaylistDto playlistDto = PlaylistDto.fromData(playlist);
     final PlaylistDto updatedDto = await api.update(id, playlistDto);
     return PlaylistData.fromDto(updatedDto);
   }
 
-  Future<void> deletePlaylist(String id) async {
+  Future<void> deletePlaylist(int id) async {
     await api.delete(id);
   }
 

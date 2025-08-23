@@ -110,7 +110,7 @@ class PlaylistSongs extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Criado por: ${playlist.author}',
+                                'Criado por: ${playlist.author?.username ?? ''}',
                                 style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 16),
                               ),
                               const SizedBox(height: 4),

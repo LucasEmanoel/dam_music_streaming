@@ -6,9 +6,14 @@ import 'dart:io';
 import 'ui/playlists/widgets/playlists_view.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'config/token_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  final String tokenParaTestes = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNhc0BnbWFpbC5jb20iLCJ1c2VybmFtZSI6Imx1Y2FzdHcxNSIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzU1OTU1NjEzLCJleHAiOjE3NjM3MzE2MTN9.6gM46jOYRope-4-viY6tU-CWlWsS0J2w-SJU7_GxO8c";
+  await saveToken(tokenParaTestes);
+
   Directory docsDir = await startMeUp();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -22,7 +27,6 @@ Future<Directory> startMeUp() async {
 
 class HarmonyApp extends StatelessWidget {
   final Directory _docsDir;
-
   const HarmonyApp({super.key, required Directory docsDir}) : _docsDir = docsDir;
 
   @override

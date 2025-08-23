@@ -1,14 +1,15 @@
 import 'package:dam_music_streaming/data/dto/song_dto.dart';
+import 'package:dam_music_streaming/data/dto/user_dto_l.dart';
 
 import '../../domain/models/playlist_data.dart';
 
 class PlaylistDto {
-  String? id;
+  int? id;
   String? title;
   String? description;
   String? urlCover;
   int? numSongs;
-  String? author;
+  UsuarioDto? author;
   String? duration;
   List<SongDto> songs;
 
@@ -25,31 +26,39 @@ class PlaylistDto {
 
   factory PlaylistDto.fromMap(Map<String, dynamic> map) {
     return PlaylistDto(
-      id: map['id'] ?? '0',
+      id: map['id'],
       title: map['title'] ?? '',
       description: map['description'] ?? '',
       urlCover: map['urlCover'] ?? '',
-      numSongs: map['numSongs'] ?? 0,
-      author: map['author'] ?? '',
-      duration: map['duration'] ?? '',
+      numSongs: map['numSongs'],
+      author: map['author'] != null
+          ? UsuarioDto.fromMap(map['author'])
+          : null,
+      duration: map['duration'],
       songs: (map['songs'] as List<dynamic>?)
           ?.map((song) => SongDto.fromMap(song as Map<String, dynamic>))
           .toList() ??
           [],
     );
   }
+
   factory PlaylistDto.fromData(PlaylistData data) {
     return PlaylistDto(
-      id: data.id ?? '',
-      title: data.title ?? '',
-      description: data.description ?? '',
-      urlCover: data.urlCover ?? '',
-      numSongs: data.numSongs ?? 0, //talvez normalizar, para pegar songs.len
-      author: data.author ?? '',
-      duration: data.duration ?? '',
-      songs: data.songs?.map((songData) => SongDto.fromData(songData)).toList()
-          ??
-          [],
+      id: data.id, 
+      title: data.title,
+      description: data.description,
+      urlCover: data.urlCover,
+      
+      numSongs: data.songs?.length ?? 0,
+      
+      author: data.author != null 
+          ? UsuarioDto.fromData(data.author!) 
+          : null,
+          
+      duration: data.duration,
+      songs: data.songs != null
+          ? data.songs!.map((songData) => SongDto.fromData(songData)).toList()
+          : [],
     );
   }
 
@@ -60,9 +69,9 @@ class PlaylistDto {
       'description': description,
       'urlCover': urlCover,
       'numSongs': numSongs,
-      'author': author,
+      'author': author?.toMap(),
       'duration': duration,
-      'songs': songs.map((song) => song.toMap()).toList(),
+      'songs': songs?.map((song) => song.toMap()).toList() ?? [],
     };
   }
 }

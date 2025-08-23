@@ -165,6 +165,7 @@ class PlaylistEntryView extends StatelessWidget{
   }
 
   void _save(BuildContext context, PlaylistViewModel vm) async {
+
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
     await vm.savePlaylist();

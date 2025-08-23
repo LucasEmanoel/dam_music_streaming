@@ -26,6 +26,7 @@ class PlaylistViewModel extends ChangeNotifier {
   Future<void> loadPlaylists() async {
     try {
       _playlists = await repository.getPlaylists();
+      print(_playlists);
     } catch (e) {
       print('error: $e');
     } finally {
@@ -34,10 +35,17 @@ class PlaylistViewModel extends ChangeNotifier {
   }
 
   Future<void> savePlaylist() async {
+    print('EN?TIDADE');
+    print(entityBeingEdited?.toMap());
+    print('IMAGEMMMM');
+    print(_pickedImageFile);
+
     if (entityBeingEdited == null) return;
 
+
+
     try {
-      final savedPlaylist = (entityBeingEdited!.id == null || entityBeingEdited!.id!.isEmpty)
+      final savedPlaylist = (entityBeingEdited!.id == null)
           ? await repository.createPlaylist(entityBeingEdited!)
           : await repository.updatePlaylist(entityBeingEdited!.id!, entityBeingEdited!);
 
@@ -61,7 +69,7 @@ class PlaylistViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> deletePlaylist(String id) async {
+  Future<void> deletePlaylist(int id) async {
     if (entityBeingVisualized == null) return;
 
     try {
@@ -93,14 +101,14 @@ class PlaylistViewModel extends ChangeNotifier {
     _pickedImageFile = null;
     entityBeingEdited = playlist ??
         PlaylistData(
-            title: '', author: '', urlCover: '', numSongs: 0, description: '');
+            title: '', urlCover: '', numSongs: 0, description: '');
     notifyListeners();
   }
 
   void startView({PlaylistData? playlist}) {
     entityBeingVisualized = playlist ??
         PlaylistData(
-            title: '', author: '', urlCover: '', numSongs: 0, description: '');
+            title: '', urlCover: '', numSongs: 0, description: '');
     notifyListeners();
   }
 

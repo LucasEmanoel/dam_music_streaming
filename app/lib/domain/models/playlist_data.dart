@@ -1,14 +1,15 @@
 import 'package:dam_music_streaming/domain/models/music_data.dart';
+import 'package:dam_music_streaming/domain/models/user_data_l.dart';
 
 import '../../data/dto/playlist_dto.dart';
 
 class PlaylistData {
-   String? id;
+   int? id;
    String? title;
    String? description;
    String? urlCover;
    int? numSongs;
-   String? author;
+   UsuarioData? author;
    String? duration;
    List<SongData>? songs;
 
@@ -31,8 +32,11 @@ class PlaylistData {
       songs: dto.songs.map((songDto) => SongData.fromDto(songDto)).toList(),
       description: dto.description ?? 'Descrição não disponível',
       urlCover: dto.urlCover ?? '',
-      author: dto.author ?? 'Autor desconhecido',
-      duration: dto.duration ?? '0'
+        author: dto.author != null
+            ? UsuarioData.fromDto(dto.author!)
+            : UsuarioData(id: null, username: 'Autor desconhecido', email: '', role: ''),
+
+        duration: dto.duration ?? '0'
     );
   }
 

@@ -1,17 +1,16 @@
-import 'dart:convert';
-import 'package:dam_music_streaming/data/repositories/playlist_repository.dart';
 import 'package:dio/dio.dart';
 
 import 'package:dam_music_streaming/data/dto/playlist_dto.dart';
-import 'package:http/http.dart';
 
-import '../../ui/core/config/api_config.dart';
+import '../../config/api_config.dart';
+import '../../config/token_manager.dart';
+
+
 
 class PlaylistApiService {
 
   final Dio _dio;
   final String baseUrl;
-  String? _token; //vou mover isso para um service de auth
 
   PlaylistApiService({Dio? dio, this.baseUrl = ApiConfig.baseUrl})
     : _dio = dio ??
@@ -25,9 +24,10 @@ class PlaylistApiService {
     ) 
     {
       _dio.interceptors.add(InterceptorsWrapper(
-        onRequest: (options, handler) {
-          if (_token != null && _token!.isNotEmpty) {
-            options.headers['Autorization'] = 'Bearer $_token';
+        onRequest: (options, handler) async {
+          final _token = await getToken();
+          if (_token != null && _token.isNotEmpty) {
+            options.headers['Authorization'] = 'Bearer $_token';
           }
           handler.next(options);
         }
@@ -37,13 +37,13 @@ class PlaylistApiService {
     Future<List<PlaylistDto>> fetchPlaylists() async{
     final response = await _dio.get('/playlists');
     final List<dynamic> jsonList = response.data;
-
+    print(jsonList);
     return jsonList
         .map((map) => PlaylistDto.fromMap(map as Map<String, dynamic>))
         .toList();
   }
 
-  Future<PlaylistDto> getById(String id) async {
+  Future<PlaylistDto> getById(int id) async {
     final response = await _dio.get('/playlists/$id');
     return PlaylistDto.fromMap(response.data);
   }
@@ -53,12 +53,14 @@ class PlaylistApiService {
     return PlaylistDto.fromMap(response.data);
   }
 
-  Future<PlaylistDto> update(String id, PlaylistDto playlist) async {
+  Future<PlaylistDto> update(int id, PlaylistDto playlist) async {
+    print('SERVICE');
+    print(playlist.toMap());
     final response = await _dio.put('/playlists/$id', data: playlist.toMap());
     return PlaylistDto.fromMap(response.data);
   }
 
-  Future<void> delete(String id) async {
+  Future<void> delete(int id) async {
     await _dio.delete('/playlists/$id');
   }
 }

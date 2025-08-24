@@ -1,6 +1,6 @@
 import 'dart:io';
-import 'dart:ui';
 
+import 'package:dam_music_streaming/ui/core/ui/svg_icon.dart';
 import 'package:flutter/material.dart';
 
 class ImageRoundEdit extends StatelessWidget {
@@ -33,11 +33,7 @@ class ImageRoundEdit extends StatelessWidget {
           backgroundColor: Colors.grey.shade300,
           backgroundImage: backgroundImage,
           child: backgroundImage == null
-              ? Icon(
-                Icons.music_note,
-                size: 50,
-                color: Colors.grey.shade600,
-          )
+              ? SvgIcon(assetName: 'assets/icons/Image.svg', size: 35,color: Colors.grey.shade600)
               : null,
         ),
         Positioned(
@@ -47,10 +43,8 @@ class ImageRoundEdit extends StatelessWidget {
             onTap: onTap,
             child: CircleAvatar(
               radius: 20,
-              child: Icon(
-                Icons.edit,
-                color: Colors.white,
-              ),
+              child: 
+                SvgIcon(assetName: 'assets/icons/Edit.svg', size: 25,color: Colors.white,)
             ),
           ),
         ),

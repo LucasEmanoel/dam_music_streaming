@@ -1,5 +1,4 @@
 import "dart:io";
-import "package:path/path.dart";
 import "package:dam_music_streaming/ui/core/ui/input_global.dart";
 import "package:flutter/material.dart";
 import "package:image_picker/image_picker.dart";
@@ -14,6 +13,8 @@ class PlaylistEntryView extends StatelessWidget{
   final TextEditingController _descController = TextEditingController();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  PlaylistEntryView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +132,7 @@ class PlaylistEntryView extends StatelessWidget{
                     final image = await ImagePicker().pickImage(source: ImageSource.camera, imageQuality: 80);
                     if (image != null) {
                       final file = File(image.path);
-                      vm.setPickedImage(File(image.path));
+                      vm.setPickedImage(file);
                       //final dir = vm.docsDir;
                       //await file.copy(join(dir.path, "playlist_cover"));
                       //final uploadTask = storageRef.putFile(_coverPlaylistFile!);
@@ -147,7 +148,7 @@ class PlaylistEntryView extends StatelessWidget{
                     final image = await ImagePicker().pickImage(source: ImageSource.gallery);
                     if (image != null) {
                       final file = File(image.path);
-                      vm.setPickedImage(File(image.path));
+                      vm.setPickedImage(file);
                       //final dir = vm.docsDir;
                       //await file.copy(join(dir.path, "playlist_cover"));
                       vm.triggerRebuild();
@@ -164,6 +165,7 @@ class PlaylistEntryView extends StatelessWidget{
   }
 
   void _save(BuildContext context, PlaylistViewModel vm) async {
+
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
     await vm.savePlaylist();

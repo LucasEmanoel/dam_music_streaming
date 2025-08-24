@@ -3,7 +3,6 @@ import 'package:dam_music_streaming/domain/models/playlist_data.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
-import "package:path/path.dart";
 
 import '../../../data/repositories/playlist_repository.dart';
 
@@ -15,8 +14,7 @@ class PlaylistViewModel extends ChangeNotifier {
   final PlaylistRepository repository = PlaylistRepository();
 
   int _stackIndex = 0;
-  bool _isLoading = false;
-
+  
   List<PlaylistData> _playlists = [];
   PlaylistData? entityBeingVisualized;
   PlaylistData? entityBeingEdited;
@@ -28,6 +26,7 @@ class PlaylistViewModel extends ChangeNotifier {
   Future<void> loadPlaylists() async {
     try {
       _playlists = await repository.getPlaylists();
+      print(_playlists);
     } catch (e) {
       print('error: $e');
     } finally {
@@ -36,10 +35,17 @@ class PlaylistViewModel extends ChangeNotifier {
   }
 
   Future<void> savePlaylist() async {
+    print('EN?TIDADE');
+    print(entityBeingEdited?.toMap());
+    print('IMAGEMMMM');
+    print(_pickedImageFile);
+
     if (entityBeingEdited == null) return;
 
+
+
     try {
-      final savedPlaylist = (entityBeingEdited!.id == null || entityBeingEdited!.id!.isEmpty)
+      final savedPlaylist = (entityBeingEdited!.id == null)
           ? await repository.createPlaylist(entityBeingEdited!)
           : await repository.updatePlaylist(entityBeingEdited!.id!, entityBeingEdited!);
 
@@ -63,7 +69,7 @@ class PlaylistViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> deletePlaylist(String id) async {
+  Future<void> deletePlaylist(int id) async {
     if (entityBeingVisualized == null) return;
 
     try {
@@ -95,14 +101,14 @@ class PlaylistViewModel extends ChangeNotifier {
     _pickedImageFile = null;
     entityBeingEdited = playlist ??
         PlaylistData(
-            title: '', author: '', urlCover: '', numSongs: 0, description: '');
+            title: '', urlCover: '', numSongs: 0, description: '');
     notifyListeners();
   }
 
   void startView({PlaylistData? playlist}) {
     entityBeingVisualized = playlist ??
         PlaylistData(
-            title: '', author: '', urlCover: '', numSongs: 0, description: '');
+            title: '', urlCover: '', numSongs: 0, description: '');
     notifyListeners();
   }
 

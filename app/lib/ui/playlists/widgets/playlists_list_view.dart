@@ -1,12 +1,13 @@
-import "dart:io" show File;
-import "package:path/path.dart";
 import "package:dam_music_streaming/domain/models/playlist_data.dart";
+import "package:dam_music_streaming/ui/core/ui/button_sheet.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 
-import "../../../data/services/playlist_service.dart";
+import "../../core/ui/confirm_dialog.dart";
 import "../../core/ui/info_tile.dart";
 import "../view_model/playlist_view_model.dart";
+
+
 
 class PlaylistListView extends StatelessWidget{
 
@@ -23,7 +24,7 @@ class PlaylistListView extends StatelessWidget{
           appBar: AppBar(
             title: const Text(
               'Minhas Playlists',
-              style: const TextStyle(color: Color(0xFFB7B0B0), fontSize: 18),
+              style: TextStyle(color: Color(0xFFB7B0B0), fontSize: 18),
             ),
             actions: [
               IconButton(
@@ -40,7 +41,6 @@ class PlaylistListView extends StatelessWidget{
 
           body: ListView.builder(
               shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
               itemCount: vm.playlists.length,
               itemBuilder: (context, index) {
                 final playlist = vm.playlists[index];
@@ -49,7 +49,7 @@ class PlaylistListView extends StatelessWidget{
                     child: InfoTile(
                         imageUrl: playlist.urlCover ?? '',
                         title: playlist.title ?? '',
-                        subtitle: playlist.author ?? '',
+                        subtitle: playlist.description ?? '',
                         onTap: () {
                           vm.startView(playlist: playlist);
                           vm.setStackIndex(2);
@@ -67,9 +67,11 @@ class PlaylistListView extends StatelessWidget{
       },
     );
   }
-
+  
   //TODO: colocar para gerar um component de modal universal, ai poderemos abrir em varias telas.
   void _showPlaylistActions(BuildContext context, PlaylistViewModel vm, PlaylistData playlist) {
+    vm.entityBeingVisualized = playlist;
+
     showModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(
@@ -85,45 +87,41 @@ class PlaylistListView extends StatelessWidget{
               InfoTile(
                 imageUrl: playlist.urlCover ?? '',
                 title: playlist.title ?? '',
-                subtitle: playlist.author ?? '',
+                subtitle: playlist.description ?? '',
               ),
               SizedBox(height: 20),
-              _buildOptionItem(
-                  context,
-                  icon: Icons.person_outline,
+              ButtonCustomSheet(
+                  icon: 'Profile',
                   text: 'Ver Author',
                   onTap: () {}),
-              _buildOptionItem(
-                  context,
-                  icon: Icons.music_note_outlined,
+              ButtonCustomSheet(
+                  icon: 'Music',
                   text: 'Ver Musicas',
                   onTap: () {
                     Navigator.pop(context);
                     vm.startView(playlist: playlist);
                     vm.setStackIndex(2);
                   }),
-              _buildOptionItem(
-                context,
-                icon: Icons.edit_outlined,
+              ButtonCustomSheet(
+                icon: 'Edit',
                 text: 'Editar playlist',
                 onTap: () {
                   Navigator.pop(context);
                   _editPlaylist(context, playlist, vm);
                 },
               ),
-              _buildOptionItem(
-                  context,
-                  icon: Icons.playlist_add,
+              ButtonCustomSheet(
+                  icon: 'Fila',
+                  iconColor: Colors.green,
                   text: 'Adicionar a fila de reprodução',
                   onTap: () {}),
-              _buildOptionItem(
-                context,
+              ButtonCustomSheet(
                 btnColor: Colors.red,
-                icon: Icons.delete_outline,
+                icon: 'Cancel',
                 text: 'Deletar playlist',
                 onTap: () {
                   Navigator.pop(context);
-                  vm.deletePlaylist(playlist.id!);
+                  _showDeleteDialog(context, vm);
                 },
               ),
             ],
@@ -133,46 +131,25 @@ class PlaylistListView extends StatelessWidget{
     );
   }
 
-  Widget _buildOptionItem(
-      BuildContext context,
-      { required IconData icon,
-        Color? btnColor,
-        required String text,
-        required VoidCallback onTap,
-      }
-      ){
-    final theme = Theme.of(context);
-    return Container(
-      margin: EdgeInsets.all(5),
-      decoration: BoxDecoration(
-        color: btnColor,
-        border: Border.all(color: Colors.black),
-        borderRadius: BorderRadius.circular(16),
-
-      ),
-      child: TextButton(
-        style: TextButton.styleFrom(
-          foregroundColor: Colors.black
-        ),
-        onPressed: onTap,
-        child: Row(
-          children: [
-            Icon(icon),
-            SizedBox(width: 15),
-            Text(text),
-          ],
-        ),
-      ),
-    );
-  }
-
-  //TODO: Vou usar S3, entao nao vai precisar dessa complexidade de path.
   Future<void> _editPlaylist(BuildContext context, PlaylistData playlist, PlaylistViewModel vm) async {
-    final avatarFile = File(join(vm.docsDir.path, "playlist_cover"));
-    if (avatarFile.existsSync()) avatarFile.deleteSync();
-    //vm.startEditing(contact: await ContactsRepository.db.get(contact.id!));
-    //var playlistDto = await PlaylistApiService.getById(playlist.id!);
     vm.startEditing(playlist: playlist);
     vm.setStackIndex(1);
+  }
+
+  void _showDeleteDialog(BuildContext context, PlaylistViewModel vm) {
+    showDialog(
+      context: context,
+      builder: (ctx) => ConfirmationDialog(
+        title: "Atenção!",
+        content: "Apagar a playlist irá remover permanentemente essa seleção do sistema. Essa ação não é reversível.",
+        // cancelara sempre vou deixar cinza
+        txtBtn: "Apagar",
+        corBtn: Color(0xFFFF3951),
+        onConfirm: () {
+          vm.deletePlaylist(vm.entityBeingVisualized?.id ?? -1);
+          print("Playlist apagada!");
+        },
+      ),
+    );
   }
 }

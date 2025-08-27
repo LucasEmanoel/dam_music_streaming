@@ -1,0 +1,4 @@
+ingress:
+  - hostname: harmony.playce.space
+    service: http://harmony-backend:8080
+  - service: http_status:404

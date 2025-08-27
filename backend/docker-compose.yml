@@ -13,3 +13,14 @@ services:
       retries: 10
     ports:
       - 5454:5432
+
+  cloudflared-harmony:
+    image: cloudflare/cloudflared
+    container_name: cloudflared_harmony
+    environment:
+      - TZ=Brazil/Recife
+      - TUNNEL_TOKEN=${CLOUDFLARED_TOKEN}
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    depends_on:
+      - db-harmony

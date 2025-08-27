@@ -33,7 +33,7 @@ class InfoTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(8.0),
           image: hasImage 
               ? DecorationImage(
-                  image: NetworkImage(imageUrl!), // Mostra a imagem da URL
+                  image: NetworkImage(imageUrl!),
                   fit: BoxFit.cover,
                 )
               : null,

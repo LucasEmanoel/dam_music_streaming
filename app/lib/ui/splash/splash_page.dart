@@ -58,6 +58,7 @@ class _SplashPageState extends State<SplashPage>
           child: const SvgIcon(
             assetName: 'assets/icons/Logo.svg',
             size: 100,
+            color: Colors.white,
           ),
         ),
       ),

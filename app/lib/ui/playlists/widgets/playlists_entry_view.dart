@@ -1,5 +1,6 @@
 import "dart:io";
 import "package:dam_music_streaming/ui/core/ui/input_global.dart";
+import "package:dam_music_streaming/ui/core/ui/loading.dart";
 import "package:flutter/material.dart";
 import "package:image_picker/image_picker.dart";
 import "package:provider/provider.dart";
@@ -13,6 +14,8 @@ class PlaylistEntryView extends StatelessWidget{
   final TextEditingController _descController = TextEditingController();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  bool _isLoading = false;
 
   PlaylistEntryView({super.key});
 
@@ -53,7 +56,15 @@ class PlaylistEntryView extends StatelessWidget{
                   borderRadius: BorderRadius.circular(30),
                 ),
               ),
-              child: const Row(
+            
+              onPressed: vm.isLoading ? null : () => _save(context, vm),
+              child: vm.isLoading
+                  ? SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: CustomLoadingIndicator(),
+                    )
+                  : const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text("Criar playlist"),
@@ -61,7 +72,6 @@ class PlaylistEntryView extends StatelessWidget{
                   Icon(Icons.arrow_forward_ios_outlined, size: 25,),
                 ],
               ),
-              onPressed: () => _save(context, vm),
             ),
           ),
           body: Form(
@@ -167,6 +177,7 @@ class PlaylistEntryView extends StatelessWidget{
   void _save(BuildContext context, PlaylistViewModel vm) async {
 
     if (!_formKey.currentState!.validate()) return;
+
     _formKey.currentState!.save();
     await vm.savePlaylist();
 

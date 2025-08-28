@@ -8,6 +8,9 @@ import '../../../data/repositories/playlist_repository.dart';
 
 class PlaylistViewModel extends ChangeNotifier {
 
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+
   final FirebaseStorage  _firestore = FirebaseStorage.instance;
   //final storageRef = FirebaseStorage.instance.ref();
 
@@ -24,25 +27,30 @@ class PlaylistViewModel extends ChangeNotifier {
   PlaylistViewModel(this.docsDir);
 
   Future<void> loadPlaylists() async {
+    _isLoading = true;
+    notifyListeners();
+
     try {
       _playlists = await repository.getPlaylists();
       print(_playlists);
     } catch (e) {
       print('error: $e');
     } finally {
+      _isLoading = false;
       notifyListeners();
     }
   }
 
   Future<void> savePlaylist() async {
+    _isLoading = true;
+    notifyListeners();
+
     print('EN?TIDADE');
     print(entityBeingEdited?.toMap());
     print('IMAGEMMMM');
     print(_pickedImageFile);
 
     if (entityBeingEdited == null) return;
-
-
 
     try {
       final savedPlaylist = (entityBeingEdited!.id == null)
@@ -64,6 +72,7 @@ class PlaylistViewModel extends ChangeNotifier {
     } catch (e) {
       print('error ao salvar: $e');
     } finally {
+      _isLoading = false;
       _pickedImageFile = null;
       setStackIndex(0);
     }
@@ -71,7 +80,7 @@ class PlaylistViewModel extends ChangeNotifier {
 
   Future<void> deletePlaylist(int id) async {
     if (entityBeingVisualized == null) return;
-
+    
     try {
       final ref = _firestore.ref('playlist_covers/$id.jpg');
       await ref.delete().catchError((e) => print("Imagem não encontrada para deletar: $e"));

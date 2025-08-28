@@ -1,5 +1,9 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:dam_music_streaming/ui/core/ui/svg_icon.dart';
 import 'widgets/cover_carousel.dart';
 
 class LoginInicio extends StatefulWidget {
@@ -15,6 +19,7 @@ class _LoginInicioState extends State<LoginInicio> {
   final passCtrl = TextEditingController();
   bool lembrar = false;
   bool obscure = true;
+  bool _loading = false;
 
   @override
   void dispose() { emailCtrl.dispose(); passCtrl.dispose(); super.dispose(); }
@@ -74,7 +79,7 @@ class _LoginInicioState extends State<LoginInicio> {
                           const Text('Lembrar de mim', style: TextStyle(fontSize: 12.5)),
                           const Spacer(),
                           TextButton(
-                            onPressed: () {},
+                            onPressed: _resetSenha,
                             style: TextButton.styleFrom(
                               padding: EdgeInsets.zero,
                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -93,8 +98,12 @@ class _LoginInicioState extends State<LoginInicio> {
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           ),
-                          onPressed: _entrar,
-                          child: const Row(
+                          onPressed: _loading ? null : _entrar,
+                          child: _loading
+                              ? const SizedBox(
+                              height: 22, width: 22,
+                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                              : const Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text('Entrar', style: TextStyle(fontWeight: FontWeight.w700)),
@@ -107,7 +116,7 @@ class _LoginInicioState extends State<LoginInicio> {
 
                       const SizedBox(height: 16),
                       OutlinedButton(
-                        onPressed: _entrarComGoogle,
+                        onPressed: _loading ? null : _entrarComGoogle,
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -115,7 +124,19 @@ class _LoginInicioState extends State<LoginInicio> {
                           backgroundColor: Colors.white,
                           foregroundColor: Colors.black87,
                         ),
-                        child: const Text('Continue with Google'),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            const Text('Continue with Google'),
+                            const Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding: EdgeInsets.only(left: 16),
+                                child: SvgIcon(assetName: 'assets/icons/google.svg', size: 20),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
 
                       const SizedBox(height: 18),
@@ -146,14 +167,88 @@ class _LoginInicioState extends State<LoginInicio> {
     );
   }
 
-  void _entrar() {
-    // TODO: autenticação real; se ok:
-    Navigator.pushReplacementNamed(context, '/home');
+  Future<void> _entrar() async {
+    final email = emailCtrl.text.trim();
+    final pass  = passCtrl.text;
+
+    if (email.isEmpty || pass.isEmpty) {
+      _toast('Preencha e-mail e senha.');
+      return;
+    }
+
+    setState(() => _loading = true);
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: pass);
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/home');
+    } on FirebaseAuthException catch (e) {
+      _toast(_mapAuthError(e));
+    } catch (e) {
+      _toast('Falha ao entrar. Tente novamente.');
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
   }
 
-  void _entrarComGoogle() {
-    // TODO: google_sign_in / firebase_auth
-    _entrar();
+  Future<void> _resetSenha() async {
+    final email = emailCtrl.text.trim();
+    if (email.isEmpty) {
+      _toast('Informe seu e-mail para recuperar a senha.');
+      return;
+    }
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      _toast('Enviamos um link de recuperação para $email');
+    } on FirebaseAuthException catch (e) {
+      _toast(_mapAuthError(e));
+    }
+  }
+
+  Future<void> _entrarComGoogle() async {
+    setState(() => _loading = true);
+    try {
+      if (kIsWeb) {
+        final cred = await FirebaseAuth.instance.signInWithPopup(GoogleAuthProvider());
+        if (cred.user == null) throw Exception('Login cancelado.');
+      } else {
+        final googleUser = await GoogleSignIn().signIn();
+        if (googleUser == null) throw Exception('Login cancelado.');
+        final googleAuth = await googleUser.authentication;
+        final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
+        await FirebaseAuth.instance.signInWithCredential(credential);
+      }
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/home');
+    } on FirebaseAuthException catch (e) {
+      _toast(_mapAuthError(e));
+    } catch (e) {
+      _toast('Não foi possível entrar com Google.');
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  void _toast(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+  }
+
+  String _mapAuthError(FirebaseAuthException e) {
+    switch (e.code) {
+      case 'user-not-found':
+        return 'Usuário não encontrado.';
+      case 'wrong-password':
+      case 'invalid-credential':
+        return 'E-mail ou senha inválidos.';
+      case 'too-many-requests':
+        return 'Muitas tentativas. Tente novamente mais tarde.';
+      case 'network-request-failed':
+        return 'Sem conexão. Verifique sua internet.';
+      default:
+        return 'Erro: ${e.message ?? e.code}';
+    }
   }
 }
 

@@ -27,19 +27,23 @@ class ButtonCustomSheet extends StatelessWidget {
         color: btnColor,
         border: Border.all(color: Colors.black),
         borderRadius: BorderRadius.circular(16),
-
       ),
       child: TextButton(
-        style: TextButton.styleFrom(
-          foregroundColor: Colors.black
-        ),
+        style: TextButton.styleFrom(foregroundColor: Colors.black),
         onPressed: onTap,
-        child: Row(
-          children: [
-            SvgIcon(assetName: 'assets/icons/$icon.svg', size: 22, color: iconColor,),
-            SizedBox(width: 15),
-            Text(text),
-          ],
+        child: Container(
+          height: 30,
+          child: Row(
+            children: [
+              SvgIcon(
+                assetName: 'assets/icons/$icon.svg',
+                size: 20,
+                color: iconColor,
+              ),
+              SizedBox(width: 15),
+              Text(text),
+            ],
+          ),
         ),
       ),
     );

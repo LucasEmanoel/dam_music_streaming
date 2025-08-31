@@ -1,9 +1,12 @@
 import 'dart:io';
+import 'package:dam_music_streaming/domain/models/user_data_l.dart';
+import 'package:dam_music_streaming/ui/core/user/view_model/user_view_model.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:dam_music_streaming/ui/core/ui/svg_icon.dart';
+import 'package:provider/provider.dart';
 import 'widgets/cover_carousel.dart';
 
 class LoginInicio extends StatefulWidget {
@@ -22,18 +25,24 @@ class _LoginInicioState extends State<LoginInicio> {
   bool _loading = false;
 
   @override
-  void dispose() { emailCtrl.dispose(); passCtrl.dispose(); super.dispose(); }
+  void dispose() {
+    emailCtrl.dispose();
+    passCtrl.dispose();
+    super.dispose();
+  }
 
   @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+  Widget build(BuildContext widgetContext) {
+    final scheme = Theme.of(widgetContext).colorScheme;
 
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final maxW = constraints.maxWidth > 520 ? 420.0 : constraints.maxWidth;
+            final maxW = constraints.maxWidth > 520
+                ? 420.0
+                : constraints.maxWidth;
             return Center(
               child: ConstrainedBox(
                 constraints: BoxConstraints(maxWidth: maxW),
@@ -45,27 +54,41 @@ class _LoginInicioState extends State<LoginInicio> {
                       const CoverCarousel(covers: _covers),
                       const SizedBox(height: 24),
 
-                      const Text('Bem-vindo ao Harmony!',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
+                      const Text(
+                        'Bem-vindo ao Harmony!',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
                       const SizedBox(height: 6),
-                      Text('Milhões de músicas para ouvir agora.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.grey, fontSize: 13)),
+                      Text(
+                        'Milhões de músicas para ouvir agora.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.grey, fontSize: 13),
+                      ),
                       const SizedBox(height: 18),
-                      Text('Faça login para entrar no sistema',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                      Text(
+                        'Faça login para entrar no sistema',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                      ),
                       const SizedBox(height: 14),
 
-                      _input(controller: emailCtrl, hint: 'Email', icon: Icons.alternate_email),
+                      _input(
+                        controller: emailCtrl,
+                        hint: 'Email',
+                        icon: Icons.alternate_email,
+                      ),
                       const SizedBox(height: 10),
                       _input(
                         controller: passCtrl,
                         hint: 'Senha',
                         icon: Icons.lock_outline,
                         obscure: obscure,
-                        onToggleObscure: () => setState(() => obscure = !obscure),
+                        onToggleObscure: () =>
+                            setState(() => obscure = !obscure),
                       ),
 
                       const SizedBox(height: 8),
@@ -73,10 +96,14 @@ class _LoginInicioState extends State<LoginInicio> {
                         children: [
                           Checkbox(
                             value: lembrar,
-                            onChanged: (v) => setState(() => lembrar = v ?? false),
+                            onChanged: (v) =>
+                                setState(() => lembrar = v ?? false),
                             visualDensity: VisualDensity.compact,
                           ),
-                          const Text('Lembrar de mim', style: TextStyle(fontSize: 12.5)),
+                          const Text(
+                            'Lembrar de mim',
+                            style: TextStyle(fontSize: 12.5),
+                          ),
                           const Spacer(),
                           TextButton(
                             onPressed: _resetSenha,
@@ -84,7 +111,10 @@ class _LoginInicioState extends State<LoginInicio> {
                               padding: EdgeInsets.zero,
                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             ),
-                            child: const Text('Esqueceu a senha?', style: TextStyle(fontSize: 12.5)),
+                            child: const Text(
+                              'Esqueceu a senha?',
+                              style: TextStyle(fontSize: 12.5),
+                            ),
                           ),
                         ],
                       ),
@@ -96,21 +126,40 @@ class _LoginInicioState extends State<LoginInicio> {
                           style: FilledButton.styleFrom(
                             backgroundColor: scheme.primary,
                             foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
-                          onPressed: _loading ? null : _entrar,
+                          onPressed: _loading
+                              ? null
+                              : () async {
+                                  await _entrar(widgetContext);
+                                },
                           child: _loading
                               ? const SizedBox(
-                              height: 22, width: 22,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                                  height: 22,
+                                  width: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
                               : const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text('Entrar', style: TextStyle(fontWeight: FontWeight.w700)),
-                              SizedBox(width: 6),
-                              Icon(Icons.arrow_right_alt_rounded, size: 22),
-                            ],
-                          ),
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Entrar',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    SizedBox(width: 6),
+                                    Icon(
+                                      Icons.arrow_right_alt_rounded,
+                                      size: 22,
+                                    ),
+                                  ],
+                                ),
                         ),
                       ),
 
@@ -119,7 +168,9 @@ class _LoginInicioState extends State<LoginInicio> {
                         onPressed: _loading ? null : _entrarComGoogle,
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                           side: BorderSide(color: Colors.grey.shade300),
                           backgroundColor: Colors.white,
                           foregroundColor: Colors.black87,
@@ -132,7 +183,10 @@ class _LoginInicioState extends State<LoginInicio> {
                               alignment: Alignment.centerLeft,
                               child: Padding(
                                 padding: EdgeInsets.only(left: 16),
-                                child: SvgIcon(assetName: 'assets/icons/google.svg', size: 20),
+                                child: SvgIcon(
+                                  assetName: 'assets/icons/google.svg',
+                                  size: 20,
+                                ),
                               ),
                             ),
                           ],
@@ -143,16 +197,22 @@ class _LoginInicioState extends State<LoginInicio> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text('Novo por aqui ?', style: TextStyle(color: Colors.grey[700])),
+                          Text(
+                            'Novo por aqui ?',
+                            style: TextStyle(color: Colors.grey[700]),
+                          ),
                           const SizedBox(width: 6),
                           GestureDetector(
-                            onTap: () => Navigator.pushNamed(context, '/signup'),
-                            child: Text('Cadastre-se',
-                                style: TextStyle(
-                                  color: scheme.primary,
-                                  fontWeight: FontWeight.w700,
-                                  decoration: TextDecoration.underline,
-                                )),
+                            onTap: () =>
+                                Navigator.pushNamed(context, '/signup'),
+                            child: Text(
+                              'Cadastre-se',
+                              style: TextStyle(
+                                color: scheme.primary,
+                                fontWeight: FontWeight.w700,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -167,9 +227,11 @@ class _LoginInicioState extends State<LoginInicio> {
     );
   }
 
-  Future<void> _entrar() async {
+  Future<void> _entrar(BuildContext context) async {
+    final UserViewModel userViewModel = context.read<UserViewModel>();
+
     final email = emailCtrl.text.trim();
-    final pass  = passCtrl.text;
+    final pass = passCtrl.text;
 
     if (email.isEmpty || pass.isEmpty) {
       _toast('Preencha e-mail e senha.');
@@ -178,7 +240,19 @@ class _LoginInicioState extends State<LoginInicio> {
 
     setState(() => _loading = true);
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: pass);
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: pass,
+      );
+      final UsuarioData user = UsuarioData(
+        id: 123,
+        fullName: 'Teste da Silva',
+        username: 'teste_zika',
+        email: "teste@email.com",
+        role: 'user',
+      );
+      userViewModel.addLoggedUser(user);
+      userViewModel.setProfilePicture();
       if (!mounted) return;
       Navigator.pushReplacementNamed(context, '/home');
     } on FirebaseAuthException catch (e) {
@@ -208,7 +282,9 @@ class _LoginInicioState extends State<LoginInicio> {
     setState(() => _loading = true);
     try {
       if (kIsWeb) {
-        final cred = await FirebaseAuth.instance.signInWithPopup(GoogleAuthProvider());
+        final cred = await FirebaseAuth.instance.signInWithPopup(
+          GoogleAuthProvider(),
+        );
         if (cred.user == null) throw Exception('Login cancelado.');
       } else {
         final googleUser = await GoogleSignIn().signIn();
@@ -269,9 +345,12 @@ Widget _input({
       prefixIcon: Icon(icon, size: 20),
       suffixIcon: onToggleObscure != null
           ? IconButton(
-        icon: Icon(obscure ? Icons.visibility_off : Icons.visibility, size: 18),
-        onPressed: onToggleObscure,
-      )
+              icon: Icon(
+                obscure ? Icons.visibility_off : Icons.visibility,
+                size: 18,
+              ),
+              onPressed: onToggleObscure,
+            )
           : null,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),

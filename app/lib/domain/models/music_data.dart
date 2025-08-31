@@ -8,7 +8,6 @@ class SongData {
   String? artist;
   String? album;
   String? coverUrl;
-  String? localPath;
 
   SongData({
     this.id,
@@ -18,7 +17,6 @@ class SongData {
     this.artist,
     this.album,
     this.coverUrl,
-    this.localPath,
   });
 
   factory SongData.fromDto(SongDto dto) {
@@ -30,7 +28,6 @@ class SongData {
         artist: dto.artist,
         album: dto.album,
         coverUrl: dto.coverUrl,
-        localPath: dto.localPath
     );
   }
 
@@ -43,7 +40,6 @@ class SongData {
       'artist': artist,
       'album': album,
       'coverUrl': coverUrl,
-      'localPath': localPath,
     };
   }
 

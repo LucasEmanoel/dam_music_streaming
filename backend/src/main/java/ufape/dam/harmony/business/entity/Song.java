@@ -8,8 +8,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 @Entity
 @Data
@@ -20,10 +18,16 @@ public class Song {
     private Long id;
 	
 	@Column(nullable = false)
-    private String apiId;
+    private String apiId; // The track's Deezer id
+	private String title;
 	
-	//Talvez eu queira cachear mais campos
-    private Duration duration;
-	
-	
+    private Duration duration; // The track's duration in seconds
+    private Double bpm; //Beats per minute
+    private Double gain; //Signal strength
+    
+	private Long albumApiId;
+	private Long artistApiId;
+    
+	//@ManyToOne
+	//private Album album;
 }

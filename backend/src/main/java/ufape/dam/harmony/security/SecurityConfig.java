@@ -40,6 +40,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                 		.requestMatchers("/auth/**").permitAll()
+                		.requestMatchers("/songs/**").permitAll()
                 		.requestMatchers("/playlists/**").authenticated()
                         //.requestMatchers(allowedEndpoints).permitAll()
                         .anyRequest().authenticated()

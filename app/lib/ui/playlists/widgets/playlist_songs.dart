@@ -133,30 +133,56 @@ class PlaylistSongs extends StatelessWidget {
                   ),
                 ),
               ),
-
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final song = playlist.songs?[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-                      child: Card(
-                        color: theme.cardColor,
-                        child: InfoTile(
-                          imageUrl: song?.coverUrl ?? '',
-                          title: song?.title ?? '',
-                          subtitle: song?.artist ?? '',
-                          trailing: const Icon(Icons.more_vert, size: 20),
-                          onTap: () async {
-                            vm.setStackIndex(2);
-                          },
+              if (playlist!.songs?.isEmpty ?? true)
+                SliverFillRemaining(
+                  hasScrollBody: false, // Importante para centralizar conteúdo que não rola.
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.music_off, size: 60, color: Colors.grey),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Playlist vazia',
+                          style: TextStyle(fontSize: 18, color: Colors.grey),
                         ),
-                      ),
-                    );
-                  },
-                  childCount: playlist.songs?.length ?? 0,
+                        const SizedBox(height: 24),
+                        TextButton.icon(
+                          icon: const Icon(Icons.add),
+                          label: const Text('Adicionar Músicas', selectionColor: Colors.black,),
+                          onPressed: () {
+                            // Sua lógica para adicionar músicas aqui
+                            print("Botão de texto pressionado!");
+                          },
+                        )
+                      ],
+                    ),
+                  ),
+                )
+              else
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final song = playlist.songs?[index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                        child: Card(
+                          color: theme.cardColor,
+                          child: InfoTile(
+                            imageUrl: song?.coverUrl ?? '',
+                            title: song?.title ?? '',
+                            subtitle: song?.artist ?? '',
+                            trailing: const Icon(Icons.more_vert, size: 20),
+                            onTap: () async {
+                              vm.setStackIndex(2);
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                    childCount: playlist.songs?.length ?? 0,
+                  ),
                 ),
-              ),
             ],
           ),
         );

@@ -18,11 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 
 import jakarta.transaction.Transactional;
-import ufape.dam.harmony.business.dto.JwtResponse;
-import ufape.dam.harmony.business.dto.LoginRequest;
-import ufape.dam.harmony.business.dto.RegisterRequest;
-import ufape.dam.harmony.business.dto.ResetPasswordDTO;
-import ufape.dam.harmony.business.dto.ResetRequestDTO;
+import ufape.dam.harmony.business.dto.reqs.LoginRequest;
+import ufape.dam.harmony.business.dto.reqs.RegisterRequest;
+import ufape.dam.harmony.business.dto.reqs.ResetPasswordDTO;
+import ufape.dam.harmony.business.dto.reqs.ResetRequestDTO;
+import ufape.dam.harmony.business.dto.res.JwtResponse;
 import ufape.dam.harmony.business.entity.PasswordResetToken;
 import ufape.dam.harmony.business.entity.Usuario;
 import ufape.dam.harmony.business.service.EmailService;

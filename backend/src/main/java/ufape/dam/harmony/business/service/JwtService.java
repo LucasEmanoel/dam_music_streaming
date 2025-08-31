@@ -29,7 +29,10 @@ import java.util.stream.Collectors;
 public class JwtService {
 
     private final UsuarioRepository usuarioRepository;
-
+    
+    @Value("${jwt.secret.key}")
+    private String secretKey;
+    
     @Value("${jwt.secret}")
     private String SECRET;
     private final long EXPIRATION = 1000L * 60 * 60 * 24 * 90; // 3 MESES

@@ -8,7 +8,6 @@ class SongDto {
   String? artist;
   String? album;
   String? coverUrl;
-  String? localPath;
 
   SongDto({
     this.id,
@@ -18,7 +17,6 @@ class SongDto {
     this.artist,
     this.album,
     this.coverUrl,
-    this.localPath,
   });
 
   factory SongDto.fromMap(Map<String, dynamic> map) {
@@ -30,7 +28,6 @@ class SongDto {
       artist: map['artist'] ?? '',
       album: map['album'] ?? '',
       coverUrl: map['coverUrl'] ?? '',
-      localPath: map['localPath'] ?? '',
     );
   }
 
@@ -43,7 +40,6 @@ class SongDto {
       coverUrl: data.coverUrl ?? '',
       apiId: data.apiId ?? '',
       genre: data.genre ?? '',
-      localPath: data.localPath ?? '',
     );
   }
 
@@ -56,7 +52,6 @@ class SongDto {
       'artist': artist,
       'album': album,
       'coverUrl': coverUrl,
-      'localPath': localPath,
     };
   }
 }

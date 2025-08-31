@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityNotFoundException;
-import ufape.dam.harmony.business.dto.PlaylistDto;
-import ufape.dam.harmony.business.dto.PlaylistSongDto;
+import ufape.dam.harmony.business.dto.reqs.PlaylistDto;
+import ufape.dam.harmony.business.dto.reqs.PlaylistSongDto;
 import ufape.dam.harmony.business.entity.Playlist;
 import ufape.dam.harmony.business.entity.Song;
 import ufape.dam.harmony.business.entity.Usuario;
@@ -98,7 +98,8 @@ public class PlaylistService {
     public Playlist updatePlaylist(Long playlistId, PlaylistDto request, SecurityUser user) {
 		Usuario userEntity = user.getUsuario(); 
         Playlist playlist = findPlaylistByIdAndEnsureOwnership(playlistId, userEntity);
-
+        
+        
         playlist.setTitle(request.getTitle());
         playlist.setDescription(request.getDescription());
         playlist.setUrlCover(request.getUrlCover());

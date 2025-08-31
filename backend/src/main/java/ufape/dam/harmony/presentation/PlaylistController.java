@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import ufape.dam.harmony.business.dto.PlaylistSongDto;
-import ufape.dam.harmony.business.dto.PlaylistDto;
-import ufape.dam.harmony.business.dto.PlaylistWithSongsDto;
+import ufape.dam.harmony.business.dto.reqs.PlaylistDto;
+import ufape.dam.harmony.business.dto.reqs.PlaylistSongDto;
+import ufape.dam.harmony.business.dto.res.PlaylistWithSongsDto;
 import ufape.dam.harmony.business.entity.Playlist;
 import ufape.dam.harmony.business.entity.Song;
 import ufape.dam.harmony.business.service.PlaylistService;

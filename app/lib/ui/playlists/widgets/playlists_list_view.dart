@@ -1,11 +1,14 @@
 import "package:dam_music_streaming/domain/models/playlist_data.dart";
 import "package:dam_music_streaming/ui/core/ui/button_sheet.dart";
+import "package:dam_music_streaming/ui/core/ui/loading.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 
 import "../../core/ui/confirm_dialog.dart";
 import "../../core/ui/info_tile.dart";
 import "../view_model/playlist_view_model.dart";
+
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 
 
@@ -21,7 +24,9 @@ class PlaylistListView extends StatelessWidget{
     return Consumer<PlaylistViewModel>(
       builder: (context, vm, child) {
         return Scaffold(
-          appBar: AppBar(
+          appBar: vm.isLoading
+            ? null
+            : AppBar(
             title: const Text(
               'Minhas Playlists',
               style: TextStyle(color: Color(0xFFB7B0B0), fontSize: 18),
@@ -39,30 +44,43 @@ class PlaylistListView extends StatelessWidget{
             backgroundColor: theme.scaffoldBackgroundColor,
           ),
 
-          body: ListView.builder(
-              shrinkWrap: true,
-              itemCount: vm.playlists.length,
-              itemBuilder: (context, index) {
-                final playlist = vm.playlists[index];
-                return Card(
-                    color: theme.cardColor,
-                    child: InfoTile(
-                        imageUrl: playlist.urlCover ?? '',
-                        title: playlist.title ?? '',
-                        subtitle: playlist.description ?? '',
-                        onTap: () {
-                          vm.startView(playlist: playlist);
-                          vm.setStackIndex(2);
-                        },
-                        trailing: IconButton(
-                          icon: const Icon(Icons.more_vert),
-                          onPressed: () => _showPlaylistActions(context, vm, playlist),
-                        ),
-
+          body: vm.isLoading
+                ? 
+                Center(
+                  child: CustomLoadingIndicator(),
+                )
+                : vm.playlists.isEmpty ? 
+                Center( 
+                  child: Text(
+                    'Nenhuma playlist encontrada.',
+                    style: TextStyle(color: Colors.grey),
                     ),
-                );
-              },
-          ),
+                  )
+                : 
+                ListView.builder(
+                shrinkWrap: true,
+                itemCount: vm.playlists.length,
+                itemBuilder: (context, index) {
+                  final playlist = vm.playlists[index];
+                  return Card(
+                      color: theme.cardColor,
+                      child: InfoTile(
+                          imageUrl: playlist.urlCover ?? '',
+                          title: playlist.title ?? '',
+                          subtitle: playlist.description ?? '',
+                          onTap: () {
+                            vm.startView(playlist: playlist);
+                            vm.setStackIndex(2);
+                          },
+                          trailing: IconButton(
+                            icon: const Icon(Icons.more_vert),
+                            onPressed: () => _showPlaylistActions(context, vm, playlist),
+                          ),
+
+                      ),
+                  );
+                },
+            ),
         );
       },
     );

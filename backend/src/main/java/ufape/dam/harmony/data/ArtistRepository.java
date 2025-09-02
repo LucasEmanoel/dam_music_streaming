@@ -11,5 +11,6 @@ import ufape.dam.harmony.business.entity.Artist;
 
 public interface ArtistRepository extends JpaRepository<Artist, Long> {
 	
-
+	@Query("SELECT a FROM Artist a LEFT JOIN FETCH a.albums LEFT JOIN FETCH a.songs WHERE a.id = :id")
+    Optional<Artist> findByIdWithAlbumsAndSongs(@Param("id") Long id);
 }

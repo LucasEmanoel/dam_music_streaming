@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import lombok.Data;
 import ufape.dam.harmony.business.entity.Album;
+import ufape.dam.harmony.business.entity.Song;
 
 @Data
 public class AlbumResponseDTO {
@@ -45,4 +46,21 @@ public class AlbumResponseDTO {
         
         return dto;
     }
+	
+	@Data
+	public static class SongInsideAlbumDTO {
+		private Long id;
+	    private String title;
+	    private Duration duration;
+
+	    public static SongInsideAlbumDTO fromEntity(Song entity) {
+	        if (entity == null) return null;
+	        SongInsideAlbumDTO dto = new SongInsideAlbumDTO();
+	        dto.setId(entity.getId());
+	        dto.setTitle(entity.getTitle());
+	        dto.setDuration(entity.getDuration());
+	        return dto;
+	    }
+	}
+
 }

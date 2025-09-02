@@ -17,11 +17,8 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Transient;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+
 
 @Entity
 @Data
@@ -34,7 +31,6 @@ public class Playlist {
 	private String title;
 	private String description;
 	private String urlCover;
-	
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "author_id")

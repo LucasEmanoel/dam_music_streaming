@@ -47,11 +47,11 @@ public class PlaylistService {
 		
 		Playlist playlist = findPlaylistByIdAndEnsureOwnership(playlistId, userEntity);
 		System.out.println(song.toString());
-		Song songRef = songRepository.findByApiId(song.getApiId())
+		Song songRef = songRepository.findById(song.getId())
 	            .orElseGet(() -> {
 	                Song newSongRef = new Song();
 	                
-	                newSongRef.setApiId(song.getApiId());
+	                newSongRef.setId(song.getId());
 	                newSongRef.setDuration(song.getDuration());
 
 	                return songRepository.save(newSongRef);
@@ -67,6 +67,21 @@ public class PlaylistService {
 		return playlist;
 	}
 	
+	@Transactional
+	public Playlist addSongsToPlaylist(SecurityUser user, Long playlistId, List<Long> songApiIds) {
+		Usuario userLogged = user.getUsuario();
+		Playlist playlist = findPlaylistByIdAndEnsureOwnership(playlistId, userLogged);
+
+	    List<Song> foundSongs = songRepository.findAllById(songApiIds); //ta assim pois iremos mudar para usar apenas musicas dentro do sistema.
+
+	    if (!foundSongs.isEmpty()) {
+	        playlist.getSongs().addAll(foundSongs);
+	    }
+	    
+	    return repository.save(playlist);
+	}
+	
+	
 	public Playlist removeSongFromPlaylist(Long playlistId, SecurityUser user, Long songId) {
 		Usuario userEntity = user.getUsuario(); 
         Playlist playlist = findPlaylistByIdAndEnsureOwnership(playlistId, userEntity);
@@ -79,14 +94,12 @@ public class PlaylistService {
 	}
 	
 	//
-	
-	@Transactional(readOnly = true)
+
     public List<Playlist> listPlaylistsByUser(SecurityUser user) {
 		Usuario userEntity = user.getUsuario(); 
         return repository.findByAuthor(userEntity);
     }
 	
-	@Transactional(readOnly = true)
     public Playlist findPlaylistById(Long playlistId) {
 		Playlist playlist = repository.findByIdWithSongs(playlistId)
 	            .orElseThrow(() -> new EntityNotFoundException("Playlist não encontrada."));
@@ -94,7 +107,6 @@ public class PlaylistService {
 		return playlist;
     }
 	
-	@Transactional
     public Playlist updatePlaylist(Long playlistId, PlaylistDto request, SecurityUser user) {
 		Usuario userEntity = user.getUsuario(); 
         Playlist playlist = findPlaylistByIdAndEnsureOwnership(playlistId, userEntity);
@@ -107,7 +119,6 @@ public class PlaylistService {
         return repository.save(playlist);
     }
 	
-	@Transactional
     public void deletePlaylist(Long playlistId, SecurityUser user) {
 		Usuario userEntity = user.getUsuario(); 
         Playlist playlist = findPlaylistByIdAndEnsureOwnership(playlistId, userEntity);

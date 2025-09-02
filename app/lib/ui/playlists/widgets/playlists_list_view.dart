@@ -110,7 +110,7 @@ class PlaylistListView extends StatelessWidget{
               SizedBox(height: 20),
               ButtonCustomSheet(
                   icon: 'Profile',
-                  text: 'Ver Author',
+                  text: 'Ver Author', // chamar tela de visualizar perfil
                   onTap: () {}),
               ButtonCustomSheet(
                   icon: 'Music',

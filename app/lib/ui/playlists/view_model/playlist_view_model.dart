@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dam_music_streaming/domain/models/playlist_data.dart';
+import 'package:dam_music_streaming/domain/models/song_data.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -32,7 +33,6 @@ class PlaylistViewModel extends ChangeNotifier {
 
     try {
       _playlists = await repository.getPlaylists();
-      print(_playlists);
     } catch (e) {
       print('error: $e');
     } finally {
@@ -78,6 +78,21 @@ class PlaylistViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> addSongsToCurrentPlaylist(int id, Set<SongData> songs) async {
+    try {
+
+      final musicApiIds = songs.map((song) => song.id!).toList();
+      PlaylistData updated = await repository.addSongsToPlaylist(id, musicApiIds);
+      entityBeingVisualized = updated;
+
+      triggerRebuild();
+    } catch (e) {
+      print('error ao deletar: $e');
+    } finally {
+      print('ok');
+    }
+  }
+
   Future<void> deletePlaylist(int id) async {
     if (entityBeingVisualized == null) return;
     
@@ -108,17 +123,30 @@ class PlaylistViewModel extends ChangeNotifier {
 
   void startEditing({PlaylistData? playlist}) {
     _pickedImageFile = null;
-    entityBeingEdited = playlist ??
-        PlaylistData(
-            title: '', urlCover: '', numSongs: 0, description: '');
+    entityBeingEdited = playlist ?? PlaylistData(title: '', urlCover: '', numSongs: 0, description: '');
     notifyListeners();
   }
 
-  void startView({PlaylistData? playlist}) {
-    entityBeingVisualized = playlist ??
-        PlaylistData(
-            title: '', urlCover: '', numSongs: 0, description: '');
+  void startView({PlaylistData? playlist}) async{
+    final playlistId = playlist?.id;
+
+    if (playlistId == null) return;
+
+    _isLoading = true;
     notifyListeners();
+
+    try {
+
+     final playlistComMusicas = await repository.getPlaylistWithSongs(playlistId);
+     print(playlistComMusicas);
+     entityBeingVisualized = playlistComMusicas ?? PlaylistData(title: '', urlCover: '', numSongs: 0, description: '');
+
+    } catch (e){
+     print(e);
+    } finally {
+     _isLoading = false;
+     notifyListeners();
+    }
   }
 
   void setPickedImage(File? file) {

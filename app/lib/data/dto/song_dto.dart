@@ -1,57 +1,69 @@
-import '../../domain/models/music_data.dart';
+import 'package:dam_music_streaming/data/dto/album_dto.dart';
+import 'package:dam_music_streaming/data/dto/artist_dto.dart';
+import 'package:dam_music_streaming/utils/duration_conversor.dart';
+import '../../domain/models/song_data.dart';
 
 class SongDto {
-  String? id;
-  String? apiId;
+  int? id;
   String? title;
-  String? genre;
-  String? artist;
-  String? album;
-  String? coverUrl;
+  ArtistDto? artist;
+  String? md5Image;
+  AlbumDto? album;
+  Duration? duration;
 
   SongDto({
     this.id,
-    this.apiId,
     this.title,
-    this.genre,
     this.artist,
     this.album,
-    this.coverUrl,
+    this.md5Image,
+    this.duration
   });
-
-  factory SongDto.fromMap(Map<String, dynamic> map) {
-    return SongDto(
-      id: map['id'] ?? '0',
-      apiId: map['apiId'] ?? '',
-      title: map['title'] ?? '',
-      genre: map['genre'] ?? '',
-      artist: map['artist'] ?? '',
-      album: map['album'] ?? '',
-      coverUrl: map['coverUrl'] ?? '',
-    );
-  }
 
   factory SongDto.fromData(SongData data) {
     return SongDto(
-      id: data.id ?? '',
+      id: data.id,
       title: data.title ?? '',
-      artist: data.artist ?? '',
-      album: data.album ?? '',
-      coverUrl: data.coverUrl ?? '',
-      apiId: data.apiId ?? '',
-      genre: data.genre ?? '',
+      artist: data.artist != null
+          ? ArtistDto.fromData(data.artist!)
+          : null,
+      album: data.album != null
+          ? AlbumDto.fromData(data.album!)
+          : null,
+      md5Image: data.md5Image ?? '',
+    );
+  }
+
+  factory SongDto.fromMap(Map<String, dynamic> map) {
+    final imageHash = map['album']?['md5_image'] ?? map['md5_image'];
+
+    return SongDto(
+      id: map['id'],
+      title: map['title'],
+      duration: map['duration'] != null ? parseIso8601Duration(map['duration']) : null,
+      artist: map['artist'] != null
+          ? ArtistDto.fromMap(map['artist'] as Map<String, dynamic>)
+          : null,
+      album: map['album'] != null
+          ? AlbumDto.fromMap(map['album'] as Map<String, dynamic>)
+          : null,
+      md5Image: imageHash,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'apiId': apiId,
       'title': title,
-      'genre': genre,
-      'artist': artist,
-      'album': album,
-      'coverUrl': coverUrl,
+      'duration': duration,
+      'artist': artist?.toMap(),
+      'album': album?.toMap(),
+      'md5_image': md5Image,
     };
+  }
+
+  @override
+  String toString() {
+    return 'SongDto(apiId: $id, title: "$title", artist: "${artist?.name}")';
   }
 }

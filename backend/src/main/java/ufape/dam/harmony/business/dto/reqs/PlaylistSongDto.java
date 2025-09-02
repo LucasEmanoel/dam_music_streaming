@@ -6,6 +6,6 @@ import lombok.Data;
 
 @Data
 public class PlaylistSongDto {
-	private String apiId;
+	private Long id;
     private Duration duration;
 }

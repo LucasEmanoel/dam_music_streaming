@@ -1,3 +1,5 @@
+import 'package:dam_music_streaming/data/dto/song_dto.dart';
+import 'package:dam_music_streaming/data/services/api_service.dart';
 import 'package:dio/dio.dart';
 
 import 'package:dam_music_streaming/data/dto/playlist_dto.dart';
@@ -8,31 +10,9 @@ import '../../config/token_manager.dart';
 
 
 class PlaylistApiService {
-
   final Dio _dio;
-  final String baseUrl;
 
-  PlaylistApiService({Dio? dio, this.baseUrl = ApiConfig.baseUrl})
-    : _dio = dio ??
-    Dio(
-      BaseOptions(
-        baseUrl: baseUrl,
-        connectTimeout: const Duration(seconds: 5),
-        receiveTimeout: const Duration(seconds: 10),
-        sendTimeout: const Duration(seconds: 10)
-      )
-    ) 
-    {
-      _dio.interceptors.add(InterceptorsWrapper(
-        onRequest: (options, handler) async {
-          final _token = await getToken();
-          if (_token != null && _token.isNotEmpty) {
-            options.headers['Authorization'] = 'Bearer $_token';
-          }
-          handler.next(options);
-        }
-      ));
-    }
+  PlaylistApiService({ApiClient? apiClient}) : _dio = apiClient?.dio ?? ApiClient().dio;
 
     Future<List<PlaylistDto>> fetchPlaylists() async{
     final response = await _dio.get('/playlists');
@@ -43,8 +23,26 @@ class PlaylistApiService {
         .toList();
   }
 
+  Future<List<SongDto>> searchSongs(String query) async {
+    if (query.trim().isEmpty) {
+      return [];
+    }
+
+    final response = await _dio.get(
+      '/songs/search',
+      queryParameters: {'q': query},
+    );
+
+    final List<dynamic> jsonList = response.data;
+
+    return jsonList
+        .map((map) => SongDto.fromMap(map as Map<String, dynamic>))
+        .toList();
+  }
+
   Future<PlaylistDto> getById(int id) async {
     final response = await _dio.get('/playlists/$id');
+
     return PlaylistDto.fromMap(response.data);
   }
 
@@ -62,5 +60,14 @@ class PlaylistApiService {
 
   Future<void> delete(int id) async {
     await _dio.delete('/playlists/$id');
+  }
+
+  Future<PlaylistDto> postSongs(int id, List<int> songsIds) async {
+    final response = await _dio.post(
+      '/playlists/$id/songs',
+      data: {'song_ids': songsIds},
+    );
+
+    return PlaylistDto.fromMap(response.data);
   }
 }

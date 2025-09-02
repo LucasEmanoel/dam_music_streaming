@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import lombok.Data;
 import ufape.dam.harmony.business.entity.Playlist;
+import ufape.dam.harmony.business.entity.Song;
 
 @Data
 public class PlaylistResponseDTO {
@@ -16,7 +17,7 @@ public class PlaylistResponseDTO {
     private String urlCover;
     
     private UserResponseDTO author;
-    private Set<SongResponseDTO> songs = new HashSet<>();
+    private Set<SongInPlaylistResponseDTO> songs = new HashSet<>();
     
     private Integer numSongs;
     private Duration duration;
@@ -41,11 +42,29 @@ public class PlaylistResponseDTO {
         if (entity.getSongs() != null) {
             dto.setSongs(
                 entity.getSongs().stream()
-                    .map(SongResponseDTO::fromEntity) 
+                    .map(SongInPlaylistResponseDTO::fromEntity) 
                     .collect(Collectors.toSet())
             );
         }
 
         return dto;
     }
+    
+    @Data
+    public static class SongInPlaylistResponseDTO {
+        private Long id;
+        private String title;
+        private Duration duration;
+
+        public static SongInPlaylistResponseDTO fromEntity(Song entity) {
+            if (entity == null) return null;
+            var dto = new SongInPlaylistResponseDTO();
+            dto.setId(entity.getId());
+            dto.setTitle(entity.getTitle());
+            dto.setDuration(entity.getDuration());
+
+            return dto;
+        }
+    }
+    
 }

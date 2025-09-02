@@ -1,5 +1,6 @@
 import 'package:dam_music_streaming/data/dto/song_dto.dart';
 import 'package:dam_music_streaming/data/dto/user_dto_l.dart';
+import 'package:dam_music_streaming/utils/duration_conversor.dart';
 
 import '../../domain/models/playlist_data.dart';
 
@@ -10,7 +11,7 @@ class PlaylistDto {
   String? urlCover;
   int? numSongs;
   UsuarioDto? author;
-  String? duration;
+  Duration? duration;
   List<SongDto> songs;
 
   PlaylistDto({
@@ -34,7 +35,7 @@ class PlaylistDto {
       author: map['author'] != null
           ? UsuarioDto.fromMap(map['author'])
           : null,
-      duration: map['duration'],
+      duration: map['duration'] != null ? parseIso8601Duration(map['duration']) : null,
       songs: (map['songs'] as List<dynamic>?)
           ?.map((song) => SongDto.fromMap(song as Map<String, dynamic>))
           .toList() ??

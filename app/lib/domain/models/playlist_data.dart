@@ -1,4 +1,4 @@
-import 'package:dam_music_streaming/domain/models/music_data.dart';
+import 'package:dam_music_streaming/domain/models/song_data.dart';
 import 'package:dam_music_streaming/domain/models/user_data_l.dart';
 
 import '../../data/dto/playlist_dto.dart';
@@ -10,7 +10,7 @@ class PlaylistData {
    String? urlCover;
    int? numSongs;
    UsuarioData? author;
-   String? duration;
+   Duration? duration;
    List<SongData>? songs;
 
   PlaylistData({
@@ -36,7 +36,7 @@ class PlaylistData {
             ? UsuarioData.fromDto(dto.author!)
             : UsuarioData(id: null, username: 'Autor desconhecido', email: '', role: ''),
 
-        duration: dto.duration ?? '0'
+        duration: dto.duration
     );
   }
 

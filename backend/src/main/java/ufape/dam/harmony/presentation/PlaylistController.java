@@ -18,7 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ufape.dam.harmony.business.dto.reqs.PlaylistDto;
 import ufape.dam.harmony.business.dto.reqs.PlaylistSongDto;
-import ufape.dam.harmony.business.dto.res.PlaylistWithSongsDto;
+import ufape.dam.harmony.business.dto.reqs.PlaylistSongsDto;
+import ufape.dam.harmony.business.dto.res.PlaylistResponseDTO;
 import ufape.dam.harmony.business.entity.Playlist;
 import ufape.dam.harmony.business.entity.Song;
 import ufape.dam.harmony.business.service.PlaylistService;
@@ -52,13 +53,11 @@ public class PlaylistController {
         return ResponseEntity.ok(dtos);
     }
 
-	
-	
-	
+
 	@GetMapping("/{playlistId}")
-    public ResponseEntity<PlaylistWithSongsDto> getPlaylistById(@PathVariable Long playlistId) {
+    public ResponseEntity<PlaylistResponseDTO> getPlaylistById(@PathVariable Long playlistId) {
         Playlist playlist = service.findPlaylistById(playlistId); 
-        return ResponseEntity.ok(PlaylistWithSongsDto.fromEntity(playlist));
+        return ResponseEntity.ok(PlaylistResponseDTO.fromEntity(playlist));
     }
 	
 	@PutMapping("/{playlistId}")
@@ -89,10 +88,18 @@ public class PlaylistController {
         return ResponseEntity.ok(songs);
     }
 	
-	@PostMapping("/{playlistId}/songs")
+	@PostMapping("/{playlistId}/song")
     public ResponseEntity<Playlist> addSongUserPlaylists(@PathVariable Long playlistId, @AuthenticationPrincipal SecurityUser user, @RequestBody PlaylistSongDto song) {
 		
 		Playlist saved = service.addSongToPlaylist(user, song, playlistId);
+		
+        return ResponseEntity.ok(saved);
+    }
+	
+	@PostMapping("/{playlistId}/songs")
+	public ResponseEntity<Playlist> addSongsUserPlaylists(@PathVariable Long playlistId, @AuthenticationPrincipal SecurityUser user, @RequestBody PlaylistSongsDto songs) {
+		
+		Playlist saved = service.addSongsToPlaylist(user, playlistId, songs.getSongIds());
 		
         return ResponseEntity.ok(saved);
     }

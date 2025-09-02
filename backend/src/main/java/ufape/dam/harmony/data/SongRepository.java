@@ -9,5 +9,5 @@ import ufape.dam.harmony.business.entity.Song;
 public interface SongRepository extends JpaRepository<Song, Long>{
 	
 	Optional<Song> findById(Long apiId);
-	Optional<Song> findByApiId(String apiId);
+	
 }

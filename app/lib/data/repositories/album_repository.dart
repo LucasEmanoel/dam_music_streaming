@@ -7,6 +7,8 @@ class AlbumRepository {
 
   Future<AlbumData> fetchById(int id) async {
     final AlbumDto dto = await api.getById(id);
+    print('Albummmmmmmmmm');
+    print(dto.toMap());
     return AlbumData.fromDto(dto);
   }
 }

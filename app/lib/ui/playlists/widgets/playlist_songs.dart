@@ -1,7 +1,7 @@
 
-import 'package:dam_music_streaming/data/dto/song_dto.dart';
-import 'package:dam_music_streaming/ui/album/widgets/album_songs.dart';
+import 'package:dam_music_streaming/ui/album/widgets/album_detail.dart';
 import 'package:dam_music_streaming/ui/core/ui/info_tile.dart';
+import 'package:dam_music_streaming/ui/core/ui/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -24,7 +24,13 @@ class PlaylistSongs extends StatelessWidget {
         final playlist = vm.entityBeingVisualized;
 
         return Scaffold(
-          body: playlist == null
+          body: vm.isLoading
+              ?
+              Center(
+                child: CustomLoadingIndicator(),
+              )
+              :
+          playlist == null
               ? const Center(child: Text('Nenhuma playlist selecionada.'))
               : CustomScrollView(
             slivers: [
@@ -175,6 +181,7 @@ class PlaylistSongs extends StatelessWidget {
                                   searchVM: searchVM),
                             );
 
+                            //TODO: Colocar um component personalizado.
                             if (selectedSongs != null &&
                                 selectedSongs.isNotEmpty) {
                               vm.addSongsToCurrentPlaylist(
@@ -223,17 +230,17 @@ class PlaylistSongs extends StatelessWidget {
     );
   }
 
-  Future<void> _deletePlaylist(BuildContext context, PlaylistData playlist,
-      PlaylistViewModel vm) async {
-    await vm.deletePlaylist(playlist.id!);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: Colors.red,
-        duration: Duration(seconds: 2),
-        content: Text("Contact deleted"),
-      ),
-    );
-  }
+  // Future<void> _deletePlaylist(BuildContext context, PlaylistData playlist,
+  //     PlaylistViewModel vm) async {
+  //   await vm.deletePlaylist(playlist.id!);
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       backgroundColor: Colors.red,
+  //       duration: Duration(seconds: 2),
+  //       content: Text("Contact deleted"),
+  //     ),
+  //   );
+  // }
 
   void _showSongActions(BuildContext context, PlaylistViewModel vm, SongData song, PlaylistData currentPlaylist) {
     showModalBottomSheet(
@@ -266,12 +273,13 @@ class PlaylistSongs extends StatelessWidget {
                 icon: 'Album',
                 text: 'Ver Álbum',
                 onTap: () {
+                  print('ID ANTES DE CHAMAR ${song.album?.id}');
                   Navigator.pop(context);
                   if (song.album?.id != null) {
                      Navigator.push(
                          context,
                          MaterialPageRoute(
-                             builder: (_) => AlbumSongs(albumID: song.album!.id!)
+                             builder: (_) => AlbumDetailView(albumId: song.album!.id!)
                          )
                      );
                   }
@@ -307,7 +315,7 @@ class PlaylistSongs extends StatelessWidget {
     );
   }
 }
-
+//pesquisa de musicas que vai no deezer apii
 class CustomSearchDelegate extends SearchDelegate<Set<SongData>> {
 
   final SongRepository repo = SongRepository();

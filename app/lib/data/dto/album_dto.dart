@@ -8,21 +8,22 @@ class AlbumDto {
   int? id;
   String? title;
   String? urlCover;
-  int? numTracks;
+  int? numSongs;
 
   Duration? duration;
   DateTime? releaseDate;
   ArtistDto? artist;
 
-  List<SongDto>? tracks;
+  List<SongDto>? songs;
 
   AlbumDto({
     this.id,
     this.title,
     this.urlCover,
-    this.numTracks,
+    this.numSongs,
     this.duration,
     this.releaseDate,
+    this.songs
   });
 
   factory AlbumDto.fromData(AlbumData data) {
@@ -30,9 +31,10 @@ class AlbumDto {
       id: data.id,
       title: data.title,
       urlCover: data.urlCover,
-      numTracks: data.numTracks,
+      numSongs: data.numSongs,
       duration: data.duration,
       releaseDate: data.releaseDate,
+      songs: data.songs?.map((s) => SongDto.fromData(s)).toList(),
     );
   }
 
@@ -41,11 +43,14 @@ class AlbumDto {
       id: map['id'],
       title: map['title'],
       urlCover: map['url_cover'],
-      numTracks: map['nb_tracks'],
+      numSongs: map['nb_songs'],
       duration: map['duration'] != null ? parseIso8601Duration(map['duration']) : null,
       releaseDate: map['release_date'] != null
           ? DateTime.parse(map['release_date'])
           : null,
+      songs: (map['songs'] as List<dynamic>?)
+          ?.map((s) => SongDto.fromMap(s as Map<String, dynamic>))
+          .toList(),
     );
   }
 
@@ -54,9 +59,10 @@ class AlbumDto {
       'id': id,
       'title': title,
       'cover_big': urlCover,
-      'nb_tracks': numTracks,
+      'nb_songs': numSongs,
       'duration': duration,
       'release_date': releaseDate,
+      'songs': songs
     };
   }
 }

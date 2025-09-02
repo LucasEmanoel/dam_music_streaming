@@ -7,21 +7,21 @@ class AlbumData {
   int? id;
   String? title;
   String? urlCover;
-  int? numTracks;
+  int? numSongs;
   ArtistData? artist;
   Duration? duration;
   DateTime? releaseDate;
-  List<SongData>? tracks;
+  List<SongData>? songs;
 
   AlbumData({
     this.id,
     this.title,
     this.urlCover,
-    this.numTracks,
+    this.numSongs,
     this.artist,
     this.duration,
     this.releaseDate,
-    this.tracks,
+    this.songs,
   });
 
   factory AlbumData.fromDto(AlbumDto dto) {
@@ -29,9 +29,11 @@ class AlbumData {
       id: dto.id ?? -1,
       title: dto.title,
       urlCover: dto.urlCover,
-      numTracks: dto.numTracks,
+      numSongs: dto.numSongs,
       duration: dto.duration != null ? dto.duration! : null,
       releaseDate: dto.releaseDate != null ? dto.releaseDate! : null,
+      songs: dto.songs?.map((song) => SongData.fromDto(song)).toList(),
     );
   }
+
 }

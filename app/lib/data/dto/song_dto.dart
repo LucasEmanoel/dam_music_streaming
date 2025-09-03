@@ -7,7 +7,7 @@ class SongDto {
   int? id;
   String? title;
   ArtistDto? artist;
-  String? md5Image;
+  String? urlCover;
   AlbumDto? album;
   Duration? duration;
 
@@ -16,7 +16,7 @@ class SongDto {
     this.title,
     this.artist,
     this.album,
-    this.md5Image,
+    this.urlCover,
     this.duration
   });
 
@@ -26,44 +26,29 @@ class SongDto {
       title: data.title ?? '',
       artist: data.artist != null
           ? ArtistDto.fromData(data.artist!)
-          : null,
+          : ArtistDto(),
       album: data.album != null
           ? AlbumDto.fromData(data.album!)
-          : null,
-      md5Image: data.md5Image ?? '',
+          : AlbumDto(),
+      urlCover: data.urlCover ?? '',
     );
   }
 
   factory SongDto.fromMap(Map<String, dynamic> map) {
-    final imageHash = map['album']?['md5_image'] ?? map['md5_image'];
-
     return SongDto(
-      id: map['id'],
-      title: map['title'],
-      duration: map['duration'] != null ? parseIso8601Duration(map['duration']) : null,
+      id: map['id'] ?? -1,
+      title: map['title'] ?? '',
+      duration: map['duration'] != null 
+        ? parseIso8601Duration(map['duration']) 
+        : Duration(seconds: 0),
       artist: map['artist'] != null
           ? ArtistDto.fromMap(map['artist'] as Map<String, dynamic>)
-          : null,
+          : ArtistDto(),
       album: map['album'] != null
           ? AlbumDto.fromMap(map['album'] as Map<String, dynamic>)
-          : null,
-      md5Image: imageHash,
+          : AlbumDto(),
+      urlCover: map['url_cover'] ?? '',
     );
   }
 
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'title': title,
-      'duration': duration,
-      'artist': artist?.toMap(),
-      'album': album?.toMap(),
-      'md5_image': md5Image,
-    };
-  }
-
-  @override
-  String toString() {
-    return 'SongDto(apiId: $id, title: "$title", artist: "${artist?.name}")';
-  }
 }

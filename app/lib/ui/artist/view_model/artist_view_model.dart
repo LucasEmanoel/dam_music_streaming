@@ -8,7 +8,7 @@ class ArtistViewModel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  List<ArtistData> _artists = [];
+  final List<ArtistData> _artists = [];
   List<ArtistData> get artists => _artists;
 
   ArtistData? _artistBeingViewed;

@@ -4,9 +4,6 @@ import 'package:dio/dio.dart';
 
 import 'package:dam_music_streaming/data/dto/playlist_dto.dart';
 
-import '../../config/api_config.dart';
-import '../../config/token_manager.dart';
-
 
 
 class PlaylistApiService {
@@ -14,10 +11,10 @@ class PlaylistApiService {
 
   PlaylistApiService({ApiClient? apiClient}) : _dio = apiClient?.dio ?? ApiClient().dio;
 
-    Future<List<PlaylistDto>> fetchPlaylists() async{
+  Future<List<PlaylistDto>> fetchPlaylists() async{
     final response = await _dio.get('/playlists');
     final List<dynamic> jsonList = response.data;
-    print(jsonList);
+    //print(jsonList);
     return jsonList
         .map((map) => PlaylistDto.fromMap(map as Map<String, dynamic>))
         .toList();
@@ -42,7 +39,6 @@ class PlaylistApiService {
 
   Future<PlaylistDto> getById(int id) async {
     final response = await _dio.get('/playlists/$id');
-
     return PlaylistDto.fromMap(response.data);
   }
 
@@ -52,8 +48,8 @@ class PlaylistApiService {
   }
 
   Future<PlaylistDto> update(int id, PlaylistDto playlist) async {
-    print('SERVICE');
-    print(playlist.toMap());
+    //('SERVICE');
+    //print(playlist.toMap());
     final response = await _dio.put('/playlists/$id', data: playlist.toMap());
     return PlaylistDto.fromMap(response.data);
   }

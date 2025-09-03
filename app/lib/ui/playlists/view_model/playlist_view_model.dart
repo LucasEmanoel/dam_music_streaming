@@ -8,17 +8,16 @@ import 'dart:io';
 import '../../../data/repositories/playlist_repository.dart';
 
 class PlaylistViewModel extends ChangeNotifier {
-
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  final FirebaseStorage  _firestore = FirebaseStorage.instance;
+  final FirebaseStorage _firestore = FirebaseStorage.instance;
   //final storageRef = FirebaseStorage.instance.ref();
 
   final PlaylistRepository repository = PlaylistRepository();
 
   int _stackIndex = 0;
-  
+
   List<PlaylistData> _playlists = [];
   PlaylistData? entityBeingVisualized;
   PlaylistData? entityBeingEdited;
@@ -45,20 +44,20 @@ class PlaylistViewModel extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    print('EN?TIDADE');
-    print(entityBeingEdited?.toMap());
-    print('IMAGEMMMM');
-    print(_pickedImageFile);
-
     if (entityBeingEdited == null) return;
 
     try {
       final savedPlaylist = (entityBeingEdited!.id == null)
           ? await repository.createPlaylist(entityBeingEdited!)
-          : await repository.updatePlaylist(entityBeingEdited!.id!, entityBeingEdited!);
+          : await repository.updatePlaylist(
+              entityBeingEdited!.id!,
+              entityBeingEdited!,
+            );
 
       if (_pickedImageFile != null) {
-        final playlistId = savedPlaylist.id ?? FirebaseFirestore.instance.collection('temp').doc().id;
+        final playlistId =
+            savedPlaylist.id ??
+            FirebaseFirestore.instance.collection('temp').doc().id;
 
         final ref = _firestore.ref('playlist_covers/$playlistId.jpg');
         final uploadTask = await ref.putFile(_pickedImageFile!);
@@ -80,9 +79,11 @@ class PlaylistViewModel extends ChangeNotifier {
 
   Future<void> addSongsToCurrentPlaylist(int id, Set<SongData> songs) async {
     try {
-
       final musicApiIds = songs.map((song) => song.id!).toList();
-      PlaylistData updated = await repository.addSongsToPlaylist(id, musicApiIds);
+      PlaylistData updated = await repository.addSongsToPlaylist(
+        id,
+        musicApiIds,
+      );
       entityBeingVisualized = updated;
 
       triggerRebuild();
@@ -95,10 +96,12 @@ class PlaylistViewModel extends ChangeNotifier {
 
   Future<void> deletePlaylist(int id) async {
     if (entityBeingVisualized == null) return;
-    
+
     try {
       final ref = _firestore.ref('playlist_covers/$id.jpg');
-      await ref.delete().catchError((e) => print("Imagem não encontrada para deletar: $e"));
+      await ref.delete().catchError(
+        (e) => print("Imagem não encontrada para deletar: $e"),
+      );
       await repository.deletePlaylist(id);
       await loadPlaylists();
     } catch (e) {
@@ -123,29 +126,42 @@ class PlaylistViewModel extends ChangeNotifier {
 
   void startEditing({PlaylistData? playlist}) {
     _pickedImageFile = null;
-    entityBeingEdited = playlist ?? PlaylistData(title: '', urlCover: '', numSongs: 0, description: '');
+    entityBeingEdited =
+        playlist ??
+        PlaylistData(title: '', urlCover: '', numSongs: 0, description: '');
     notifyListeners();
   }
 
-  void startView({PlaylistData? playlist}) async{
-    final playlistId = playlist?.id;
+  void startView({int? id}) async {
+    print('ID QUE TO PASSANDO LIST -> VIEW = $id');
 
-    if (playlistId == null) return;
+    if (id == null) {
+      print('ID NULL');
+      return;
+    }
 
     _isLoading = true;
     notifyListeners();
 
     try {
+      print('antes');
+      final playlistComMusicas = await repository.getPlaylistWithSongs(
+        id,
+      );
+      print('depois');
+      if(playlistComMusicas.songs?.isEmpty ?? true){
+        print('vazia');
+      } else {
+        entityBeingVisualized = playlistComMusicas;
+      }
 
-     final playlistComMusicas = await repository.getPlaylistWithSongs(playlistId);
-     print(playlistComMusicas);
-     entityBeingVisualized = playlistComMusicas ?? PlaylistData(title: '', urlCover: '', numSongs: 0, description: '');
 
-    } catch (e){
-     print(e);
+      
+    } catch (e) {
+      print(e);
     } finally {
-     _isLoading = false;
-     notifyListeners();
+      _isLoading = false;
+      notifyListeners();
     }
   }
 

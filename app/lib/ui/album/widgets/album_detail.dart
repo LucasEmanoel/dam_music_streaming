@@ -76,7 +76,7 @@ class AlbumDetailView extends StatelessWidget {
                   Padding(padding: EdgeInsets.only(left: 40, right: 40),
                     child: Center(
                       child: Text(
-                        album?.title ?? '',
+                        album.title ?? '',
                         style: TextStyle(
                             fontSize: 40,
                             fontWeight: FontWeight.bold
@@ -141,8 +141,8 @@ class AlbumDetailView extends StatelessWidget {
                             ),
                             SizedBox(height: 4),
                             Text(
-                              album?.duration != null
-                                  ? '${album!.duration!.inMinutes}min e ${album!.duration!.inSeconds.remainder(60)}s'
+                              album.duration != null
+                                  ? '${album.duration!.inMinutes}min e ${album.duration!.inSeconds.remainder(60)}s'
                                   : 'Duração indisponível',
                               style: TextStyle(
                                 fontSize: 14,
@@ -163,7 +163,7 @@ class AlbumDetailView extends StatelessWidget {
                       itemBuilder: (context, index) {
                         final song = album.songs![index];
                         return InfoTile(
-                          imageUrl: song.md5Image ?? '',
+                          imageUrl: song.urlCover ?? '',
                           title: song.title ?? '',
                           subtitle: song.artist?.name ?? '',
                           trailing: const Icon(Icons.more_vert, size: 20),
@@ -198,7 +198,7 @@ void _showSongActions(BuildContext context, AlbumViewModel vm, SongData song) {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             InfoTile(
-              imageUrl: song.md5Image ?? '',
+              imageUrl: song.urlCover ?? '',
               title: song.title ?? '',
               subtitle: song.artist?.name ?? '',
             ),

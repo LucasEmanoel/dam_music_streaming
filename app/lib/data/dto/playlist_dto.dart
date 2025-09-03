@@ -12,7 +12,7 @@ class PlaylistDto {
   int? numSongs;
   UsuarioDto? author;
   Duration? duration;
-  List<SongDto> songs;
+  List<SongDto>? songs;
 
   PlaylistDto({
     this.id,
@@ -27,34 +27,35 @@ class PlaylistDto {
 
   factory PlaylistDto.fromMap(Map<String, dynamic> map) {
     return PlaylistDto(
-      id: map['id'],
+      id: map['id'] ?? -1,
       title: map['title'] ?? '',
       description: map['description'] ?? '',
       urlCover: map['urlCover'] ?? '',
-      numSongs: map['numSongs'],
+      numSongs: map['numSongs'] ?? -1,
       author: map['author'] != null
           ? UsuarioDto.fromMap(map['author'])
-          : null,
-      duration: map['duration'] != null ? parseIso8601Duration(map['duration']) : null,
+          : UsuarioDto(),
+      duration: map['duration'] != null 
+          ? parseIso8601Duration(map['duration']) 
+          : Duration(seconds: 0),
       songs: (map['songs'] as List<dynamic>?)
-          ?.map((song) => SongDto.fromMap(song as Map<String, dynamic>))
-          .toList() ??
-          [],
+        ?.map((e) => SongDto.fromMap(e))
+        .toList() 
+        ?? []
     );
   }
 
   factory PlaylistDto.fromData(PlaylistData data) {
     return PlaylistDto(
-      id: data.id, 
+      id: data.id , 
       title: data.title,
       description: data.description,
       urlCover: data.urlCover,
-      
       numSongs: data.songs?.length ?? 0,
       
       author: data.author != null 
           ? UsuarioDto.fromData(data.author!) 
-          : null,
+          : UsuarioDto(),
           
       duration: data.duration,
       songs: data.songs != null
@@ -70,9 +71,7 @@ class PlaylistDto {
       'description': description,
       'urlCover': urlCover,
       'numSongs': numSongs,
-      'author': author?.toMap(),
       'duration': duration,
-      'songs': songs?.map((song) => song.toMap()).toList() ?? [],
     };
   }
 }

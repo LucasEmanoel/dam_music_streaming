@@ -30,8 +30,8 @@ class AlbumData {
       title: dto.title,
       urlCover: dto.urlCover,
       numSongs: dto.numSongs,
-      duration: dto.duration != null ? dto.duration! : null,
-      releaseDate: dto.releaseDate != null ? dto.releaseDate! : null,
+      duration: dto.duration,
+      releaseDate: dto.releaseDate,
       songs: dto.songs?.map((song) => SongData.fromDto(song)).toList(),
     );
   }

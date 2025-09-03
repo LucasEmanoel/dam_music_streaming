@@ -23,7 +23,7 @@ class AlbumDto {
     this.numSongs,
     this.duration,
     this.releaseDate,
-    this.songs
+    this.songs = const []
   });
 
   factory AlbumDto.fromData(AlbumData data) {
@@ -40,29 +40,20 @@ class AlbumDto {
 
   factory AlbumDto.fromMap(Map<String, dynamic> map) {
     return AlbumDto(
-      id: map['id'],
-      title: map['title'],
-      urlCover: map['url_cover'],
-      numSongs: map['nb_songs'],
-      duration: map['duration'] != null ? parseIso8601Duration(map['duration']) : null,
+      id: map['id'] ?? -1,
+      title: map['title'] ?? '',
+      urlCover: map['url_cover'] ?? '',
+      numSongs: map['nb_songs'] ?? -1,
+      duration: map['duration'] != null 
+        ? parseIso8601Duration(map['duration']) 
+        : Duration(seconds: 0),
       releaseDate: map['release_date'] != null
           ? DateTime.parse(map['release_date'])
-          : null,
+          : DateTime(0),
       songs: (map['songs'] as List<dynamic>?)
           ?.map((s) => SongDto.fromMap(s as Map<String, dynamic>))
-          .toList(),
+          .toList() ?? [],
     );
   }
 
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'title': title,
-      'cover_big': urlCover,
-      'nb_songs': numSongs,
-      'duration': duration,
-      'release_date': releaseDate,
-      'songs': songs
-    };
-  }
 }

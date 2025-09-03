@@ -21,35 +21,24 @@ class PlaylistData {
     this.numSongs,
     this.author,
     this.duration,
-    this.songs = const [],
+    this.songs,
   });
 
   factory PlaylistData.fromDto(PlaylistDto dto) {
     return PlaylistData(
       id: dto.id,
       title: dto.title,
-      numSongs: dto.songs.length,
-      songs: dto.songs.map((songDto) => SongData.fromDto(songDto)).toList(),
+      numSongs: dto.songs?.length,
+      songs: dto.songs
+        ?.map((songDto) => SongData.fromDto(songDto))
+        .toList(),
       description: dto.description ?? 'Descrição não disponível',
       urlCover: dto.urlCover ?? '',
-        author: dto.author != null
+      author: dto.author != null
             ? UsuarioData.fromDto(dto.author!)
             : UsuarioData(id: null, username: 'Autor desconhecido', email: '', role: ''),
 
-        duration: dto.duration
+      duration: dto.duration
     );
   }
-
-   Map<String, dynamic> toMap() {
-     return {
-       'id': id,
-       'title': title,
-       'description': description,
-       'urlCover': urlCover,
-       'numSongs': numSongs,
-       'author': author,
-       'duration': duration,
-       'songs': songs?.map((song) => song.toMap()).toList(),
-     };
-   }
 }

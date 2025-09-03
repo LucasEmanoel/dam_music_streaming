@@ -54,6 +54,7 @@ class InfoTile extends StatelessWidget {
       contentPadding: EdgeInsets.only(left: 7),
       trailing: trailing,
       onTap: onTap,
+      shape: null
     );
   }
 }

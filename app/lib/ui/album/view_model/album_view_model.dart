@@ -8,7 +8,7 @@ class AlbumViewModel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  List<AlbumData> _albums = [];
+  final List<AlbumData> _albums = [];
   List<AlbumData> get albums => _albums;
 
   AlbumData? _albumBeingViewed;

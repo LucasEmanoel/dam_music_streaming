@@ -13,6 +13,8 @@ class PlaylistRepository {
 
   Future<PlaylistData> getPlaylistById(int id) async {
     final PlaylistDto dto = await api.getById(id);
+    print('OQ VEM DO BAK');
+    print(dto.toMap());
     return PlaylistData.fromDto(dto);
   }
 
@@ -36,6 +38,7 @@ class PlaylistRepository {
 
   Future<PlaylistData> getPlaylistWithSongs(int id) async{
     final PlaylistDto dto = await api.getById(id);
+    print(dto.toMap());
     return PlaylistData.fromDto(dto);
   }
 

@@ -38,4 +38,6 @@ class SongData {
 
   @override
   int get hashCode => title.hashCode;
+
+  get duration => null;
 }

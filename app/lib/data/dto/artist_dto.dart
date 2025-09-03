@@ -21,7 +21,7 @@ class ArtistDto {
     return ArtistDto(
       id: map['id'] ?? -1,
       name: map['name'] ?? '',
-      pictureBig: map['picture_big'] ?? '',
+      pictureBig: map['artistImage'] ?? '',
       albums: (map['albums'] as List<dynamic>?)
           ?.map((s) => AlbumDto.fromMap(s as Map<String, dynamic>))
           .toList(),

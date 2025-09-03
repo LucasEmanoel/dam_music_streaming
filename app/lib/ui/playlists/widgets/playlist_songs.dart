@@ -13,44 +13,47 @@ import '../view_model/playlist_view_model.dart';
 import '../view_model/search_view_model.dart';
 
 class PlaylistSongs extends StatelessWidget {
-   const PlaylistSongs({super.key});
+  const PlaylistSongs({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Consumer<PlaylistViewModel>(
       builder: (context, vm, child) {
-
         final playlist = vm.entityBeingVisualized;
 
         if (playlist == null) {
           return Scaffold(
             appBar: AppBar(),
             body: vm.isLoading
-                ?  Center(child: CustomLoadingIndicator())
-                :  Center(child: Text('Nenhuma playlist selecionada.')),
+                ? Center(child: CustomLoadingIndicator())
+                : Center(child: Text('Nenhuma playlist selecionada.')),
           );
         }
 
         return Scaffold(
           body: vm.isLoading
-              ?  Center(child: CustomLoadingIndicator())
+              ? Center(child: CustomLoadingIndicator())
               : CustomScrollView(
-            slivers: [
-              _buildSliverAppBar(context, vm, playlist),
-              _buildHeader(context, playlist),
+                  slivers: [
+                    _buildSliverAppBar(context, vm, playlist),
+                    _buildHeader(context, playlist),
 
-              if (playlist.songs?.isEmpty ?? true)
-                _buildEmptyView(context, vm, playlist)
-              else
-                _buildSongsList(context, vm, playlist),
-            ],
-          ),
+                    if (playlist.songs?.isEmpty ?? true)
+                      _buildEmptyView(context, vm, playlist)
+                    else
+                      _buildSongsList(context, vm, playlist),
+                  ],
+                ),
         );
       },
     );
   }
 
-  Widget _buildSliverAppBar(BuildContext context, PlaylistViewModel vm, PlaylistData playlist) {
+  Widget _buildSliverAppBar(
+    BuildContext context,
+    PlaylistViewModel vm,
+    PlaylistData playlist,
+  ) {
     final theme = Theme.of(context);
     return SliverAppBar.large(
       expandedHeight: 200.0,
@@ -71,7 +74,11 @@ class PlaylistSongs extends StatelessWidget {
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
                     color: Colors.grey[700],
-                    child: Icon(Icons.music_note, color: Colors.white, size: 60),
+                    child: Icon(
+                      Icons.music_note,
+                      color: Colors.white,
+                      size: 60,
+                    ),
                   );
                 },
               )
@@ -99,19 +106,20 @@ class PlaylistSongs extends StatelessWidget {
                 children: [
                   Text(
                     playlist.title ?? 'Playlist sem título',
-                    style:  TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
                       fontSize: 35,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   SizedBox(height: 4),
-                  if (playlist.description != null && playlist.description!.isNotEmpty)
+                  if (playlist.description != null &&
+                      playlist.description!.isNotEmpty)
                     Text(
                       playlist.description!,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
-                      style:  TextStyle(
+                      style: TextStyle(
                         color: Colors.white70,
                         fontSize: 20,
                         fontWeight: FontWeight.w400,
@@ -131,7 +139,7 @@ class PlaylistSongs extends StatelessWidget {
     final theme = Theme.of(context);
     return SliverToBoxAdapter(
       child: Padding(
-        padding:  EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -143,114 +151,132 @@ class PlaylistSongs extends StatelessWidget {
                     Text(
                       'Criado por: ${playlist.author?.username ?? 'Desconhecido'}',
                       style: TextStyle(
-                          color: theme.colorScheme.onSurface, fontSize: 16),
+                        color: theme.colorScheme.onSurface,
+                        fontSize: 16,
+                      ),
                     ),
-                     SizedBox(height: 4),
+                    SizedBox(height: 4),
                     if (playlist.duration != null)
                       Text(
                         '${playlist.duration!.inMinutes} min de duração',
-                        style:  TextStyle(
-                            color: Color.fromARGB(255, 117, 117, 117),
-                            fontSize: 13),
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 117, 117, 117),
+                          fontSize: 13,
+                        ),
                       ),
                   ],
                 ),
-                 Spacer(),
+                Spacer(),
                 FloatingActionButton(
-                  shape:  CircleBorder(),
-                  child:  Icon(Icons.play_arrow, size: 30),
+                  shape: CircleBorder(),
+                  child: Icon(Icons.play_arrow, size: 30),
                   onPressed: () {},
-                )
+                ),
               ],
             ),
-             SizedBox(height: 20),
+            SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildEmptyView(BuildContext context, PlaylistViewModel vm, PlaylistData playlist) {
+  Widget _buildEmptyView(
+    BuildContext context,
+    PlaylistViewModel vm,
+    PlaylistData playlist,
+  ) {
     return SliverFillRemaining(
       hasScrollBody: false,
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-             Icon(Icons.music_off, size: 60, color: Colors.grey),
-             SizedBox(height: 24),
+            Icon(Icons.music_off, size: 60, color: Colors.grey),
+            SizedBox(height: 24),
             TextButton.icon(
-              icon:  Icon(Icons.add),
-              label:  Text('Adicionar Músicas'),
+              icon: Icon(Icons.add),
+              label: Text('Adicionar Músicas'),
               onPressed: () async {
-
                 if (playlist.id == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                     SnackBar(content: Text("Erro: ID da playlist é nulo.")),
+                    SnackBar(content: Text("Erro: ID da playlist é nulo.")),
                   );
                   return;
                 }
 
-                final searchVM = Provider.of<SearchViewModel>(context, listen: false);
+                final searchVM = Provider.of<SearchViewModel>(
+                  context,
+                  listen: false,
+                );
                 searchVM.clearSelection();
 
-                final Set<SongData>? selectedSongs = await showSearch<Set<SongData>>(
-                  context: context,
-                  delegate: CustomSearchDelegate(searchVM: searchVM),
-                );
+                final Set<SongData>? selectedSongs =
+                    await showSearch<Set<SongData>>(
+                      context: context,
+                      delegate: CustomSearchDelegate(searchVM: searchVM),
+                    );
 
                 if (selectedSongs != null && selectedSongs.isNotEmpty) {
                   vm.addSongsToCurrentPlaylist(playlist.id!, selectedSongs);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('${selectedSongs.length} músicas adicionadas!')),
+                    SnackBar(
+                      content: Text(
+                        '${selectedSongs.length} músicas adicionadas!',
+                      ),
+                    ),
                   );
                 }
               },
-            )
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSongsList(BuildContext context, PlaylistViewModel vm, PlaylistData playlist) {
+  Widget _buildSongsList(
+    BuildContext context,
+    PlaylistViewModel vm,
+    PlaylistData playlist,
+  ) {
     final theme = Theme.of(context);
     final songs = playlist.songs ?? [];
 
     return SliverList(
-      delegate: SliverChildBuilderDelegate(
-            (context, index) {
-          final song = songs[index];
-          return Padding(
-            padding:  EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-            child: Card(
-              color: theme.cardColor,
-              child: InfoTile(
-                imageUrl: song.urlCover ?? '',
-                title: song.title ?? 'Título desconhecido',
-                subtitle: song.artist?.name ?? 'Artista desconhecido',
-                trailing:  Icon(Icons.more_vert, size: 20),
-                onTap: () {
-                  _showSongActions(context, vm, song, playlist);
-                },
-              ),
-            ),
-          );
-        },
-        childCount: songs.length,
-      ),
+      delegate: SliverChildBuilderDelegate((context, index) {
+        final song = songs[index];
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+
+          child: InfoTile(
+            imageUrl: song.urlCover ?? '',
+            title: song.title ?? 'Título desconhecido',
+            subtitle: song.artist?.name ?? 'Artista desconhecido',
+            trailing: Icon(Icons.more_vert, size: 20),
+            onTap: () {
+              _showSongActions(context, vm, song, playlist);
+            },
+          ),
+        );
+      }, childCount: songs.length),
     );
   }
 
-  void _showSongActions(BuildContext context, PlaylistViewModel vm, SongData song, PlaylistData currentPlaylist) {
+  void _showSongActions(
+    BuildContext context,
+    PlaylistViewModel vm,
+    SongData song,
+    PlaylistData currentPlaylist,
+  ) {
     showModalBottomSheet(
       context: context,
-      shape:  RoundedRectangleBorder(
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (BuildContext context) {
         return Padding(
-          padding:  EdgeInsets.all(20.0),
+          padding: EdgeInsets.all(20.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -270,7 +296,10 @@ class PlaylistSongs extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => ArtistDetailView(artistId: song.artist!.id ?? -1)));
+                        builder: (_) =>
+                            ArtistDetailView(artistId: song.artist!.id ?? -1),
+                      ),
+                    );
                   }
                 },
               ),
@@ -283,7 +312,10 @@ class PlaylistSongs extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => AlbumDetailView(albumId: song.album!.id ?? -1)));
+                        builder: (_) =>
+                            AlbumDetailView(albumId: song.album!.id ?? -1),
+                      ),
+                    );
                   }
                 },
               ),
@@ -307,7 +339,7 @@ class PlaylistSongs extends StatelessWidget {
                 icon: 'Cancel',
                 text: 'Remover desta playlist',
                 onTap: () {
-                  if(currentPlaylist.id != null && song.id != null){
+                  if (currentPlaylist.id != null && song.id != null) {
                     print('remover');
                   }
                   Navigator.pop(context);
@@ -322,7 +354,6 @@ class PlaylistSongs extends StatelessWidget {
 }
 
 class CustomSearchDelegate extends SearchDelegate<Set<SongData>> {
-
   final SongRepository repo = SongRepository();
   final SearchViewModel searchVM;
 
@@ -338,7 +369,7 @@ class CustomSearchDelegate extends SearchDelegate<Set<SongData>> {
         onPressed: () {
           query = '';
         },
-        icon:  Icon(Icons.clear),
+        icon: Icon(Icons.clear),
       ),
     ];
   }
@@ -349,7 +380,7 @@ class CustomSearchDelegate extends SearchDelegate<Set<SongData>> {
       onPressed: () {
         close(context, searchVM.selectedSongs);
       },
-      icon:  Icon(Icons.arrow_back),
+      icon: Icon(Icons.arrow_back),
     );
   }
 
@@ -358,7 +389,7 @@ class CustomSearchDelegate extends SearchDelegate<Set<SongData>> {
     if (query.isEmpty) {
       return Container();
     }
-    if(query != previousQuery){
+    if (query != previousQuery) {
       previousQuery = query;
       _searchSongs = repo.searchSongs(query);
     }
@@ -371,13 +402,13 @@ class CustomSearchDelegate extends SearchDelegate<Set<SongData>> {
             future: _searchSongs,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return  Center(child: CircularProgressIndicator());
+                return Center(child: CircularProgressIndicator());
               }
               if (snapshot.hasError) {
-                return  Center(child: Text("Ocorreu um erro na busca."));
+                return Center(child: Text("Ocorreu um erro na busca."));
               }
               if (snapshot.data?.isEmpty ?? true) {
-                return  Center(child: Text("Nenhuma música encontrada."));
+                return Center(child: Text("Nenhuma música encontrada."));
               }
               final songs = snapshot.data!;
               return ListView.builder(
@@ -406,6 +437,6 @@ class CustomSearchDelegate extends SearchDelegate<Set<SongData>> {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    return  SizedBox.shrink();
+    return SizedBox.shrink();
   }
 }

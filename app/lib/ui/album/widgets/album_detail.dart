@@ -38,8 +38,13 @@ class AlbumDetailView extends StatelessWidget {
                   Navigator.pop(context);
                 },
               ),
-              title: Text(album.title ?? "Detalhes do Álbum",
-              style: TextStyle( fontWeight: FontWeight.w400, color: Colors.grey)),
+              title: Text(
+                album.title ?? "Detalhes do Álbum",
+                style: TextStyle(
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey,
+                ),
+              ),
             ),
             body: SingleChildScrollView(
               child: Column(
@@ -55,8 +60,8 @@ class AlbumDetailView extends StatelessWidget {
                               color: Colors.black54,
                               offset: Offset(0, 6),
                               blurRadius: 6,
-                            )
-                          ]
+                            ),
+                          ],
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(8.0),
@@ -67,33 +72,38 @@ class AlbumDetailView extends StatelessWidget {
                             fit: BoxFit.cover,
 
                             errorBuilder: (context, error, stackTrace) =>
-                                Container(width: 150, height: 150, color: Colors.grey),
+                                Container(
+                                  width: 150,
+                                  height: 150,
+                                  color: Colors.grey,
+                                ),
                           ),
                         ),
-                      )
+                      ),
                     ),
                   ),
-                  Padding(padding: EdgeInsets.only(left: 40, right: 40),
+                  Padding(
+                    padding: EdgeInsets.only(left: 40, right: 40),
                     child: Center(
                       child: Text(
                         album.title ?? '',
                         style: TextStyle(
-                            fontSize: 40,
-                            fontWeight: FontWeight.bold
+                          fontSize: 40,
+                          fontWeight: FontWeight.bold,
                         ),
                         textAlign: TextAlign.center,
                       ),
                     ),
                   ),
-                  SizedBox(height: 8,),
-                  Padding(padding: EdgeInsets.only(left: 15, right: 15),
+                  SizedBox(height: 8),
+                  Padding(
+                    padding: EdgeInsets.only(left: 15, right: 15),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
                           children: [
-
                             const SizedBox(width: 12),
 
                             Column(
@@ -103,12 +113,42 @@ class AlbumDetailView extends StatelessWidget {
                                   children: [
                                     CircleAvatar(
                                       radius: 20,
-                                      backgroundImage: NetworkImage('https://via.placeholder.com/40'), //TODO: colocar imagem do artist
                                       backgroundColor: Colors.grey,
+                                      child: ClipOval(
+                                        child:
+                                            (album.artist?.pictureBig != null &&
+                                                album
+                                                    .artist!
+                                                    .pictureBig!
+                                                    .isNotEmpty)
+                                            ? Image.network(
+                                                album.artist!.pictureBig!,
+                                                fit: BoxFit.cover,
+                                                width: 40.0,
+                                                height: 40.0,
+                                                errorBuilder:
+                                                    (
+                                                      context,
+                                                      error,
+                                                      stackTrace,
+                                                    ) {
+                                                      return const Icon(
+                                                        Icons.person,
+                                                        color: Colors.white,
+                                                      );
+                                                    },
+                                              )
+                                            : const Icon(
+                                                // Fallback para quando a URL é nula ou vazia
+                                                Icons.person,
+                                                color: Colors.white,
+                                              ),
+                                      ),
                                     ),
-                                    SizedBox(width: 6,),
+                                    SizedBox(width: 6),
                                     Text(
-                                      album.artist?.name ?? 'Artista Desconhecido',
+                                      album.artist?.name ??
+                                          'Artista Desconhecido',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 14,
@@ -155,15 +195,16 @@ class AlbumDetailView extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 20),
-                  Padding(padding: EdgeInsets.only(left: 10, right: 10),
+                  Padding(
+                    padding: EdgeInsets.only(left: 10, right: 10),
                     child: ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: album.songs?.length ?? 0,
                       itemBuilder: (context, index) {
                         final song = album.songs?[index];
-                        
-                        if(song == null) {
+
+                        if (song == null) {
                           return Container();
                         }
 
@@ -230,7 +271,7 @@ void _showSongActions(BuildContext context, AlbumViewModel vm, SongData song) {
               onTap: () {
                 Navigator.pop(context);
               },
-            )
+            ),
           ],
         ),
       );

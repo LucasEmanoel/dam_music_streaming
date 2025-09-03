@@ -29,7 +29,7 @@ class MediaTile extends StatelessWidget {
                 imageUrl,
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) => Container(
-                  color: Colors.grey.shade300,
+                  color: Colors.grey.shade500,
                   child: const Icon(Icons.music_note, color: Colors.white),
                 ),
               ),

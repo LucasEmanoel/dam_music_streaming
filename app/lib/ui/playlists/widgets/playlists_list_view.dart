@@ -51,23 +51,20 @@ class PlaylistListView extends StatelessWidget {
                   itemCount: vm.playlists.length,
                   itemBuilder: (context, index) {
                     final playlist = vm.playlists[index];
-                    return Card(
-                      color: theme.cardColor,
-                      child: InfoTile(
-                        imageUrl: playlist.urlCover ?? '',
-                        title: playlist.title ?? '',
-                        subtitle: playlist.description ?? '',
-                        onTap: () {
-                          if (playlist.id != null) {
-                            vm.startView(id: playlist.id!);
-                            vm.setStackIndex(2);
-                          }
-                        },
-                        trailing: IconButton(
-                          icon: const Icon(Icons.more_vert),
-                          onPressed: () =>
-                              _showPlaylistActions(context, vm, playlist),
-                        ),
+                    return InfoTile(
+                      imageUrl: playlist.urlCover ?? '',
+                      title: playlist.title ?? '',
+                      subtitle: playlist.description ?? '',
+                      onTap: () {
+                        if (playlist.id != null) {
+                          vm.startView(id: playlist.id!);
+                          vm.setStackIndex(2);
+                        }
+                      },
+                      trailing: IconButton(
+                        icon: const Icon(Icons.more_vert),
+                        onPressed: () =>
+                            _showPlaylistActions(context, vm, playlist),
                       ),
                     );
                   },
@@ -77,7 +74,6 @@ class PlaylistListView extends StatelessWidget {
     );
   }
 
-  //TODO: colocar para gerar um component de modal universal, ai poderemos abrir em varias telas.
   void _showPlaylistActions(
     BuildContext context,
     PlaylistViewModel vm,
@@ -153,13 +149,16 @@ class PlaylistListView extends StatelessWidget {
     BuildContext context,
     PlaylistViewModel vm,
     PlaylistData playlist,
-    
   ) async {
     vm.startEditing(playlist: playlist);
     vm.setStackIndex(1);
   }
 
-  void _showDeleteDialog(BuildContext context, PlaylistViewModel vm, PlaylistData playlist) {
+  void _showDeleteDialog(
+    BuildContext context,
+    PlaylistViewModel vm,
+    PlaylistData playlist,
+  ) {
     showDialog(
       context: context,
       builder: (ctx) => ConfirmationDialog(
@@ -169,11 +168,10 @@ class PlaylistListView extends StatelessWidget {
         txtBtn: "Apagar",
         corBtn: Color(0xFFFF3951),
         onConfirm: () {
-          if(playlist.id != null) {
+          if (playlist.id != null) {
             vm.deletePlaylist(playlist.id!);
             print("Playlist apagada!");
           }
-          
         },
       ),
     );

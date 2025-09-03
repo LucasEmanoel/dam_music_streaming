@@ -98,7 +98,10 @@ class ArtistDetailView extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Center(
-            child: Text('Descricao do artista', textAlign: TextAlign.start),
+            child: Text(
+              'Descricao do artista',
+              textAlign: TextAlign.start,
+            ), //TODO: retornar na api
           ),
         ),
       ],
@@ -112,10 +115,12 @@ class ArtistDetailView extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           Text(
-            '123.000 ouvintes mensais',
+            '123.000 ouvintes mensais', //TODO: Nao entra no escopo
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
           ),
-          Text('14 álbums - 136 músicas lançadas'),
+          Text(
+            '14 álbums - 136 músicas lançadas',
+          ), //TODO: retornar quantidade de albums / musicas.
         ],
       ),
     );
@@ -139,14 +144,19 @@ class ArtistDetailView extends StatelessWidget {
           ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: 3,
+            itemCount: artist.songs?.length ?? 0,
             itemBuilder: (context, index) {
-              //final song = artist.songs![index];
+              final song = artist.songs?[index];
+
+              if (song == null) {
+                return Container();
+              }
+
               return InfoTile(
                 leading: ClipRRect(
                   borderRadius: BorderRadius.circular(4),
                   child: Image.network(
-                    '',
+                    song.urlCover ?? '',
                     width: 50,
                     height: 50,
                     fit: BoxFit.cover,
@@ -158,15 +168,13 @@ class ArtistDetailView extends StatelessWidget {
                     ),
                   ),
                 ),
-                title: 'Música desconhecida',
-                subtitle: 'Single',
+                title: song.title ?? 'Música desconhecida',
+                subtitle: 'Single', //TODO: alguma informacao util que nao seja o nome do artista
                 trailing: IconButton(
                   icon: const Icon(Icons.more_vert),
                   onPressed: () => print('oi'),
                 ),
-                onTap: () {
-
-                },
+                onTap: () {},
               );
             },
           ),
@@ -176,9 +184,9 @@ class ArtistDetailView extends StatelessWidget {
   }
 
   Widget _buildAlbums(BuildContext context, ArtistData artist) {
-    //if (artist.albums == null || artist.albums!.isEmpty) {
-    //  return const SizedBox.shrink();
-    //}
+    if (artist.albums == null || artist.albums!.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return Padding(
       padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 16.0),
@@ -186,7 +194,7 @@ class ArtistDetailView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsetsGeometry.symmetric(horizontal: 10, vertical: 10),
+            padding: EdgeInsetsGeometry.symmetric(horizontal: 15, vertical: 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -197,33 +205,40 @@ class ArtistDetailView extends StatelessWidget {
                 RichText(
                   text: TextSpan(
                     text: 'Ver todos',
-                    style: TextStyle(fontSize: 20, color: Colors.grey,fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-          
+
           SizedBox(height: 16),
           SizedBox(
             height: 220,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: 5, //artist.albums!.length,
+              itemCount: artist.albums?.length ?? 0,
               itemBuilder: (context, index) {
-                //final album = artist.albums![index];
+                final album = artist.albums?[index];
+
+                if(album == null) {
+                  return Container();
+                }
 
                 return Container(
                   width: 160,
                   margin: const EdgeInsets.only(right: 16.0),
                   child: MediaTile(
-                    imageUrl: '', //album.urlCover ?? '',
-                    title:
-                        'Álbum desconhecido', //album.title ?? 'Álbum desconhecido',
-                    subtitle: 'Tse', //album.releaseDate?.year.toString() ?? '',
+                    imageUrl: album.urlCover ?? '',
+                    title: album.title ?? 'Álbum desconhecido',
+                    subtitle: album.releaseDate?.year.toString() ?? '',
                     onTap: () {
                       print('Clicou no álbum:');
-                    },
+                    }
                   ),
                 );
               },

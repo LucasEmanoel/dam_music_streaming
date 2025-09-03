@@ -105,14 +105,14 @@ class PlaylistEntryView extends StatelessWidget{
                               }
                               return null;
                             },
-                            onChanged: (v) => vm.entityBeingEdited!.title = v,
+                            onChanged: (v) => vm.entityBeingEdited?.title = v,
                           ),
                           const SizedBox(height: 20),
                           CustomInputField(
                             controller: _descController,
                             hintText: 'Descrição',
                             iconData: Icons.description,
-                            onChanged: (v) => vm.entityBeingEdited!.description = v,
+                            onChanged: (v) => vm.entityBeingEdited?.description = v,
 
                           ),
                         ],
@@ -179,7 +179,7 @@ class PlaylistEntryView extends StatelessWidget{
     if (!_formKey.currentState!.validate()) return;
 
     _formKey.currentState!.save();
-    await vm.savePlaylist();
+    //await vm.savePlaylist();
 
     _nameController.clear();
     _descController.clear();

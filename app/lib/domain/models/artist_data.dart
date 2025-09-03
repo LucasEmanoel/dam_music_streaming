@@ -1,6 +1,5 @@
-import 'package:dam_music_streaming/domain/models/album_data.dart';
-import 'package:dam_music_streaming/domain/models/song_data.dart';
-
+import 'album_data.dart';
+import 'song_data.dart';
 import '../../data/dto/artist_dto.dart';
 
 class ArtistData {
@@ -15,16 +14,16 @@ class ArtistData {
     this.name,
     this.pictureBig,
     this.albums,
-    this.songs
+    this.songs,
   });
 
   factory ArtistData.fromDto(ArtistDto dto) {
     return ArtistData(
-      id: dto.id ?? 0,
+      id: dto.id,
       name: dto.name,
       pictureBig: dto.pictureBig,
       albums: dto.albums?.map((a) => AlbumData.fromDto(a)).toList(),
-      songs: dto.songs?.map((song) => SongData.fromDto(song)).toList(),
+      songs: dto.songs?.map((s) => SongData.fromDto(s)).toList(),
     );
   }
 }

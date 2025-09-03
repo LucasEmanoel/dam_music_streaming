@@ -215,7 +215,7 @@ class PlaylistSongs extends StatelessWidget {
 
   Widget _buildSongsList(BuildContext context, PlaylistViewModel vm, PlaylistData playlist) {
     final theme = Theme.of(context);
-    final songs = playlist.songs!;
+    final songs = playlist.songs ?? [];
 
     return SliverList(
       delegate: SliverChildBuilderDelegate(
@@ -270,7 +270,7 @@ class PlaylistSongs extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => ArtistDetailView(artistId: song.artist!.id!)));
+                        builder: (_) => ArtistDetailView(artistId: song.artist!.id ?? -1)));
                   }
                 },
               ),
@@ -283,7 +283,7 @@ class PlaylistSongs extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => AlbumDetailView(albumId: song.album!.id!)));
+                        builder: (_) => AlbumDetailView(albumId: song.album!.id ?? -1)));
                   }
                 },
               ),
@@ -376,7 +376,7 @@ class CustomSearchDelegate extends SearchDelegate<Set<SongData>> {
               if (snapshot.hasError) {
                 return  Center(child: Text("Ocorreu um erro na busca."));
               }
-              if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              if (snapshot.data?.isEmpty ?? true) {
                 return  Center(child: Text("Nenhuma música encontrada."));
               }
               final songs = snapshot.data!;

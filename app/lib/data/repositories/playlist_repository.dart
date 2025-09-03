@@ -18,17 +18,17 @@ class PlaylistRepository {
     return PlaylistData.fromDto(dto);
   }
 
-  Future<PlaylistData> createPlaylist(PlaylistData playlist) async {
-    final PlaylistDto playlistDto = PlaylistDto.fromData(playlist);
-    final PlaylistDto createdDto = await api.create(playlistDto);
-    return PlaylistData.fromDto(createdDto);
-  }
-
-  Future<PlaylistData> updatePlaylist(int id, PlaylistData playlist) async {
-    final PlaylistDto playlistDto = PlaylistDto.fromData(playlist);
-    final PlaylistDto updatedDto = await api.update(id, playlistDto);
-    return PlaylistData.fromDto(updatedDto);
-  }
+  // Future<PlaylistData> createPlaylist(PlaylistData playlist) async {
+  //   final PlaylistDto playlistDto = PlaylistDto.fromData(playlist);
+  //   final PlaylistDto createdDto = await api.create(playlistDto);
+  //   return PlaylistData.fromDto(createdDto);
+  // }
+  //
+  // Future<PlaylistData> updatePlaylist(int id, PlaylistData playlist) async {
+  //   final PlaylistDto playlistDto = PlaylistDto.fromData(playlist);
+  //   final PlaylistDto updatedDto = await api.update(id, playlistDto);
+  //   return PlaylistData.fromDto(updatedDto);
+  // }
 
   Future<PlaylistData> addSongsToPlaylist(int id, List<int> songsIds) async{
     final PlaylistDto updatedDto = await api.postSongs(id, songsIds);

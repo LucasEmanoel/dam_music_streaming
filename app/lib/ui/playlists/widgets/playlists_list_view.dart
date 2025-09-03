@@ -58,8 +58,10 @@ class PlaylistListView extends StatelessWidget {
                         title: playlist.title ?? '',
                         subtitle: playlist.description ?? '',
                         onTap: () {
-                          vm.startView(id: playlist.id!);
-                          vm.setStackIndex(2);
+                          if (playlist.id != null) {
+                            vm.startView(id: playlist.id!);
+                            vm.setStackIndex(2);
+                          }
                         },
                         trailing: IconButton(
                           icon: const Icon(Icons.more_vert),
@@ -81,7 +83,6 @@ class PlaylistListView extends StatelessWidget {
     PlaylistViewModel vm,
     PlaylistData playlist,
   ) {
-
     vm.entityBeingVisualized = playlist;
 
     showModalBottomSheet(
@@ -112,8 +113,10 @@ class PlaylistListView extends StatelessWidget {
                 text: 'Ver Musicas',
                 onTap: () {
                   Navigator.pop(context);
-                  vm.startView(id: playlist.id!);
-                  vm.setStackIndex(2);
+                  if (playlist.id != null) {
+                    vm.startView(id: playlist.id!);
+                    vm.setStackIndex(2);
+                  }
                 },
               ),
               ButtonCustomSheet(
@@ -121,7 +124,7 @@ class PlaylistListView extends StatelessWidget {
                 text: 'Editar playlist',
                 onTap: () {
                   Navigator.pop(context);
-                  _editPlaylist(context, playlist, vm);
+                  _editPlaylist(context, vm, playlist);
                 },
               ),
               ButtonCustomSheet(
@@ -136,7 +139,7 @@ class PlaylistListView extends StatelessWidget {
                 text: 'Deletar playlist',
                 onTap: () {
                   Navigator.pop(context);
-                  _showDeleteDialog(context, vm);
+                  _showDeleteDialog(context, vm, playlist);
                 },
               ),
             ],
@@ -148,26 +151,29 @@ class PlaylistListView extends StatelessWidget {
 
   Future<void> _editPlaylist(
     BuildContext context,
-    PlaylistData playlist,
     PlaylistViewModel vm,
+    PlaylistData playlist,
+    
   ) async {
     vm.startEditing(playlist: playlist);
     vm.setStackIndex(1);
   }
 
-  void _showDeleteDialog(BuildContext context, PlaylistViewModel vm) {
+  void _showDeleteDialog(BuildContext context, PlaylistViewModel vm, PlaylistData playlist) {
     showDialog(
       context: context,
       builder: (ctx) => ConfirmationDialog(
         title: "Atenção!",
         content:
             "Apagar a playlist irá remover permanentemente essa seleção do sistema. Essa ação não é reversível.",
-        // cancelara sempre vou deixar cinza
         txtBtn: "Apagar",
         corBtn: Color(0xFFFF3951),
         onConfirm: () {
-          vm.deletePlaylist(vm.entityBeingVisualized?.id ?? -1);
-          print("Playlist apagada!");
+          if(playlist.id != null) {
+            vm.deletePlaylist(playlist.id!);
+            print("Playlist apagada!");
+          }
+          
         },
       ),
     );

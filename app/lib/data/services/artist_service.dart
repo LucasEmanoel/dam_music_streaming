@@ -9,7 +9,6 @@ class ArtistApiService {
   ArtistApiService({ApiClient? apiClient}) : _dio = apiClient?.dio ?? ApiClient().dio;
 
   Future<ArtistDto> getById(int id) async {
-    print('ARTIST ID $id');
     final response = await _dio.get('/artists/$id');
     return ArtistDto.fromMap(response.data);
   }

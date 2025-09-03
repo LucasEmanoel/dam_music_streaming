@@ -7,7 +7,6 @@ class SongRepository {
 
   Future<List<SongData>> searchSongs(String query) async {
     if (query.isEmpty) return [];
-
     List<SongDto> songs = await api.searchSongs(query);
     return songs.map((dto) => SongData.fromDto(dto)).toList();
   }

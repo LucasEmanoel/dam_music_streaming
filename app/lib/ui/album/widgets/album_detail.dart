@@ -103,12 +103,12 @@ class AlbumDetailView extends StatelessWidget {
                                   children: [
                                     CircleAvatar(
                                       radius: 20,
-                                      backgroundImage: NetworkImage('https://via.placeholder.com/40'), // Replace with your image URL
+                                      backgroundImage: NetworkImage('https://via.placeholder.com/40'), //TODO: colocar imagem do artist
                                       backgroundColor: Colors.grey,
                                     ),
                                     SizedBox(width: 6,),
                                     Text(
-                                      'Arctic Monkeys',
+                                      album.artist?.name ?? 'Artista Desconhecido',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 14,
@@ -161,11 +161,16 @@ class AlbumDetailView extends StatelessWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: album.songs?.length ?? 0,
                       itemBuilder: (context, index) {
-                        final song = album.songs![index];
+                        final song = album.songs?[index];
+                        
+                        if(song == null) {
+                          return Container();
+                        }
+
                         return InfoTile(
-                          imageUrl: song.urlCover ?? '',
-                          title: song.title ?? '',
-                          subtitle: song.artist?.name ?? '',
+                          imageUrl: song.urlCover ?? 'Sem imagem',
+                          title: song.title ?? 'Sem titulo',
+                          subtitle: song.artist?.name ?? 'Artista Desconhecido',
                           trailing: const Icon(Icons.more_vert, size: 20),
                           onTap: () async {
                             _showSongActions(context, vm, song);

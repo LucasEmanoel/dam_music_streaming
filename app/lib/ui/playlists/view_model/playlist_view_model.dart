@@ -40,42 +40,42 @@ class PlaylistViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> savePlaylist() async {
-    _isLoading = true;
-    notifyListeners();
-
-    if (entityBeingEdited == null) return;
-
-    try {
-      final savedPlaylist = (entityBeingEdited!.id == null)
-          ? await repository.createPlaylist(entityBeingEdited!)
-          : await repository.updatePlaylist(
-              entityBeingEdited!.id!,
-              entityBeingEdited!,
-            );
-
-      if (_pickedImageFile != null) {
-        final playlistId =
-            savedPlaylist.id ??
-            FirebaseFirestore.instance.collection('temp').doc().id;
-
-        final ref = _firestore.ref('playlist_covers/$playlistId.jpg');
-        final uploadTask = await ref.putFile(_pickedImageFile!);
-
-        final imageUrl = await uploadTask.ref.getDownloadURL();
-        savedPlaylist.urlCover = imageUrl;
-      }
-
-      await repository.updatePlaylist(savedPlaylist.id!, savedPlaylist);
-      await loadPlaylists();
-    } catch (e) {
-      print('error ao salvar: $e');
-    } finally {
-      _isLoading = false;
-      _pickedImageFile = null;
-      setStackIndex(0);
-    }
-  }
+  // Future<void> savePlaylist() async {
+  //   _isLoading = true;
+  //   notifyListeners();
+  //
+  //   if (entityBeingEdited == null) return;
+  //
+  //   try {
+  //     final savedPlaylist = (entityBeingEdited!.id == null)
+  //         ? await repository.createPlaylist(entityBeingEdited!)
+  //         : await repository.updatePlaylist(
+  //             entityBeingEdited!.id!,
+  //             entityBeingEdited!,
+  //           );
+  //
+  //     if (_pickedImageFile != null) {
+  //       final playlistId =
+  //           savedPlaylist.id ??
+  //           FirebaseFirestore.instance.collection('temp').doc().id;
+  //
+  //       final ref = _firestore.ref('playlist_covers/$playlistId.jpg');
+  //       final uploadTask = await ref.putFile(_pickedImageFile!);
+  //
+  //       final imageUrl = await uploadTask.ref.getDownloadURL();
+  //       savedPlaylist.urlCover = imageUrl;
+  //     }
+  //
+  //     await repository.updatePlaylist(savedPlaylist.id!, savedPlaylist);
+  //     await loadPlaylists();
+  //   } catch (e) {
+  //     print('error ao salvar: $e');
+  //   } finally {
+  //     _isLoading = false;
+  //     _pickedImageFile = null;
+  //     setStackIndex(0);
+  //   }
+  // }
 
   Future<void> addSongsToCurrentPlaylist(int id, Set<SongData> songs) async {
     try {
@@ -95,8 +95,6 @@ class PlaylistViewModel extends ChangeNotifier {
   }
 
   Future<void> deletePlaylist(int id) async {
-    if (entityBeingVisualized == null) return;
-
     try {
       final ref = _firestore.ref('playlist_covers/$id.jpg');
       await ref.delete().catchError(
@@ -132,31 +130,16 @@ class PlaylistViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void startView({int? id}) async {
-    print('ID QUE TO PASSANDO LIST -> VIEW = $id');
-
-    if (id == null) {
-      print('ID NULL');
-      return;
-    }
-
+  void startView({required int id}) async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      print('antes');
       final playlistComMusicas = await repository.getPlaylistWithSongs(
         id,
       );
-      print('depois');
-      if(playlistComMusicas.songs?.isEmpty ?? true){
-        print('vazia');
-      } else {
-        entityBeingVisualized = playlistComMusicas;
-      }
-
-
-      
+      entityBeingVisualized = playlistComMusicas;
+  
     } catch (e) {
       print(e);
     } finally {

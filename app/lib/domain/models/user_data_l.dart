@@ -1,10 +1,10 @@
 import '../../data/dto/user_dto_l.dart';
 
 class UsuarioData {
-  final int? id;
-  final String? username;
-  final String? email;
-  final String? role;
+  int? id;
+  String? username;
+  String? email;
+  String? role;
 
   UsuarioData({
     this.id,

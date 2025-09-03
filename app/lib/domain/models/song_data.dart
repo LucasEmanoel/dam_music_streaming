@@ -1,6 +1,6 @@
-import '../../data/dto/song_dto.dart';
 import 'album_data.dart';
 import 'artist_data.dart';
+import '../../data/dto/song_dto.dart';
 
 class SongData {
   int? id;
@@ -10,17 +10,21 @@ class SongData {
   ArtistData? artist;
   AlbumData? album;
 
-  SongData({this.id, this.title, this.artist, this.album, this.urlCover});
+  SongData({
+    this.id,
+    this.title,
+    this.urlCover,
+    this.artist,
+    this.album,
+  });
 
   factory SongData.fromDto(SongDto dto) {
     return SongData(
-      id: dto.id ?? 0,
+      id: dto.id,
       title: dto.title,
-      artist: dto.artist != null
-          ? ArtistData.fromDto(dto.artist!)
-          : ArtistData(),
-      album: dto.album != null ? AlbumData.fromDto(dto.album!) : AlbumData(),
       urlCover: dto.urlCover,
+      artist: dto.artist != null ? ArtistData.fromDto(dto.artist!) : null,
+      album: dto.album != null ? AlbumData.fromDto(dto.album!) : null,
     );
   }
 

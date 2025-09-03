@@ -14,7 +14,6 @@ class PlaylistApiService {
   Future<List<PlaylistDto>> fetchPlaylists() async{
     final response = await _dio.get('/playlists');
     final List<dynamic> jsonList = response.data;
-    //print(jsonList);
     return jsonList
         .map((map) => PlaylistDto.fromMap(map as Map<String, dynamic>))
         .toList();
@@ -48,8 +47,6 @@ class PlaylistApiService {
   }
 
   Future<PlaylistDto> update(int id, PlaylistDto playlist) async {
-    //('SERVICE');
-    //print(playlist.toMap());
     final response = await _dio.put('/playlists/$id', data: playlist.toMap());
     return PlaylistDto.fromMap(response.data);
   }

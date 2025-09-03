@@ -165,7 +165,7 @@ class ArtistDetailView extends StatelessWidget {
                   onPressed: () => print('oi'),
                 ),
                 onTap: () {
-                  // TODO: Adicionar lógica para tocar música
+
                 },
               );
             },

@@ -1,0 +1,114 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Genre {
+  id Int @id @default(autoincrement())
+  idDeezer Int @map("id_deezer")
+  name String
+
+  artist Artist[]
+  album Album[]
+  song Song[]
+
+  @@map("genre")
+}
+
+model Artist {
+  id Int @id @default(autoincrement())
+  idDeezer Int @map("id_deezer")
+  name  String
+  picture String
+  pictureSmall String  @map("picture_small")
+  pictureMedium String @map("picture_medium")
+  pictureBig String @map("picture_big")
+  pictureXl String @map("picture_xl")
+  radio Boolean
+  tracklist String
+  type String
+
+  genre Genre @relation(fields: [genreId], references: [id])
+  genreId Int @map("genre_id")
+
+  album Album[]
+
+  song Song[]
+
+  @@map("artist")
+}
+
+model Album {
+  id Int @id @default(autoincrement())
+  idDeezer Int @map("id_deezer")
+  title String
+  link String
+  cover String
+  coverSmall String @map("cover_small")
+  coverMedium String @map("cover_medium")
+  coverBig String @map("cover_big")
+  coverXl String @map("cover_xl")
+  md5Image String @map("md5_image")
+  genreDeezerId Int @map("genre_deezer_id")
+  fans Int
+  releasedDate String @map("release_date")
+  recordType String @map("record_type")
+  tracklist String
+  explicitLyrics Boolean @map("explicit_lyrics")
+  type String
+
+  genre Genre @relation(fields: [genreId], references: [id])
+  genreId Int @map("genre_id")
+
+  artist Artist @relation(fields: [artistId], references: [id])
+  artistId Int @map("artist_id")
+
+  song Song[]
+
+  @@map("album")
+}
+
+model Song{
+  id Int @id @default(autoincrement())
+  idDeezer Int @map("id_deezer")
+  readable Boolean
+  title String
+  titleShort String @map("title_short")
+  titleVersion String @map("title_version")
+  isrc String
+  link String
+  duration Int
+  trackPosition Int @map("track_position")
+  diskNumber Int @map("disk_number")
+  rank Int
+  explicitLyrics Boolean @map("explicit_lyrics")
+  explicitContentLyrics Int @map("explicit_content_lyrics")
+  explicitContentCover Int @map("explicit_content_cover")
+  preview String
+  md5Image String @map("md5_image")
+  type String
+
+  downloadUrl String @map("download_url")
+
+  genre Genre @relation(fields: [genreId], references: [id])
+  genreId Int @map("genre_id")
+
+  artist Artist @relation(fields: [artistId], references: [id])
+  artistId Int @map("artist_id")
+
+  album Album @relation(fields: [albumId], references: [id])
+  albumId Int @map("album_id")
+
+  @@map("song")
+}

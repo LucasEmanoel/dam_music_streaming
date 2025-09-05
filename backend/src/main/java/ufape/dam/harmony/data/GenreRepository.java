@@ -7,9 +7,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import ufape.dam.harmony.business.entity.Album;
+import ufape.dam.harmony.business.entity.Genre;
 
-public interface AlbumRepository extends JpaRepository<Album, Long> {
-	
-	@Query("SELECT b FROM Album b LEFT JOIN FETCH b.songs WHERE b.id = :id")
-    Optional<Album> findByIdWithSongs(@Param("id") Long id);
+public interface GenreRepository extends JpaRepository<Genre, Long> {
+	@Query("SELECT g FROM Genre g LEFT JOIN FETCH g.albums WHERE g.id = :id")
+    Optional<Genre> findByIdWithAlbums(@Param("id") Long id);
 }

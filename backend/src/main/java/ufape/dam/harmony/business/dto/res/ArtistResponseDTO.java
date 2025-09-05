@@ -26,41 +26,45 @@ public class ArtistResponseDTO {
         
         dto.setId(entity.getId());
         dto.setName(entity.getName());
-        dto.setPictureUrl(entity.getPictureUrl());
-        
-        if (entity.getAlbums() != null) {
-            dto.setAlbums(
-                entity.getAlbums().stream()
-                    .map(AlbumInArtistResponseDTO::fromEntity)
-                    .collect(Collectors.toList())
-            );
-        }
-
-        if (entity.getSongs() != null) {
-            dto.setSongs(
-                entity.getSongs().stream()
-                    .map(SongInArtistResponseDTO::fromEntity)
-                    .collect(Collectors.toList())
-            );
-        }
+        dto.setPictureUrl(entity.getPictureMedium());
         
         return dto;
     }
-
+    
+    public static ArtistResponseDTO fromEntityWithAlbums(Artist entity) {
+        if (entity == null) return null;
+        
+        ArtistResponseDTO dto = new ArtistResponseDTO();
+        
+        dto.setId(entity.getId());
+        dto.setName(entity.getName());
+        dto.setPictureUrl(entity.getPictureMedium());
+        
+	      if (entity.getAlbums() != null) {
+		      dto.setAlbums(
+		          entity.getAlbums().stream()
+		              .map(AlbumInArtistResponseDTO::fromEntity)
+		              .collect(Collectors.toList())
+		      );
+		  }
+        
+        return dto;
+    }
+    
     @Data
     public static class AlbumInArtistResponseDTO {
         private Long id;
         private String title;
         private String urlCover;
-        private Date release_date;
+        private String release_date;
 
         public static AlbumInArtistResponseDTO fromEntity(Album entity) {
             if (entity == null) return null;
             var dto = new AlbumInArtistResponseDTO();
             dto.setId(entity.getId());
             dto.setTitle(entity.getTitle());
-            dto.setUrlCover(entity.getUrlCover());
-            dto.setRelease_date(entity.getRelease_date());
+            dto.setUrlCover(entity.getCoverMedium());
+            dto.setRelease_date(entity.getReleasedDate());
             return dto;
         }
     }
@@ -76,7 +80,7 @@ public class ArtistResponseDTO {
             var dto = new SongInArtistResponseDTO();
             dto.setId(entity.getId());
             dto.setTitle(entity.getTitle());
-            dto.setDuration(entity.getDuration());
+            dto.setDuration(Duration.ofSeconds(entity.getDuration()));
             return dto;
         }
     }

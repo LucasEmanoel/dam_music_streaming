@@ -1,9 +1,11 @@
 package ufape.dam.harmony.business.dto.res;
 
 import java.time.Duration;
-import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
 import ufape.dam.harmony.business.entity.Album;
@@ -14,12 +16,13 @@ import ufape.dam.harmony.business.entity.Song;
 public class ArtistResponseDTO {
 	private Long id;
     private String name;
+    @JsonProperty("picture_url")
     private String pictureUrl;
     
     private List<AlbumInArtistResponseDTO> albums;
     private List<SongInArtistResponseDTO> songs;
     
-    public static ArtistResponseDTO fromEntity(Artist entity) {
+    public static ArtistResponseDTO fromEntity(Artist entity, List<Album> albums, List<Song> songs) {
         if (entity == null) return null;
         
         ArtistResponseDTO dto = new ArtistResponseDTO();
@@ -27,26 +30,23 @@ public class ArtistResponseDTO {
         dto.setId(entity.getId());
         dto.setName(entity.getName());
         dto.setPictureUrl(entity.getPictureMedium());
-        
-        return dto;
-    }
-    
-    public static ArtistResponseDTO fromEntityWithAlbums(Artist entity) {
-        if (entity == null) return null;
-        
-        ArtistResponseDTO dto = new ArtistResponseDTO();
-        
-        dto.setId(entity.getId());
-        dto.setName(entity.getName());
-        dto.setPictureUrl(entity.getPictureMedium());
-        
-	      if (entity.getAlbums() != null) {
-		      dto.setAlbums(
-		          entity.getAlbums().stream()
-		              .map(AlbumInArtistResponseDTO::fromEntity)
-		              .collect(Collectors.toList())
-		      );
-		  }
+
+        if (albums != null) {
+            dto.setAlbums(
+                albums.stream()
+                    .map(AlbumInArtistResponseDTO::fromEntity)
+                    .collect(Collectors.toList())
+            );
+        }
+
+        if (songs != null) {
+            dto.setSongs(
+                songs.stream()
+                    .map(SongInArtistResponseDTO::fromEntity)
+                    .collect(Collectors.toList())
+            );
+        }
+
         
         return dto;
     }
@@ -55,8 +55,10 @@ public class ArtistResponseDTO {
     public static class AlbumInArtistResponseDTO {
         private Long id;
         private String title;
+        @JsonProperty("url_cover")
         private String urlCover;
-        private String release_date;
+        @JsonProperty("release_date")
+        private String releaseDate;
 
         public static AlbumInArtistResponseDTO fromEntity(Album entity) {
             if (entity == null) return null;
@@ -64,7 +66,7 @@ public class ArtistResponseDTO {
             dto.setId(entity.getId());
             dto.setTitle(entity.getTitle());
             dto.setUrlCover(entity.getCoverMedium());
-            dto.setRelease_date(entity.getReleasedDate());
+            dto.setReleaseDate(entity.getReleasedDate());
             return dto;
         }
     }

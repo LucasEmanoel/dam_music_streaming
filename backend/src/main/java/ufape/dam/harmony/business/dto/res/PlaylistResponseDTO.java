@@ -1,29 +1,34 @@
 package ufape.dam.harmony.business.dto.res;
 
 import java.time.Duration;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
 import ufape.dam.harmony.business.entity.Playlist;
 import ufape.dam.harmony.business.entity.Song;
+import ufape.dam.harmony.business.entity.Usuario;
 
 @Data
 public class PlaylistResponseDTO {
 	private Long id;
     private String title;
     private String description;
+    @JsonProperty("url_cover")
     private String urlCover;
     
-    private UserResponseDTO author;
-    private Set<SongInPlaylistResponseDTO> songs = new HashSet<>();
+    private AuthorInPlaylistResponseDTO author;
+    private List<SongInPlaylistResponseDTO> songs;
     
+    @JsonProperty("nb_songs")
     private Integer numSongs;
     private Duration duration;
     
 
-    public static PlaylistResponseDTO fromEntity(Playlist entity) {
+    public static PlaylistResponseDTO fromEntity(Playlist entity, Set<Song> songs) {
         if (entity == null) return null;
         
         PlaylistResponseDTO dto = new PlaylistResponseDTO();
@@ -36,18 +41,35 @@ public class PlaylistResponseDTO {
         dto.setDuration(entity.getDuration());
 
         if (entity.getAuthor() != null) {
-            dto.setAuthor(UserResponseDTO.fromEntity(entity.getAuthor()));
+            dto.setAuthor(AuthorInPlaylistResponseDTO.fromEntity(entity.getAuthor()));
         }
         
-        if (entity.getSongs() != null) {
+        if (songs != null) {
             dto.setSongs(
-                entity.getSongs().stream()
-                    .map(SongInPlaylistResponseDTO::fromEntity) 
-                    .collect(Collectors.toSet())
+                songs.stream()
+                    .map(SongInPlaylistResponseDTO::fromEntity)
+                    .collect(Collectors.toList())
             );
         }
 
+
         return dto;
+    }
+    
+    @Data
+    public static class AuthorInPlaylistResponseDTO {
+    	private Long id;
+        private String username;
+        
+        public static AuthorInPlaylistResponseDTO fromEntity(Usuario entity) {
+            if (entity == null) return null;
+            var dto = new AuthorInPlaylistResponseDTO();
+            
+            dto.setId(entity.getId());
+            dto.setUsername(entity.getUsername());
+
+            return dto;
+        }
     }
     
     @Data

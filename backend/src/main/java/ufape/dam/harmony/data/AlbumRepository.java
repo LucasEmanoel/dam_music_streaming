@@ -1,5 +1,6 @@
 package ufape.dam.harmony.data;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +11,6 @@ import ufape.dam.harmony.business.entity.Album;
 
 public interface AlbumRepository extends JpaRepository<Album, Long> {
 	
-	@Query("SELECT b FROM Album b LEFT JOIN FETCH b.songs WHERE b.id = :id")
-    Optional<Album> findByIdWithSongs(@Param("id") Long id);
+	List<Album> findAllByArtistId(Long id);
+	List<Album> findTop10ByGenreIdOrderByReleasedDateDesc(Long id);
 }

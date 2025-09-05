@@ -1,6 +1,9 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'package:dam_music_streaming/config/token_manager.dart';
+import 'package:dam_music_streaming/data/services/api_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:dam_music_streaming/ui/core/ui/svg_icon.dart';
@@ -88,7 +91,18 @@ class _LoginInicioState extends State<LoginInicio> {
                           ),
                         ],
                       ),
-
+                      ElevatedButton(
+                        onPressed: () async {
+                          try {
+                            final r = await ApiClient().dio.get('/health',
+                                options: Options(extra: {'auth': false}));
+                            _toast('Health: ${r.statusCode} ${r.data}');
+                          } catch (e) {
+                            _toast('Sem resposta do backend: $e');
+                          }
+                        },
+                        child: const Text('Testar backend'),
+                      ),
                       const SizedBox(height: 10),
                       SizedBox(
                         height: 48,
@@ -167,6 +181,33 @@ class _LoginInicioState extends State<LoginInicio> {
     );
   }
 
+  Future<void> _exchangeAndGoHome() async {
+    final user = FirebaseAuth.instance.currentUser;
+    final idToken = await user?.getIdToken(true);
+    if (idToken == null) throw Exception('Falha ao obter idToken do Firebase.');
+
+    try {
+      final res = await ApiClient().dio.post(
+        '/auth/google',
+        data: {'id_token': idToken},
+        options: Options(extra: {'auth': false}),
+      );
+
+      final data = res.data as Map<String, dynamic>;
+      final jwt = (data['access_token'] ?? data['token'] ?? data['jwt']) as String?;
+      if (jwt == null || jwt.isEmpty) throw Exception('Backend não retornou JWT');
+
+      await saveToken(jwt);
+      if (!mounted) return;
+      Navigator.pushNamedAndRemoveUntil(context, '/home', (_) => false);
+    } on DioException catch (e) {
+      _toast('Falha ao trocar token (${e.type}) ${e.response?.statusCode ?? ''}');
+      rethrow;
+    } catch (e) {
+      _toast('Falha ao trocar token: $e');
+      rethrow;
+    }
+  }
   Future<void> _entrar() async {
     final email = emailCtrl.text.trim();
     final pass  = passCtrl.text;
@@ -179,8 +220,8 @@ class _LoginInicioState extends State<LoginInicio> {
     setState(() => _loading = true);
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: pass);
+      await _exchangeAndGoHome();
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/home');
     } on FirebaseAuthException catch (e) {
       _toast(_mapAuthError(e));
     } catch (e) {
@@ -210,6 +251,7 @@ class _LoginInicioState extends State<LoginInicio> {
       if (kIsWeb) {
         final cred = await FirebaseAuth.instance.signInWithPopup(GoogleAuthProvider());
         if (cred.user == null) throw Exception('Login cancelado.');
+        await _exchangeAndGoHome();
       } else {
         final googleUser = await GoogleSignIn().signIn();
         if (googleUser == null) throw Exception('Login cancelado.');
@@ -219,9 +261,9 @@ class _LoginInicioState extends State<LoginInicio> {
           idToken: googleAuth.idToken,
         );
         await FirebaseAuth.instance.signInWithCredential(credential);
+        await _exchangeAndGoHome();
       }
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/home');
     } on FirebaseAuthException catch (e) {
       _toast(_mapAuthError(e));
     } catch (e) {

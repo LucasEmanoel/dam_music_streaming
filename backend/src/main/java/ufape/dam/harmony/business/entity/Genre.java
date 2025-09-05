@@ -20,12 +20,12 @@ public class Genre {
 	private int idDeezer;
 	private String name;
 	
-    @OneToMany(mappedBy = "genre", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Artist> artists;
-	
-    @OneToMany(mappedBy = "genre", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Album> albums;
-	
-	@OneToMany(mappedBy = "genre", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Song> songs;
+//    @OneToMany(mappedBy = "genre", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Artist> artists;
+//	
+//    @OneToMany(mappedBy = "genre", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Album> albums;
+//	
+//	@OneToMany(mappedBy = "genre", cascade = CascadeType.ALL, orphanRemoval = true)
+//	private List<Song> songs;
 }

@@ -1,14 +1,9 @@
 package ufape.dam.harmony.business.entity;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import lombok.Data;
 
 @Entity
@@ -22,8 +17,5 @@ public class Usuario {
     private String email;
     private String password;
     private String role;
-    
-    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Playlist> playlists = new HashSet<>();
     
 }

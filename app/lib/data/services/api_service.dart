@@ -8,26 +8,31 @@ class ApiClient {
   ApiClient._internal()
       : dio = Dio(BaseOptions(
     baseUrl: ApiConfig.baseUrl,
-    connectTimeout: const Duration(seconds: 5),
-    receiveTimeout: const Duration(seconds: 10),
-    sendTimeout: const Duration(seconds: 10),
+    connectTimeout: const Duration(seconds: 10),
+    receiveTimeout: const Duration(seconds: 15),
   )) {
+    dio.interceptors.add(LogInterceptor(
+      request: true, requestHeader: true, requestBody: true,
+      responseHeader: false, responseBody: true, error: true,
+    ));
 
+    // Injeta Authorization só quando precisar
     dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
-
-        final token = await getToken();
-        if (token != null && token.isNotEmpty) {
-          options.headers['Authorization'] = 'Bearer $token';
+        final needsAuth = options.extra['auth'] != false;
+        if (needsAuth) {
+          final token = await getToken();
+          if (token != null && token.isNotEmpty) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
+        } else {
+          options.headers.remove('Authorization'); // garantir que não vai
         }
-        return handler.next(options);
+        handler.next(options);
       },
     ));
   }
 
   static final ApiClient _instance = ApiClient._internal();
-
-  factory ApiClient() {
-    return _instance;
-  }
+  factory ApiClient() => _instance;
 }

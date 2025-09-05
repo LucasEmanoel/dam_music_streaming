@@ -90,6 +90,7 @@ class PlaylistViewModel extends ChangeNotifier {
         musicApiIds,
       );
       entityBeingVisualized = updated;
+      notifyListeners();
     } catch (e) {
       print('Erro ao adicionar músicas: $e');
     } finally {
@@ -114,6 +115,7 @@ class PlaylistViewModel extends ChangeNotifier {
     _isLoading = true;
     try {
       await repository.removeSongFromPlaylist(playlistId, songId);
+      entityBeingVisualized?.songs?.removeWhere((song) => song.id == songId);
       await loadPlaylists();
     } catch (e) {
       print('Erro ao remove musuca de playlist: $e');

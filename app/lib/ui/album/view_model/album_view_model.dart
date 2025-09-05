@@ -19,7 +19,7 @@ class AlbumViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _albumBeingViewed = await _repository.fetchById(albumId);
+      _albumBeingViewed = await _repository.fetchDetailedById(albumId);
     } catch (e) {
       print("Erro ao carregar detalhes do álbum: $e");
     } finally {

@@ -61,7 +61,7 @@ class PlaylistApiService {
   Future<PlaylistDto> postSongs(int id, List<int> songsIds) async {
     final response = await _dio.post(
       '/playlists/$id/songs',
-      data: {'song_ids': songsIds},
+      data: {'songs_ids': songsIds},
     );
 
     return PlaylistDto.fromMap(response.data);

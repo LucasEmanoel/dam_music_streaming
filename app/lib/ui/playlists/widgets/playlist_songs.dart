@@ -218,7 +218,9 @@ class PlaylistSongs extends StatelessWidget {
                     );
 
                 if (selectedSongs != null && selectedSongs.isNotEmpty) {
+                 
                   vm.addSongsToCurrentPlaylist(playlist.id!, selectedSongs);
+                  
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
@@ -343,7 +345,7 @@ class PlaylistSongs extends StatelessWidget {
                     print('remover');
                     vm.removeSongFromPlaylist(currentPlaylist.id!, song.id!);
                   }
-                  
+
                   Navigator.pop(context);
                 },
               ),
@@ -400,37 +402,48 @@ class CustomSearchDelegate extends SearchDelegate<Set<SongData>> {
       value: searchVM,
       child: Consumer<SearchViewModel>(
         builder: (context, viewModel, child) {
-          return FutureBuilder<List<SongData>>(
-            future: _searchSongs,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
-              }
-              if (snapshot.hasError) {
-                return Center(child: Text("Ocorreu um erro na busca."));
-              }
-              if (snapshot.data?.isEmpty ?? true) {
-                return Center(child: Text("Nenhuma música encontrada."));
-              }
-              final songs = snapshot.data!;
-              return ListView.builder(
-                itemCount: songs.length,
-                itemBuilder: (context, index) {
-                  final song = songs[index];
-                  final isSelected = viewModel.selectedSongs.contains(song);
-                  return InfoTile(
-                    title: song.title ?? 'Título Desconhecido',
-                    subtitle: song.artist?.name ?? 'Artista Desconhecido',
-                    imageUrl: song.urlCover ?? '',
-                    trailing: Checkbox(
-                      value: isSelected,
-                      onChanged: (value) => viewModel.toggleSongSelection(song),
-                    ),
-                    onTap: () => viewModel.toggleSongSelection(song),
-                  );
-                },
-              );
-            },
+          return Scaffold(
+            body: FutureBuilder<List<SongData>>(
+              future: _searchSongs,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return Center(child: Text("Ocorreu um erro na busca."));
+                }
+                if (snapshot.data?.isEmpty ?? true) {
+                  return Center(child: Text("Nenhuma música encontrada."));
+                }
+                final songs = snapshot.data!;
+                return ListView.builder(
+                  itemCount: songs.length,
+                  itemBuilder: (context, index) {
+                    final song = songs[index];
+                    final isSelected = viewModel.selectedSongs.contains(song);
+                    return InfoTile(
+                      title: song.title ?? 'Título Desconhecido',
+                      subtitle: song.artist?.name ?? 'Artista Desconhecido',
+                      imageUrl: song.urlCover ?? '',
+                      trailing: Checkbox(
+                        value: isSelected,
+                        onChanged: (value) =>
+                            viewModel.toggleSongSelection(song),
+                      ),
+                      onTap: () => viewModel.toggleSongSelection(song),
+                    );
+                  },
+                );
+              },
+            ),
+            floatingActionButton: FloatingActionButton.extended(
+              onPressed: () {
+                close(context, viewModel.selectedSongs);
+              },
+              icon: Icon(Icons.check, color: Colors.white),
+              label: Text('Salvar', style: TextStyle(color: Colors.white)),
+            ),
+            floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
           );
         },
       ),

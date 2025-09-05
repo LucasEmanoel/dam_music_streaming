@@ -18,7 +18,7 @@ public class AlbumResponseDTO {
     private String title;
     @JsonProperty("url_cover")
     private String urlCover;
-    private int duration; // segundos
+    private Duration duration; // segundos
     @JsonProperty("release_date")
     private String releaseDate;
     
@@ -48,7 +48,7 @@ public class AlbumResponseDTO {
                                            .mapToInt(Song::getDuration)
                                            .sum();                     
         }
-        dto.setDuration(totalDurationInSeconds);
+        dto.setDuration(Duration.ofSeconds(totalDurationInSeconds));
         
         
         if (entity.getArtist() != null) {
@@ -80,12 +80,15 @@ public class AlbumResponseDTO {
 		private Long id;
 	    private String title;
 	    private Duration duration;
+	    @JsonProperty("md5_image")
+	    private String md5Image;
 
 	    public static SongInsideAlbumDTO fromEntity(Song entity) {
 	        if (entity == null) return null;
 	        SongInsideAlbumDTO dto = new SongInsideAlbumDTO();
 	        dto.setId(entity.getId());
 	        dto.setTitle(entity.getTitle());
+	        dto.setMd5Image(entity.getMd5Image());
 	        dto.setDuration(Duration.ofSeconds(entity.getDuration()));
 	        return dto;
 	    }

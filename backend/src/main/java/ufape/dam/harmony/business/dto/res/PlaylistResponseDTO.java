@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
+import ufape.dam.harmony.business.entity.Album;
+import ufape.dam.harmony.business.entity.Artist;
 import ufape.dam.harmony.business.entity.Playlist;
 import ufape.dam.harmony.business.entity.Song;
 import ufape.dam.harmony.business.entity.Usuario;
@@ -77,13 +79,49 @@ public class PlaylistResponseDTO {
         private Long id;
         private String title;
         private Duration duration;
-
+        private AlbumInSongPlaylistResponseDTO album;
+        private ArtistInSongPlaylistResponseDTO artist;
+        
         public static SongInPlaylistResponseDTO fromEntity(Song entity) {
             if (entity == null) return null;
+            
             var dto = new SongInPlaylistResponseDTO();
+            
             dto.setId(entity.getId());
             dto.setTitle(entity.getTitle());
+            dto.setAlbum(AlbumInSongPlaylistResponseDTO.fromEntity(entity.getAlbum()));
+            dto.setArtist(ArtistInSongPlaylistResponseDTO.fromEntity(entity.getArtist()));
             dto.setDuration(Duration.ofSeconds(entity.getDuration()));
+
+            return dto;
+        }
+    }
+    
+    @Data
+    public static class AlbumInSongPlaylistResponseDTO {
+        private Long id;
+        private String title;
+        
+        public static AlbumInSongPlaylistResponseDTO fromEntity(Album entity) {
+            if (entity == null) return null;
+            var dto = new AlbumInSongPlaylistResponseDTO();
+            dto.setId(entity.getId());
+            dto.setTitle(entity.getTitle());
+
+            return dto;
+        }
+    }
+    
+    @Data
+    public static class ArtistInSongPlaylistResponseDTO {
+        private Long id;
+        private String name;
+        
+        public static ArtistInSongPlaylistResponseDTO fromEntity(Artist entity) {
+            if (entity == null) return null;
+            var dto = new ArtistInSongPlaylistResponseDTO();
+            dto.setId(entity.getId());
+            dto.setName(entity.getName());
 
             return dto;
         }

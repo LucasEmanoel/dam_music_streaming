@@ -44,4 +44,7 @@ class PlaylistRepository {
   Future<void> deletePlaylist(int id) async {
     await api.delete(id);
   }
+  Future<void> removeSongFromPlaylist(int playlistId, int songId) async {
+    await api.removeSong(playlistId, songId);
+  }
 }

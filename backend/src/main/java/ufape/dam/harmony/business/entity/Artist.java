@@ -20,9 +20,6 @@ public class Artist {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 	
-//	private String name;
-//    private String pictureUrl;
-	
 	private int IdDeezer;
 	private String name;
 	private String picture;
@@ -39,9 +36,9 @@ public class Artist {
 	@ManyToOne
 	private Genre genre;
     
-    @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Album> albums;
-    
+//    @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Album> albums;
+//    
     @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Song> songs;
 }

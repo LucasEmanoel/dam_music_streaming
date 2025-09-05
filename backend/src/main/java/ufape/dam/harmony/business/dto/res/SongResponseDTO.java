@@ -24,7 +24,6 @@ public class SongResponseDTO {
     private ArtistInSongResponseDTO artist;
     private AlbumInSongResponseDTO album;
 
-
     @JsonProperty("md5_image")
     private String md5Image;
     
@@ -45,6 +44,7 @@ public class SongResponseDTO {
     public static class ArtistInSongResponseDTO {
         private Long id;
         private String name;
+        @JsonProperty("picture_url")
         private String pictureUrl;
 
         public static ArtistInSongResponseDTO fromEntity(Artist entity) {
@@ -61,6 +61,7 @@ public class SongResponseDTO {
     public static class AlbumInSongResponseDTO {
         private Long id;
         private String title;
+        @JsonProperty("url_cover")
         private String urlCover;
         
         public static AlbumInSongResponseDTO fromEntity(Album entity) {

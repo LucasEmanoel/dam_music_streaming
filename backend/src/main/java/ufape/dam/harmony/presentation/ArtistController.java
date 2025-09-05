@@ -20,7 +20,7 @@ public class ArtistController {
 	@GetMapping("/{id}")
     public ResponseEntity<ArtistResponseDTO> getArtistById(@PathVariable Long id) {
 		
-		ArtistResponseDTO artist = artistService.findByIdWithAlbums(id).orElse(null);
+		ArtistResponseDTO artist = artistService.findByIdWithAlbumsAndSongs(id).orElse(null);
 		
         return ResponseEntity.ok(artist);
     }

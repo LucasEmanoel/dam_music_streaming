@@ -1,8 +1,12 @@
 package ufape.dam.harmony.business.dto.res;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
 import ufape.dam.harmony.business.entity.Album;
@@ -19,7 +23,7 @@ public class GenreResponseDTO {
     private List<AlbumInGenreResponseDTO> albums;
     private List<SongInsideGenreDTO> songs;
     
-	public static GenreResponseDTO fromEntity(Genre entity) {
+	public static GenreResponseDTO fromEntity(Genre entity, List<Album> albums, List<Song> songs, List<Artist> artists) {
         if (entity == null) return null;
         
         GenreResponseDTO dto = new GenreResponseDTO();
@@ -27,12 +31,22 @@ public class GenreResponseDTO {
         dto.setId(entity.getId());
         dto.setName(entity.getName());
         
-        if (entity.getAlbums() != null) {
-            dto.setAlbums(
-                entity.getAlbums().stream()
-                    .map(AlbumInGenreResponseDTO::fromEntity)
-                    .collect(Collectors.toList())
-            );
+        if (artists != null) {
+            dto.setArtists(artists.stream()
+                .map(ArtistInGenreResponseDTO::fromEntity)
+                .collect(Collectors.toList()));
+        }
+        
+        if (albums != null) {
+            dto.setAlbums(albums.stream()
+                .map(AlbumInGenreResponseDTO::fromEntity)
+                .collect(Collectors.toList()));
+        }
+
+        if (songs != null) {
+            dto.setSongs(songs.stream()
+                .map(SongInsideGenreDTO::fromEntity)
+                .collect(Collectors.toList()));
         }
         
         return dto;
@@ -42,6 +56,7 @@ public class GenreResponseDTO {
     public static class ArtistInGenreResponseDTO {
         private Long id;
         private String name;
+        @JsonProperty("url_cover")
         private String urlCover; 
 
         public static ArtistInGenreResponseDTO fromEntity(Artist entity) {
@@ -58,8 +73,10 @@ public class GenreResponseDTO {
     public static class AlbumInGenreResponseDTO {
         private Long id;
         private String title;
+        @JsonProperty("url_cover")
         private String urlCover;
-        private String release_date;
+        @JsonProperty("release_date")
+        private String releaseDate;
 
         public static AlbumInGenreResponseDTO fromEntity(Album entity) {
             if (entity == null) return null;
@@ -67,7 +84,7 @@ public class GenreResponseDTO {
             dto.setId(entity.getId());
             dto.setTitle(entity.getTitle());
             dto.setUrlCover(entity.getCoverMedium());
-            dto.setRelease_date(entity.getReleasedDate());
+            dto.setReleaseDate(entity.getReleasedDate());
             return dto;
         }
     }

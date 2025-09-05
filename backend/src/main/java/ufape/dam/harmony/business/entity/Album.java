@@ -23,13 +23,6 @@ public class Album {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
-//	private String title;
-//	private String urlCover;
-    
-//	private Duration duration; // The album's duration (seconds)
-//	private Date release_date; //The album's release date
-	
 	private int idDeezer;
 	private String title;
 	private String link;
@@ -54,27 +47,27 @@ public class Album {
 	@ManyToOne
 	private Artist artist;
 
-	@OneToMany(mappedBy = "album", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Song> songs;
-	
-	@Transient
-	public int getNumSongs() {
-		return this.songs.size();
-	}
-	
-	@Transient
-	public Duration getDuration() {
-		if(this.songs.size() == 0) {
-			return Duration.ZERO;
-		}
-		
-		Duration playlist = Duration.ZERO;
-		
-		for (Song song : this.songs) {
-			Duration songDuration = Duration.ofSeconds(song.getDuration());
-			playlist = playlist.plus(songDuration);
-		}
-		
-		return playlist;
-	}
+//	@OneToMany(mappedBy = "album", cascade = CascadeType.ALL, orphanRemoval = true)
+//	private List<Song> songs;
+//	
+//	@Transient
+//	public int getNumSongs() {
+//		return this.songs.size();
+//	}
+//	
+//	@Transient
+//	public Duration getDuration() {
+//		if(this.songs.size() == 0) {
+//			return Duration.ZERO;
+//		}
+//		
+//		Duration playlist = Duration.ZERO;
+//		
+//		for (Song song : this.songs) {
+//			Duration songDuration = Duration.ofSeconds(song.getDuration());
+//			playlist = playlist.plus(songDuration);
+//		}
+//		
+//		return playlist;
+//	}
 }

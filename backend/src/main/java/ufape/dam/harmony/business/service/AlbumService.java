@@ -2,14 +2,16 @@ package ufape.dam.harmony.business.service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import ufape.dam.harmony.business.dto.res.AlbumResponseDTO;
 import ufape.dam.harmony.business.entity.Album;
+import ufape.dam.harmony.business.entity.Song;
 import ufape.dam.harmony.data.AlbumRepository;
+import ufape.dam.harmony.data.SongRepository;
 
 @Service
 public class AlbumService {
@@ -17,24 +19,23 @@ public class AlbumService {
 	@Autowired
 	private AlbumRepository albumRepository;
 
-    public Optional<AlbumResponseDTO> findById(Long id) {
-        return albumRepository.findById(id)
-        		.map(AlbumResponseDTO::fromEntity);
-    }
-    
+    @Autowired
+    private SongRepository songRepository;
+
+
+    @Transactional(readOnly = true)
     public Optional<AlbumResponseDTO> findByIdWithSongs(Long id) {
-        return albumRepository.findByIdWithSongs(id)
-        		.map(AlbumResponseDTO::fromEntity);
+        Optional<Album> albumOptional = albumRepository.findById(id);
+
+        if (albumOptional.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Album album = albumOptional.get();
+        List<Song> songs = songRepository.findAllByAlbumId(album.getId());
+
+        AlbumResponseDTO dto = AlbumResponseDTO.fromEntity(album, songs);
+        
+        return Optional.of(dto);
     }
-
-    public List<AlbumResponseDTO> findAll() {
-    	
-    	List<Album> entities = albumRepository.findAll();
-    	
-    	return entities.stream()
-                .map(AlbumResponseDTO::fromEntity)
-                .collect(Collectors.toList());
-    }
-
-
 }

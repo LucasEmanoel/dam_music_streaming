@@ -27,7 +27,7 @@ public class GenreController {
 	
 	@GetMapping("/{id}")
     public ResponseEntity<GenreResponseDTO> getAlbumById(@PathVariable Long id) {
-		GenreResponseDTO genre = genreService.findById(id).orElse(null);
+		GenreResponseDTO genre = genreService.findByIdWithArtistsAlbumsSongs(id).orElse(null);
 		return ResponseEntity.ok(genre);
     }
 }

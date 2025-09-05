@@ -72,11 +72,11 @@ public class PlaylistController {
     }
 	
 	
-//	@GetMapping("/{playlistId}/songs")
-//    public ResponseEntity<Set<Song>> listPlaylistSongs(@PathVariable Long playlistId) {
-//        PlaylistResponseDTO songs = service.findPlaylistByIdWithSongs(playlistId); 
-//        return ResponseEntity.ok(songs);
-//    }
+	@GetMapping("/{playlistId}/songs")
+    public ResponseEntity<PlaylistResponseDTO> listPlaylistSongs(@PathVariable Long playlistId) {
+        PlaylistResponseDTO songs = service.findPlaylistByIdWithSongs(playlistId); 
+        return ResponseEntity.ok(songs);
+    }
 	
 	//@PostMapping("/{playlistId}/song")
     //public ResponseEntity<PlaylistResponseDTO> addSongUserPlaylists(@PathVariable Long playlistId, @AuthenticationPrincipal SecurityUser user, @RequestBody PlaylistSongDto song) {

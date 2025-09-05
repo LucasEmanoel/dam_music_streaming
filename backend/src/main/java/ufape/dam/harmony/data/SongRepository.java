@@ -13,4 +13,6 @@ public interface SongRepository extends JpaRepository<Song, Long>{
 
 	List<Song> findAllByArtistId(Long artistId);
 	List<Song> findAllByAlbumId(Long id);
+	//title
+	List<Song> findByTitleContainingIgnoreCase(String q);
 }

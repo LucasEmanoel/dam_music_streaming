@@ -1,9 +1,11 @@
 package ufape.dam.harmony.business.dto.res;
 
 import java.time.Duration;
-import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
 import ufape.dam.harmony.business.entity.Album;
@@ -14,53 +16,57 @@ import ufape.dam.harmony.business.entity.Song;
 public class ArtistResponseDTO {
 	private Long id;
     private String name;
+    @JsonProperty("picture_url")
     private String pictureUrl;
     
     private List<AlbumInArtistResponseDTO> albums;
     private List<SongInArtistResponseDTO> songs;
     
-    public static ArtistResponseDTO fromEntity(Artist entity) {
+    public static ArtistResponseDTO fromEntity(Artist entity, List<Album> albums, List<Song> songs) {
         if (entity == null) return null;
         
         ArtistResponseDTO dto = new ArtistResponseDTO();
         
         dto.setId(entity.getId());
         dto.setName(entity.getName());
-        dto.setPictureUrl(entity.getPictureUrl());
-        
-        if (entity.getAlbums() != null) {
+        dto.setPictureUrl(entity.getPictureMedium());
+
+        if (albums != null) {
             dto.setAlbums(
-                entity.getAlbums().stream()
+                albums.stream()
                     .map(AlbumInArtistResponseDTO::fromEntity)
                     .collect(Collectors.toList())
             );
         }
 
-        if (entity.getSongs() != null) {
+        if (songs != null) {
             dto.setSongs(
-                entity.getSongs().stream()
+                songs.stream()
                     .map(SongInArtistResponseDTO::fromEntity)
                     .collect(Collectors.toList())
             );
         }
+
         
         return dto;
     }
-
+    
     @Data
     public static class AlbumInArtistResponseDTO {
         private Long id;
         private String title;
+        @JsonProperty("url_cover")
         private String urlCover;
-        private Date release_date;
+        @JsonProperty("release_date")
+        private String releaseDate;
 
         public static AlbumInArtistResponseDTO fromEntity(Album entity) {
             if (entity == null) return null;
             var dto = new AlbumInArtistResponseDTO();
             dto.setId(entity.getId());
             dto.setTitle(entity.getTitle());
-            dto.setUrlCover(entity.getUrlCover());
-            dto.setRelease_date(entity.getRelease_date());
+            dto.setUrlCover(entity.getCoverMedium());
+            dto.setReleaseDate(entity.getReleasedDate());
             return dto;
         }
     }
@@ -76,7 +82,7 @@ public class ArtistResponseDTO {
             var dto = new SongInArtistResponseDTO();
             dto.setId(entity.getId());
             dto.setTitle(entity.getTitle());
-            dto.setDuration(entity.getDuration());
+            dto.setDuration(Duration.ofSeconds(entity.getDuration()));
             return dto;
         }
     }

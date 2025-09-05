@@ -43,11 +43,11 @@ class ConfirmationDialog extends StatelessWidget {
       actions: [
         ElevatedButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text("Cancelar"),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.grey,
             foregroundColor: Colors.black,
           ),
+          child: Text("Cancelar")
         ),
         SizedBox(
           width: 10,

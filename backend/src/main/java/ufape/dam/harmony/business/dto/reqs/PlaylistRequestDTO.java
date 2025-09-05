@@ -5,16 +5,15 @@ import ufape.dam.harmony.business.entity.Playlist;
 import ufape.dam.harmony.business.entity.Usuario;
 
 @Data
-public class PlaylistDto {
+public class PlaylistRequestDTO {
 
 	private Long id;
 	private String title;
 	private String description;
 	private String urlCover;
-	private UsuarioDto author;
+    private Usuario author; //vem da sessao
     
-    
-    public static Playlist toEntity(PlaylistDto dto, Usuario author) {
+    public static Playlist toEntity(PlaylistRequestDTO dto, Usuario author) {
         Playlist entity = new Playlist();
         
         entity.setId(dto.getId());
@@ -27,22 +26,14 @@ public class PlaylistDto {
         return entity;
     }
 	
+
+	@Override
+	public String toString() {
+		return "PlaylistDto [id=" + id + ", title=" + title + ", description=" + description + ", urlCover=" + urlCover
+				+ ", author=" + author + "]";
+	}
 	
-	public static PlaylistDto fromEntity(Playlist entity) {
-        PlaylistDto dto = new PlaylistDto();
-
-        dto.setId(entity.getId());
-        dto.setTitle(entity.getTitle());
-        dto.setDescription(entity.getDescription());
-        dto.setUrlCover(entity.getUrlCover());
-        
-        if (entity.getAuthor() != null) {
-            dto.setAuthor(UsuarioDto.fromEntity(entity.getAuthor()));
-        }
-
-
-        return dto;
-    }
+	
 	
 	
 }

@@ -73,8 +73,7 @@ public class SongController {
 	}
 	
 	@GetMapping("/{idSong}")
-	public ResponseEntity<SongDeezerDTO> getSong(@PathVariable String idSong){
-		
+	public ResponseEntity<SongDeezerDTO> getSong(@PathVariable String idSong){		
 		String finalUrl = deezerApiBaseUrl + idSong;
 		
 		try {

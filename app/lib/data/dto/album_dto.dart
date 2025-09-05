@@ -39,7 +39,7 @@ class AlbumDto {
           ? DateTime.parse(map['release_date'])
           : null,
 
-      urlCover: map['url_cover'],
+      urlCover: map['md5_image'],
 
       artist: map['artist'] != null
           ? ArtistDto.fromMap(map['artist'] as Map<String, dynamic>)

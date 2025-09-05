@@ -12,4 +12,10 @@ class ArtistApiService {
     final response = await _dio.get('/artists/$id');
     return ArtistDto.fromMap(response.data);
   }
+
+  Future<ArtistDto> getDetailedById(int id) async {
+    final response = await _dio.get('/artists/$id/items');
+    return ArtistDto.fromMap(response.data);
+  }
+
 }

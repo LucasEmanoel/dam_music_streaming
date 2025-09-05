@@ -1,5 +1,7 @@
 package ufape.dam.harmony.business.dto.reqs;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Data;
 import ufape.dam.harmony.business.entity.Playlist;
 import ufape.dam.harmony.business.entity.Usuario;
@@ -10,6 +12,7 @@ public class PlaylistRequestDTO {
 	private Long id;
 	private String title;
 	private String description;
+	@JsonProperty("url_cover")
 	private String urlCover;
     private Usuario author; //vem da sessao
     

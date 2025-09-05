@@ -9,4 +9,10 @@ class AlbumRepository {
     final AlbumDto dto = await api.getById(id);
     return AlbumData.fromDto(dto);
   }
+
+  Future<AlbumData> fetchDetailedById(int id) async {
+    final AlbumDto dto = await api.getDetailedById(id);
+    return AlbumData.fromDto(dto);
+  }
+  
 }

@@ -13,4 +13,9 @@ class AlbumApiService {
     return AlbumDto.fromMap(response.data);
   }
 
+  Future<AlbumDto> getDetailedById(int id) async {
+    final response = await _dio.get('/albums/$id/songs');
+    return AlbumDto.fromMap(response.data);
+  }
+
 }

@@ -15,9 +15,6 @@ import 'ui/splash/splash_page.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final String tokenParaTestes = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjYXJsYS5zYW50b3NAZXhhbXBsZS5jb20iLCJ1c2VybmFtZSI6ImNhcmxhX3NhbnRvcyIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzU2NzY4ODc3LCJleHAiOjE3NjQ1NDQ4Nzd9.Od8ngvkOSjBF3sh-c1_zc6zFBG72Sfv4uM3FChldtbg";
-  await saveToken(tokenParaTestes);
-
   Directory docsDir = await startMeUp();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -40,8 +37,8 @@ class HarmonyApp extends StatelessWidget {
       theme: LightTheme.lightTheme,
       debugShowCheckedModeBanner: false,
 
-      //home: SplashPage(docsDir: _docsDir),
-      home: HomeScaffold(docsDir: _docsDir),
+      home: SplashPage(docsDir: _docsDir),
+      //home: HomeScaffold(docsDir: _docsDir),
       routes: {
         '/home':   (_) => HomeScaffold(docsDir: _docsDir),
         '/signup': (_) => CadastroPage(docsDir: _docsDir),

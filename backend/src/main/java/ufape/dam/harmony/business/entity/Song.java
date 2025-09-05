@@ -57,4 +57,6 @@ public class Song {
 //    @ManyToOne(fetch = FetchType.LAZY)
 	@ManyToOne
 	private Album album;
+	
+	
 }

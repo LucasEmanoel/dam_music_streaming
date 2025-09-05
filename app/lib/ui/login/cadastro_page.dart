@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 import 'package:dam_music_streaming/config/token_manager.dart';
 import 'package:dam_music_streaming/data/services/api_service.dart';
 import 'package:dam_music_streaming/ui/core/ui/svg_icon.dart';
@@ -26,6 +27,14 @@ class _CadastroPageState extends State<CadastroPage> {
   bool obscure = true;
   bool aceitouTermos = false;
   bool _loading = false;
+
+  static const _webClientId = '940448057923-jbu82iq5eutmg54kfiphcgl9q8kfgrr5.apps.googleusercontent.com';
+
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    serverClientId: _webClientId,
+    scopes: <String>['email'],
+  );
+
 
   @override
   void dispose() {
@@ -190,49 +199,73 @@ class _CadastroPageState extends State<CadastroPage> {
 
   Future<void> _exchangeAndGoHome() async {
     final user = FirebaseAuth.instance.currentUser;
-    final idToken = await user?.getIdToken();
-    if (idToken == null) throw Exception('Falha ao obter idToken do Firebase.');
+    final idToken = await user?.getIdToken(true);
+    if (idToken == null || idToken.isEmpty) {
+      throw Exception('Falha ao obter Google ID Token.');
+    }
 
-    final dio = ApiClient().dio;
-    final res = await dio.post('/auth/firebase', data: {'id_token': idToken});
-    final jwt = (res.data['access_token'] ?? res.data['token'] ?? res.data['jwt']) as String;
+    await _exchangeGoogleIdToken(idToken);
 
-    await saveToken(jwt);
     if (!mounted) return;
     Navigator.pushReplacementNamed(context, '/home');
   }
 
 
-  Future<void> _cadastrar() async {
-    final nome  = nomeCtrl.text.trim();
-    final email = emailCtrl.text.trim();
-    final pass  = passCtrl.text;
+  Future<void> _exchangeGoogleIdToken(String googleIdToken) async {
+    if (googleIdToken.isEmpty) throw Exception('Google ID Token vazio.');
+    final res = await ApiClient().dio.post(
+      '/auth/google',
+      data: googleIdToken,
+      options: Options(
+        headers: {'Content-Type': 'text/plain'},
+        extra: {'auth': false},
+      ),
+    );
+    final data = res.data as Map<String, dynamic>;
+    final jwt = (data['token'] as String?) ?? '';
+    if (jwt.isEmpty) throw Exception('Backend não retornou o campo "token".');
+    await saveToken(jwt);
+  }
 
-    if (nome.isEmpty || email.isEmpty || pass.isEmpty) {
+
+  Future<void> _cadastrar() async {
+    final username = nomeCtrl.text.trim();
+    final email    = emailCtrl.text.trim();
+    final password = passCtrl.text;
+
+    if (username.isEmpty || email.isEmpty || password.isEmpty) {
       _toast('Preencha todos os campos.');
       return;
     }
-    if (pass.length < 6) {
+    if (password.length < 6) {
       _toast('A senha precisa ter pelo menos 6 caracteres.');
       return;
     }
 
     setState(() => _loading = true);
     try {
-      final cred = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: pass);
+      final res = await ApiClient().dio.post(
+        '/auth/register',
+        data: {'username': username, 'email': email, 'password': password},
+        options: Options(
+          headers: {'Content-Type': 'application/json'},
+          extra: {'auth': false},
+        ),
+      );
 
-      final user = cred.user;
-      if (user != null) {
-        await user.updateDisplayName(nome);
-      }
+      final data = res.data as Map<String, dynamic>;
+      final jwt = (data['token'] as String?) ?? '';
+      if (jwt.isEmpty) throw Exception('Backend não retornou o campo "token".');
 
-      await _exchangeAndGoHome();
-
+      await saveToken(jwt);
       if (!mounted) return;
       Navigator.pushReplacementNamed(context, '/home');
-    } on FirebaseAuthException catch (e) {
-      _toast(_mapAuthError(e));
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 409) {
+        _toast('Este e-mail já está em uso.');
+      } else {
+        _toast('Falha ao cadastrar (${e.type}) ${e.response?.statusCode ?? ''}');
+      }
     } catch (_) {
       _toast('Não foi possível criar sua conta. Tente novamente.');
     } finally {
@@ -240,32 +273,52 @@ class _CadastroPageState extends State<CadastroPage> {
     }
   }
 
+
   Future<void> _cadastrarComGoogle() async {
     setState(() => _loading = true);
     try {
       if (kIsWeb) {
-        await FirebaseAuth.instance.signInWithPopup(GoogleAuthProvider());
+        final cred = await FirebaseAuth.instance.signInWithPopup(GoogleAuthProvider());
+        if (cred.user == null) throw Exception('Cadastro cancelado.');
+
+        final oauthCred = cred.credential as OAuthCredential?;
+        final idToken = oauthCred?.idToken;
+        if (idToken == null || idToken.isEmpty) {
+          throw Exception('Não foi possível obter o Google ID Token (web).');
+        }
+
+        await _exchangeGoogleIdToken(idToken);
       } else {
-        final googleUser = await GoogleSignIn().signIn();
+        await _googleSignIn.signOut();
+        final googleUser = await _googleSignIn.signIn();
         if (googleUser == null) throw Exception('Cadastro cancelado.');
+
         final googleAuth = await googleUser.authentication;
+        final googleIdToken = googleAuth.idToken;
+        if (googleIdToken == null || googleIdToken.isEmpty) {
+          throw Exception('Não foi possível obter o Google ID Token (mobile).');
+        }
+
         final credential = GoogleAuthProvider.credential(
           accessToken: googleAuth.accessToken,
-          idToken: googleAuth.idToken,
+          idToken: googleIdToken,
         );
         await FirebaseAuth.instance.signInWithCredential(credential);
-        await _exchangeAndGoHome();
+
+        await _exchangeGoogleIdToken(googleIdToken);
       }
+
       if (!mounted) return;
       Navigator.pushReplacementNamed(context, '/home');
     } on FirebaseAuthException catch (e) {
       _toast(_mapAuthError(e));
-    } catch (_) {
+    } catch (e) {
       _toast('Não foi possível continuar com Google.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
+
 
   void _toast(String msg) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));

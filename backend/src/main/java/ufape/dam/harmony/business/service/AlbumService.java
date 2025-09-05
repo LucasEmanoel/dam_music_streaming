@@ -33,8 +33,20 @@ public class AlbumService {
 
         Album album = albumOptional.get();
         List<Song> songs = songRepository.findAllByAlbumId(album.getId());
-
         AlbumResponseDTO dto = AlbumResponseDTO.fromEntity(album, songs);
+        
+        return Optional.of(dto);
+    }
+    
+    public Optional<AlbumResponseDTO> findById(Long id) {
+        Optional<Album> albumOptional = albumRepository.findById(id);
+
+        if (albumOptional.isEmpty()) {
+            return Optional.empty();
+        }
+        Album album = albumOptional.get();
+        
+        AlbumResponseDTO dto = AlbumResponseDTO.fromEntity(album, null);
         
         return Optional.of(dto);
     }

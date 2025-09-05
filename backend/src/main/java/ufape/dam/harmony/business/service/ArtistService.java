@@ -47,4 +47,19 @@ public class ArtistService {
 
 		return Optional.of(response);
 	}
+
+
+	public Optional<ArtistResponseDTO> findById(Long id) {
+        Optional<Artist> artistOptional = artistRepository.findById(id);
+		
+		if (artistOptional.isEmpty()) {
+			return Optional.empty();
+		}
+		
+		Artist artist = artistOptional.get();
+
+		ArtistResponseDTO response = ArtistResponseDTO.fromEntity(artist, null, null);
+
+		return Optional.of(response);
+	}
 }

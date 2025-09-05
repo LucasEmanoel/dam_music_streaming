@@ -14,12 +14,12 @@ class ArtistViewModel extends ChangeNotifier {
   ArtistData? _artistBeingViewed;
   ArtistData? get artistBeingViewed => _artistBeingViewed;
 
-  Future<void> viewArtist(int artistId) async {
+  Future<void> viewDetailedArtist(int artistId) async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      _artistBeingViewed = await _repository.fetchById(artistId);
+      _artistBeingViewed = await _repository.fetchDetailedById(artistId);
     } catch (e) {
       print("Erro ao carregar detalhes do artista: $e");
     } finally {

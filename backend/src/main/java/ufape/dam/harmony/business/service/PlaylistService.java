@@ -71,34 +71,8 @@ public class PlaylistService {
 	}
 	
 
-	@Transactional
-	public PlaylistResponseDTO addSongToPlaylist(Long playlistId, Long songId, SecurityUser user) {
-		Usuario userEntity = user.getUsuario();
-		Playlist playlist = findPlaylistByIdAndEnsureOwnership(playlistId, userEntity);
-		
-		Song song = songRepository.findById(songId)
-			.orElseThrow(() -> new EntityNotFoundException("Música não encontrada com o ID: " + songId));
-		
-		playlist.getSongs().add(song);
-		
-		Playlist updatedPlaylist = playlistRepository.save(playlist);
-		return PlaylistResponseDTO.fromEntity(updatedPlaylist, updatedPlaylist.getSongs());
-	}
 
 
-	@Transactional
-	public PlaylistResponseDTO removeSongFromPlaylist(Long playlistId, Long songId, SecurityUser user) {
-		Usuario userEntity = user.getUsuario();
-		Playlist playlist = findPlaylistByIdAndEnsureOwnership(playlistId, userEntity);
-		
-		Song song = songRepository.findById(songId)
-			.orElseThrow(() -> new EntityNotFoundException("Música não encontrada com o ID: " + songId));
-		
-		playlist.getSongs().remove(song);
-
-		Playlist updatedPlaylist = playlistRepository.save(playlist);
-		return PlaylistResponseDTO.fromEntity(updatedPlaylist, updatedPlaylist.getSongs());
-	}
 	
 
 	private Playlist findPlaylistByIdAndEnsureOwnership(Long playlistId, Usuario user) {
@@ -119,6 +93,35 @@ public class PlaylistService {
 		
 		return PlaylistResponseDTO.fromEntity(playlist, playlist.getSongs());
     }
+
+	@Transactional
+	public PlaylistResponseDTO addSongsToPlaylist(SecurityUser user, Long playlistId, List<Long> songIds) {
+		Playlist playlist = findPlaylistByIdAndEnsureOwnership(playlistId, user.getUsuario());
+		
+		List<Song> songsToAdd = songRepository.findAllById(songIds);
+		Set<Song> currentSongs = playlist.getSongs();
+		currentSongs.addAll(songsToAdd);
+		playlist.setSongs(currentSongs);
+		
+		
+		Playlist updatedPlaylist = playlistRepository.save(playlist);
+		return PlaylistResponseDTO.fromEntity(updatedPlaylist, updatedPlaylist.getSongs());
+	}
+	
+	@Transactional
+	public void removeSongFromPlaylist(Long playlistId, Long songId, SecurityUser user) {
+		Usuario userEntity = user.getUsuario();
+		Playlist playlist = findPlaylistByIdAndEnsureOwnership(playlistId, userEntity);
+		
+		Song song = songRepository.findById(songId)
+			.orElseThrow(() -> new EntityNotFoundException("Música não encontrada com o ID: " + songId));
+		
+		playlist.getSongs().remove(song);
+		playlistRepository.save(playlist);
+		
+	}
+	
+	
 
 
 }

@@ -47,9 +47,7 @@ class PlaylistDto {
       'id': id,
       'title': title,
       'description': description,
-      'url_cover': urlCover,
-      'num_songs': numSongs,
-      'duration': duration?.inSeconds,
+      'url_cover': urlCover
     };
   }
 

@@ -11,4 +11,10 @@ class ArtistRepository {
     final ArtistDto dto = await api.getById(id);
     return ArtistData.fromDto(dto);
   }
+
+  Future<ArtistData> fetchDetailedById(int id) async {
+    final ArtistDto dto = await api.getDetailedById(id);
+    return ArtistData.fromDto(dto);
+  }
+
 }

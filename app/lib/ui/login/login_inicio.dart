@@ -24,8 +24,19 @@ class _LoginInicioState extends State<LoginInicio> {
   bool obscure = true;
   bool _loading = false;
 
+  static const _webClientId = '940448057923-jbu82iq5eutmg54kfiphcgl9q8kfgrr5.apps.googleusercontent.com';
+
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    serverClientId: _webClientId,
+    scopes: <String>['email'],
+  );
+
   @override
-  void dispose() { emailCtrl.dispose(); passCtrl.dispose(); super.dispose(); }
+  void dispose() {
+    emailCtrl.dispose();
+    passCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +56,7 @@ class _LoginInicioState extends State<LoginInicio> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const CoverCarousel(covers: _covers),
+                      const SizedBox(height: 140, child: CoverCarousel(covers: _covers)),
                       const SizedBox(height: 24),
 
                       const Text('Bem-vindo ao Harmony!',
@@ -90,18 +101,6 @@ class _LoginInicioState extends State<LoginInicio> {
                             child: const Text('Esqueceu a senha?', style: TextStyle(fontSize: 12.5)),
                           ),
                         ],
-                      ),
-                      ElevatedButton(
-                        onPressed: () async {
-                          try {
-                            final r = await ApiClient().dio.get('/health',
-                                options: Options(extra: {'auth': false}));
-                            _toast('Health: ${r.statusCode} ${r.data}');
-                          } catch (e) {
-                            _toast('Sem resposta do backend: $e');
-                          }
-                        },
-                        child: const Text('Testar backend'),
                       ),
                       const SizedBox(height: 10),
                       SizedBox(
@@ -181,25 +180,23 @@ class _LoginInicioState extends State<LoginInicio> {
     );
   }
 
-  Future<void> _exchangeAndGoHome() async {
-    final user = FirebaseAuth.instance.currentUser;
-    final idToken = await user?.getIdToken(true);
-    if (idToken == null) throw Exception('Falha ao obter idToken do Firebase.');
-
+  Future<void> _exchangeGoogleIdToken(String googleIdToken) async {
+    if (googleIdToken.isEmpty) throw Exception('Google ID Token vazio.');
     try {
       final res = await ApiClient().dio.post(
         '/auth/google',
-        data: {'id_token': idToken},
-        options: Options(extra: {'auth': false}),
+        data: googleIdToken,
+        options: Options(
+          headers: {'Content-Type': 'text/plain'},
+          extra: {'auth': false},
+        ),
       );
 
       final data = res.data as Map<String, dynamic>;
-      final jwt = (data['access_token'] ?? data['token'] ?? data['jwt']) as String?;
-      if (jwt == null || jwt.isEmpty) throw Exception('Backend não retornou JWT');
+      final jwt = (data['token'] as String?) ?? '';
+      if (jwt.isEmpty) throw Exception('Backend não retornou o campo "token".');
 
       await saveToken(jwt);
-      if (!mounted) return;
-      Navigator.pushNamedAndRemoveUntil(context, '/home', (_) => false);
     } on DioException catch (e) {
       _toast('Falha ao trocar token (${e.type}) ${e.response?.statusCode ?? ''}');
       rethrow;
@@ -208,6 +205,7 @@ class _LoginInicioState extends State<LoginInicio> {
       rethrow;
     }
   }
+
   Future<void> _entrar() async {
     final email = emailCtrl.text.trim();
     final pass  = passCtrl.text;
@@ -219,11 +217,28 @@ class _LoginInicioState extends State<LoginInicio> {
 
     setState(() => _loading = true);
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: pass);
-      await _exchangeAndGoHome();
+      final res = await ApiClient().dio.post(
+        '/auth/login',
+        data: {'email': email, 'password': pass},
+        options: Options(
+          headers: {'Content-Type': 'application/json'},
+          extra: {'auth': false},
+        ),
+      );
+
+      final data = res.data as Map<String, dynamic>;
+      final jwt = (data['token'] as String?) ?? '';
+      if (jwt.isEmpty) throw Exception('Backend não retornou o campo "token".');
+
+      await saveToken(jwt);
       if (!mounted) return;
-    } on FirebaseAuthException catch (e) {
-      _toast(_mapAuthError(e));
+      Navigator.pushNamedAndRemoveUntil(context, '/home', (_) => false);
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        _toast('E-mail ou senha inválidos.');
+      } else {
+        _toast('Falha ao entrar (${e.type}) ${e.response?.statusCode ?? ''}');
+      }
     } catch (e) {
       _toast('Falha ao entrar. Tente novamente.');
     } finally {
@@ -251,19 +266,44 @@ class _LoginInicioState extends State<LoginInicio> {
       if (kIsWeb) {
         final cred = await FirebaseAuth.instance.signInWithPopup(GoogleAuthProvider());
         if (cred.user == null) throw Exception('Login cancelado.');
-        await _exchangeAndGoHome();
+
+        final oauthCred = cred.credential as OAuthCredential?;
+        final idToken = oauthCred?.idToken;
+        if (idToken == null || idToken.isEmpty) {
+          throw Exception('Não foi possível obter o Google ID Token (web).');
+        }
+
+        await _exchangeGoogleIdToken(idToken);
       } else {
-        final googleUser = await GoogleSignIn().signIn();
+        await _googleSignIn.signOut();
+        final googleUser = await _googleSignIn.signIn();
         if (googleUser == null) throw Exception('Login cancelado.');
+
         final googleAuth = await googleUser.authentication;
+        var googleIdToken = googleAuth.idToken;
+
+        if (googleIdToken == null || googleIdToken.isEmpty) {
+          final silent = await _googleSignIn.signInSilently();
+          final silentAuth = await silent?.authentication;
+          googleIdToken = silentAuth?.idToken;
+        }
+
+        if (googleIdToken == null || googleIdToken.isEmpty) {
+          throw Exception('Não foi possível obter o Google ID Token (mobile). '
+              'Verifique Web Client ID e SHA-1 no Firebase.');
+        }
+
         final credential = GoogleAuthProvider.credential(
           accessToken: googleAuth.accessToken,
-          idToken: googleAuth.idToken,
+          idToken: googleIdToken,
         );
         await FirebaseAuth.instance.signInWithCredential(credential);
-        await _exchangeAndGoHome();
+
+        await _exchangeGoogleIdToken(googleIdToken);
       }
+
       if (!mounted) return;
+      Navigator.pushNamedAndRemoveUntil(context, '/home', (_) => false);
     } on FirebaseAuthException catch (e) {
       _toast(_mapAuthError(e));
     } catch (e) {
@@ -280,9 +320,9 @@ class _LoginInicioState extends State<LoginInicio> {
   String _mapAuthError(FirebaseAuthException e) {
     switch (e.code) {
       case 'user-not-found':
-        return 'Usuário não encontrado.';
+        return 'Usuário não encontrado com e-mail:';
       case 'wrong-password':
-      case 'invalid-credential':
+      case 'Bad credentials.':
         return 'E-mail ou senha inválidos.';
       case 'too-many-requests':
         return 'Muitas tentativas. Tente novamente mais tarde.';

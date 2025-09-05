@@ -17,7 +17,7 @@ class ArtistDetailView extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) {
         final vm = ArtistViewModel();
-        vm.viewArtist(artistId);
+        vm.viewDetailedArtist(artistId);
         return vm;
       },
       child: Consumer<ArtistViewModel>(

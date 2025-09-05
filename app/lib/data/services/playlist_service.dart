@@ -4,14 +4,13 @@ import 'package:dio/dio.dart';
 
 import 'package:dam_music_streaming/data/dto/playlist_dto.dart';
 
-
-
 class PlaylistApiService {
   final Dio _dio;
 
-  PlaylistApiService({ApiClient? apiClient}) : _dio = apiClient?.dio ?? ApiClient().dio;
+  PlaylistApiService({ApiClient? apiClient})
+    : _dio = apiClient?.dio ?? ApiClient().dio;
 
-  Future<List<PlaylistDto>> fetchPlaylists() async{
+  Future<List<PlaylistDto>> fetchPlaylists() async {
     final response = await _dio.get('/playlists');
     final List<dynamic> jsonList = response.data;
     return jsonList
@@ -53,6 +52,10 @@ class PlaylistApiService {
 
   Future<void> delete(int id) async {
     await _dio.delete('/playlists/$id');
+  }
+
+  Future<void> removeSong(int playlistId, int songId) async {
+    await _dio.delete('/playlists/$playlistId/songs/$songId');
   }
 
   Future<PlaylistDto> postSongs(int id, List<int> songsIds) async {

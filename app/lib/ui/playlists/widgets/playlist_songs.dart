@@ -341,7 +341,9 @@ class PlaylistSongs extends StatelessWidget {
                 onTap: () {
                   if (currentPlaylist.id != null && song.id != null) {
                     print('remover');
+                    vm.removeSongFromPlaylist(currentPlaylist.id!, song.id!);
                   }
+                  
                   Navigator.pop(context);
                 },
               ),

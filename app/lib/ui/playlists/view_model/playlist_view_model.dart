@@ -110,6 +110,18 @@ class PlaylistViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> removeSongFromPlaylist(int playlistId, int songId) async {
+    _isLoading = true;
+    try {
+      await repository.removeSongFromPlaylist(playlistId, songId);
+      await loadPlaylists();
+    } catch (e) {
+      print('Erro ao remove musuca de playlist: $e');
+    } finally {
+      _isLoading = false;
+    }
+  }
+
   int get stackIndex => _stackIndex;
   List<PlaylistData> get playlists => _playlists;
   File? get pickedImageFile => _pickedImageFile;

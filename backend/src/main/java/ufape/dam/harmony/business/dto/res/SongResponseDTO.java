@@ -24,7 +24,6 @@ public class SongResponseDTO {
     private ArtistInSongResponseDTO artist;
     private AlbumInSongResponseDTO album;
 
-
     @JsonProperty("md5_image")
     private String md5Image;
     
@@ -34,7 +33,7 @@ public class SongResponseDTO {
         
     	dto.setId(entity.getId());
         dto.setTitle(entity.getTitle());
-        dto.setDuration(entity.getDuration());
+        dto.setDuration(Duration.ofSeconds(entity.getDuration()));
         dto.setArtist(ArtistInSongResponseDTO.fromEntity(entity.getArtist()));
         dto.setAlbum(AlbumInSongResponseDTO.fromEntity(entity.getAlbum()));
         
@@ -45,6 +44,7 @@ public class SongResponseDTO {
     public static class ArtistInSongResponseDTO {
         private Long id;
         private String name;
+        @JsonProperty("picture_url")
         private String pictureUrl;
 
         public static ArtistInSongResponseDTO fromEntity(Artist entity) {
@@ -52,7 +52,7 @@ public class SongResponseDTO {
             var dto = new ArtistInSongResponseDTO();
             dto.setId(entity.getId());
             dto.setName(entity.getName());
-            dto.setPictureUrl(entity.getPictureUrl());
+            dto.setPictureUrl(entity.getPictureMedium());
             return dto;
         }
     }
@@ -61,6 +61,7 @@ public class SongResponseDTO {
     public static class AlbumInSongResponseDTO {
         private Long id;
         private String title;
+        @JsonProperty("url_cover")
         private String urlCover;
         
         public static AlbumInSongResponseDTO fromEntity(Album entity) {
@@ -68,7 +69,7 @@ public class SongResponseDTO {
             var dto = new AlbumInSongResponseDTO();
             dto.setId(entity.getId());
             dto.setTitle(entity.getTitle());
-            dto.setUrlCover(entity.getUrlCover());
+            dto.setUrlCover(entity.getCoverMedium());
             return dto;
         }
     }

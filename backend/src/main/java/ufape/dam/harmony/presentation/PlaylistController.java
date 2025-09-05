@@ -16,9 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import ufape.dam.harmony.business.dto.reqs.PlaylistDto;
-import ufape.dam.harmony.business.dto.reqs.PlaylistSongDto;
-import ufape.dam.harmony.business.dto.reqs.PlaylistSongsDto;
+import ufape.dam.harmony.business.dto.reqs.PlaylistRequestDTO;
 import ufape.dam.harmony.business.dto.res.PlaylistResponseDTO;
 import ufape.dam.harmony.business.entity.Playlist;
 import ufape.dam.harmony.business.entity.Song;
@@ -33,41 +31,35 @@ public class PlaylistController {
 	private PlaylistService service;
 	
 	@PostMapping
-    public ResponseEntity<PlaylistDto> createPlaylist(
-            @RequestBody PlaylistDto request,
+    public ResponseEntity<PlaylistResponseDTO> createPlaylist(
+            @RequestBody PlaylistRequestDTO request,
             @AuthenticationPrincipal SecurityUser user) {
 
-        Playlist saved = service.createPlaylist(request, user);
-        
-        return ResponseEntity.ok(PlaylistDto.fromEntity(saved)); 
+        PlaylistResponseDTO saved = service.createPlaylist(request, user);
+        return ResponseEntity.ok(saved); 
     }
 	
 	@GetMapping
-    public ResponseEntity<List<PlaylistDto>> getUserPlaylists(@AuthenticationPrincipal SecurityUser user) {
-        List<Playlist> userPlaylists = service.listPlaylistsByUser(user);
-        
-        List<PlaylistDto> dtos = userPlaylists.stream()
-                .map(PlaylistDto::fromEntity)
-                .collect(Collectors.toList());
-        
-        return ResponseEntity.ok(dtos);
+    public ResponseEntity<List<PlaylistResponseDTO>> getUserPlaylists(@AuthenticationPrincipal SecurityUser user) {
+        List<PlaylistResponseDTO> userPlaylists = service.listPlaylistsByUser(user);
+        return ResponseEntity.ok(userPlaylists);
     }
 
 
 	@GetMapping("/{playlistId}")
     public ResponseEntity<PlaylistResponseDTO> getPlaylistById(@PathVariable Long playlistId) {
-        Playlist playlist = service.findPlaylistById(playlistId); 
-        return ResponseEntity.ok(PlaylistResponseDTO.fromEntity(playlist));
+        PlaylistResponseDTO playlist = service.findPlaylistByIdWithSongs(playlistId); 
+        return ResponseEntity.ok(playlist);
     }
 	
 	@PutMapping("/{playlistId}")
-    public ResponseEntity<PlaylistDto> updatePlaylist(
+    public ResponseEntity<PlaylistResponseDTO> updatePlaylist(
             @PathVariable Long playlistId,
-            @RequestBody PlaylistDto request,
+            @RequestBody PlaylistRequestDTO request,
             @AuthenticationPrincipal SecurityUser user) {
         
-        Playlist updated = service.updatePlaylist(playlistId, request, user);
-        return ResponseEntity.ok(PlaylistDto.fromEntity(updated));
+		PlaylistResponseDTO updated = service.updatePlaylist(playlistId, request, user);
+        return ResponseEntity.ok(updated);
     }
 	
 	@DeleteMapping("/{playlistId}")
@@ -80,39 +72,37 @@ public class PlaylistController {
     }
 	
 	
-	
-	
 	@GetMapping("/{playlistId}/songs")
-    public ResponseEntity<Set<Song>> listPlaylistSongs(@PathVariable Long playlistId) {
-        Set<Song> songs = service.listPlaylistSongs(playlistId); 
+    public ResponseEntity<PlaylistResponseDTO> listPlaylistSongs(@PathVariable Long playlistId) {
+        PlaylistResponseDTO songs = service.findPlaylistByIdWithSongs(playlistId); 
         return ResponseEntity.ok(songs);
     }
 	
-	@PostMapping("/{playlistId}/song")
-    public ResponseEntity<Playlist> addSongUserPlaylists(@PathVariable Long playlistId, @AuthenticationPrincipal SecurityUser user, @RequestBody PlaylistSongDto song) {
+	//@PostMapping("/{playlistId}/song")
+    //public ResponseEntity<PlaylistResponseDTO> addSongUserPlaylists(@PathVariable Long playlistId, @AuthenticationPrincipal SecurityUser user, @RequestBody PlaylistSongDto song) {
 		
-		Playlist saved = service.addSongToPlaylist(user, song, playlistId);
+	//	Playlist saved = service.addSongToPlaylist(user, song, playlistId);
 		
-        return ResponseEntity.ok(saved);
-    }
+    //    return ResponseEntity.ok(PlaylistResponseDTO.fromEntity(saved));
+    //}
 	
-	@PostMapping("/{playlistId}/songs")
-	public ResponseEntity<Playlist> addSongsUserPlaylists(@PathVariable Long playlistId, @AuthenticationPrincipal SecurityUser user, @RequestBody PlaylistSongsDto songs) {
-		
-		Playlist saved = service.addSongsToPlaylist(user, playlistId, songs.getSongIds());
-		
-        return ResponseEntity.ok(saved);
-    }
-	
-	@DeleteMapping("/{playlistId}/songs/{songId}")
-    public ResponseEntity<Void> deleteSongFromPlaylist(
-            @PathVariable Long playlistId,
-            @PathVariable Long songId,
-            @AuthenticationPrincipal SecurityUser user) {
-        
-        service.removeSongFromPlaylist(playlistId, user, songId);
-        return ResponseEntity.noContent().build();
-    }
+//	@PostMapping("/{playlistId}/songs")
+//	public ResponseEntity<PlaylistResponseDTO> addSongsUserPlaylists(@PathVariable Long playlistId, @AuthenticationPrincipal SecurityUser user, @RequestBody PlaylistSongsDto songs) {
+//		
+//		Playlist saved = service.addSongToPlaylist(user, playlistId, songs.getSongIds());
+//		
+//        return ResponseEntity.ok(PlaylistResponseDTO.fromEntity(saved));
+//    }
+//	
+//	@DeleteMapping("/{playlistId}/songs/{songId}")
+//    public ResponseEntity<Void> deleteSongFromPlaylist(
+//            @PathVariable Long playlistId,
+//            @PathVariable Long songId,
+//            @AuthenticationPrincipal SecurityUser user) {
+//        
+//        service.removeSongFromPlaylist(playlistId, user, songId);
+//        return ResponseEntity.noContent().build();
+//    }
 	
 	
 	

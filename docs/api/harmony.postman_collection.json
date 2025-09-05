@@ -1,9 +1,10 @@
 {
 	"info": {
-		"_postman_id": "143ea9f0-cc68-49be-95a0-1373fc5fa02d",
+		"_postman_id": "e6808d05-0ece-48de-90cd-689fe04205c6",
 		"name": "harmony",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "25789376"
+		"_exporter_id": "48190486",
+		"_collection_link": "https://juan-cavalcante-5431069.postman.co/workspace/dev's-Workspace~c4aac49c-7f3e-448d-88c4-8dcff275b0b9/collection/48190486-e6808d05-0ece-48de-90cd-689fe04205c6?action=share&source=collection_link&creator=48190486"
 	},
 	"item": [
 		{
@@ -353,6 +354,97 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "artists",
+			"item": [
+				{
+					"name": "get artist",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/artists/2",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"artists",
+								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "albums",
+			"item": [
+				{
+					"name": "get album",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/albums/7",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"albums",
+								"7"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "genre",
+			"item": [
+				{
+					"name": "get all",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/genres/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"genres",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "get artist",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/api/artists/2",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api",
+						"artists",
+						"2"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"variable": [

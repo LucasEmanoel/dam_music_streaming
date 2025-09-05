@@ -61,7 +61,7 @@ public class PlaylistResponseDTO {
             var dto = new SongInPlaylistResponseDTO();
             dto.setId(entity.getId());
             dto.setTitle(entity.getTitle());
-            dto.setDuration(entity.getDuration());
+            dto.setDuration(Duration.ofSeconds(entity.getDuration()));
 
             return dto;
         }

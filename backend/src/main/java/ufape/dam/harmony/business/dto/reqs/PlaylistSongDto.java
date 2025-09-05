@@ -7,5 +7,5 @@ import lombok.Data;
 @Data
 public class PlaylistSongDto {
 	private Long id;
-    private Duration duration;
+    private int duration;
 }

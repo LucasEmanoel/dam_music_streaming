@@ -34,7 +34,7 @@ public class SongResponseDTO {
         
     	dto.setId(entity.getId());
         dto.setTitle(entity.getTitle());
-        dto.setDuration(entity.getDuration());
+        dto.setDuration(Duration.ofSeconds(entity.getDuration()));
         dto.setArtist(ArtistInSongResponseDTO.fromEntity(entity.getArtist()));
         dto.setAlbum(AlbumInSongResponseDTO.fromEntity(entity.getAlbum()));
         
@@ -52,7 +52,7 @@ public class SongResponseDTO {
             var dto = new ArtistInSongResponseDTO();
             dto.setId(entity.getId());
             dto.setName(entity.getName());
-            dto.setPictureUrl(entity.getPictureUrl());
+            dto.setPictureUrl(entity.getPictureMedium());
             return dto;
         }
     }
@@ -68,7 +68,7 @@ public class SongResponseDTO {
             var dto = new AlbumInSongResponseDTO();
             dto.setId(entity.getId());
             dto.setTitle(entity.getTitle());
-            dto.setUrlCover(entity.getUrlCover());
+            dto.setUrlCover(entity.getCoverMedium());
             return dto;
         }
     }

@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ufape.dam.harmony.business.dto.res.ArtistResponseDTO;
-import ufape.dam.harmony.business.entity.Artist;
 import ufape.dam.harmony.business.service.ArtistService;
 
 @RestController
@@ -21,9 +20,9 @@ public class ArtistController {
 	@GetMapping("/{id}")
     public ResponseEntity<ArtistResponseDTO> getArtistById(@PathVariable Long id) {
 		
-		Artist artist = artistService.findById(id).orElse(null);
+		ArtistResponseDTO artist = artistService.findByIdWithAlbums(id).orElse(null);
 		
-        return ResponseEntity.ok(ArtistResponseDTO.fromEntity(artist));
+        return ResponseEntity.ok(artist);
     }
 	
 }

@@ -59,7 +59,8 @@ public class Playlist {
 		Duration playlist = Duration.ZERO;
 		
 		for (Song song : this.songs) {
-			playlist = playlist.plus(song.getDuration());
+			Duration songDuration = Duration.ofSeconds(song.getDuration());
+			playlist = playlist.plus(songDuration);
 		}
 		
 		return playlist;

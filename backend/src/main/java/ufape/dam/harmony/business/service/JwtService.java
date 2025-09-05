@@ -32,7 +32,13 @@ public class JwtService {
     
     @Value("${jwt.secret.key}")
     private String secretKey;
-    
+
+    private static final String WEB_CLIENT_ID =
+            "940448057923-jbu82iq5eutmg54kfiphcgl9q8kfgrr5.apps.googleusercontent.com";
+
+    private static final NetHttpTransport transport = new NetHttpTransport();
+    private static final JacksonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+
     @Value("${jwt.secret}")
     private String SECRET;
     private final long EXPIRATION = 1000L * 60 * 60 * 24 * 90; // 3 MESES
@@ -92,19 +98,17 @@ public class JwtService {
 
     public GoogleIdToken.Payload verifyToken(String idTokenString) {
         try {
-            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
-                    new NetHttpTransport(),
-                    JacksonFactory.getDefaultInstance()
-            )
-            .setAudience(Collections.singletonList(googleClientId))
-            .build();
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
+                    .setAudience(Collections.singletonList(WEB_CLIENT_ID))
+                    .setIssuer("https://accounts.google.com")
+                    .build();
 
             GoogleIdToken idToken = verifier.verify(idTokenString);
-
-            return idToken != null ? idToken.getPayload() : null;
-
+            if (idToken == null) {
+                return null;
+            }
+            return idToken.getPayload();
         } catch (Exception e) {
-            e.printStackTrace();
             return null;
         }
     }

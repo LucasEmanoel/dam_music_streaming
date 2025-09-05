@@ -1,5 +1,6 @@
 import 'package:dam_music_streaming/data/dto/album_dto.dart';
 import 'package:dam_music_streaming/data/dto/artist_dto.dart';
+import 'package:dam_music_streaming/domain/models/song_data.dart';
 import 'package:dam_music_streaming/utils/duration_conversor.dart';
 
 class SongDto {
@@ -34,6 +35,16 @@ class SongDto {
       album: map['album'] != null
           ? AlbumDto.fromMap(map['album'] as Map<String, dynamic>)
           : null,
+    );
+  }
+
+  factory SongDto.fromData(SongData data) {
+    return SongDto(
+      id: data.id ?? -1,
+      title: data.title ?? '',
+      artist: data.artist != null ? ArtistDto.fromData(data.artist!) : null,
+      album: data.album != null ? AlbumDto.fromData(data.album!) : null,
+      urlCover: data.urlCover ?? '',
     );
   }
 }

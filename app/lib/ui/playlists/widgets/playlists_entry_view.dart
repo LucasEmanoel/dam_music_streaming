@@ -12,10 +12,7 @@ class PlaylistEntryView extends StatelessWidget{
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descController = TextEditingController();
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  bool _isLoading = false;
 
   PlaylistEntryView({super.key});
 
@@ -143,10 +140,6 @@ class PlaylistEntryView extends StatelessWidget{
                     if (image != null) {
                       final file = File(image.path);
                       vm.setPickedImage(file);
-                      //final dir = vm.docsDir;
-                      //await file.copy(join(dir.path, "playlist_cover"));
-                      //final uploadTask = storageRef.putFile(_coverPlaylistFile!);
-                      vm.triggerRebuild();
                     }
                     Navigator.of(ctx).pop();
                   },
@@ -159,9 +152,6 @@ class PlaylistEntryView extends StatelessWidget{
                     if (image != null) {
                       final file = File(image.path);
                       vm.setPickedImage(file);
-                      //final dir = vm.docsDir;
-                      //await file.copy(join(dir.path, "playlist_cover"));
-                      vm.triggerRebuild();
                     }
                     Navigator.of(ctx).pop();
                   },
@@ -179,7 +169,7 @@ class PlaylistEntryView extends StatelessWidget{
     if (!_formKey.currentState!.validate()) return;
 
     _formKey.currentState!.save();
-    //await vm.savePlaylist();
+    await vm.savePlaylist();
 
     _nameController.clear();
     _descController.clear();

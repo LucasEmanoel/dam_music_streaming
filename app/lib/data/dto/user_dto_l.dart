@@ -1,3 +1,5 @@
+import 'package:dam_music_streaming/domain/models/user_data_l.dart';
+
 class UsuarioDto {
   int id;
   String username;
@@ -21,11 +23,15 @@ class UsuarioDto {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'username': username,
-      'email': email,
-      'role': role,
-    };
+    return {'id': id, 'username': username, 'email': email, 'role': role};
+  }
+
+  factory UsuarioDto.fromData(UsuarioData data) {
+    return UsuarioDto(
+      id: data.id ?? -1,
+      username: data.username ?? '',
+      email: data.email ?? '',
+      role: data.role ?? '',
+    );
   }
 }

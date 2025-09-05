@@ -1,7 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dam_music_streaming/data/services/storage_service.dart';
 import 'package:dam_music_streaming/domain/models/playlist_data.dart';
 import 'package:dam_music_streaming/domain/models/song_data.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 
@@ -11,9 +10,7 @@ class PlaylistViewModel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  final FirebaseStorage _firestore = FirebaseStorage.instance;
-  //final storageRef = FirebaseStorage.instance.ref();
-
+  final StorageService storageService = StorageService();
   final PlaylistRepository repository = PlaylistRepository();
 
   int _stackIndex = 0;
@@ -40,44 +37,52 @@ class PlaylistViewModel extends ChangeNotifier {
     }
   }
 
-  // Future<void> savePlaylist() async {
-  //   _isLoading = true;
-  //   notifyListeners();
-  //
-  //   if (entityBeingEdited == null) return;
-  //
-  //   try {
-  //     final savedPlaylist = (entityBeingEdited!.id == null)
-  //         ? await repository.createPlaylist(entityBeingEdited!)
-  //         : await repository.updatePlaylist(
-  //             entityBeingEdited!.id!,
-  //             entityBeingEdited!,
-  //           );
-  //
-  //     if (_pickedImageFile != null) {
-  //       final playlistId =
-  //           savedPlaylist.id ??
-  //           FirebaseFirestore.instance.collection('temp').doc().id;
-  //
-  //       final ref = _firestore.ref('playlist_covers/$playlistId.jpg');
-  //       final uploadTask = await ref.putFile(_pickedImageFile!);
-  //
-  //       final imageUrl = await uploadTask.ref.getDownloadURL();
-  //       savedPlaylist.urlCover = imageUrl;
-  //     }
-  //
-  //     await repository.updatePlaylist(savedPlaylist.id!, savedPlaylist);
-  //     await loadPlaylists();
-  //   } catch (e) {
-  //     print('error ao salvar: $e');
-  //   } finally {
-  //     _isLoading = false;
-  //     _pickedImageFile = null;
-  //     setStackIndex(0);
-  //   }
-  // }
+  Future<void> savePlaylist() async {
+    final playlistToSave = entityBeingEdited;
+    if (playlistToSave == null) {
+      return;
+    }
+
+    _isLoading = true;
+
+    try {
+      if (playlistToSave.id == null) {
+        print(entityBeingEdited.toString());
+        var createdPlaylist = await repository.createPlaylist(playlistToSave);
+        print(createdPlaylist.toString());
+
+        if (_pickedImageFile != null && createdPlaylist.id != null) {
+          final imageUrl = await storageService.uploadPlaylistCover(
+            playlistId: createdPlaylist.id!,
+            imageFile: _pickedImageFile!,
+          );
+
+          createdPlaylist.urlCover = imageUrl;
+          await repository.updatePlaylist(createdPlaylist.id!, createdPlaylist);
+        }
+      } else {
+        if (_pickedImageFile != null) {
+          final imageUrl = await storageService.uploadPlaylistCover(
+            playlistId: playlistToSave.id!,
+            imageFile: _pickedImageFile!,
+          );
+          playlistToSave.urlCover = imageUrl;
+        }
+        await repository.updatePlaylist(playlistToSave.id!, playlistToSave);
+      }
+
+      await loadPlaylists();
+    } catch (e, s) {
+      print('Erro ao salvar playlist: $e\n$s');
+    } finally {
+      _pickedImageFile = null;
+      setStackIndex(0);
+      _isLoading = false;
+    }
+  }
 
   Future<void> addSongsToCurrentPlaylist(int id, Set<SongData> songs) async {
+    _isLoading = true;
     try {
       final musicApiIds = songs.map((song) => song.id!).toList();
       PlaylistData updated = await repository.addSongsToPlaylist(
@@ -85,25 +90,21 @@ class PlaylistViewModel extends ChangeNotifier {
         musicApiIds,
       );
       entityBeingVisualized = updated;
-
-      triggerRebuild();
     } catch (e) {
-      print('error ao deletar: $e');
+      print('Erro ao adicionar músicas: $e');
     } finally {
-      print('ok');
+      _isLoading = false;
     }
   }
 
   Future<void> deletePlaylist(int id) async {
+    _isLoading = true;
     try {
-      final ref = _firestore.ref('playlist_covers/$id.jpg');
-      await ref.delete().catchError(
-        (e) => print("Imagem não encontrada para deletar: $e"),
-      );
+      await storageService.deletePlaylistCover(id);
       await repository.deletePlaylist(id);
       await loadPlaylists();
     } catch (e) {
-      print('error ao deletar: $e');
+      print('Erro ao deletar playlist: $e');
     } finally {
       setStackIndex(0);
     }
@@ -135,11 +136,8 @@ class PlaylistViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final playlistComMusicas = await repository.getPlaylistWithSongs(
-        id,
-      );
+      final playlistComMusicas = await repository.getPlaylistWithSongs(id);
       entityBeingVisualized = playlistComMusicas;
-  
     } catch (e) {
       print(e);
     } finally {
@@ -150,9 +148,6 @@ class PlaylistViewModel extends ChangeNotifier {
 
   void setPickedImage(File? file) {
     _pickedImageFile = file;
-  }
-
-  void triggerRebuild() {
     notifyListeners();
   }
 }

@@ -1,10 +1,11 @@
 import 'package:dam_music_streaming/data/dto/song_dto.dart';
 import 'package:dam_music_streaming/data/dto/user_dto_l.dart';
+import 'package:dam_music_streaming/domain/models/playlist_data.dart';
 import 'package:dam_music_streaming/utils/duration_conversor.dart';
 
 class PlaylistDto {
-  int id;
-  String title;
+  int? id;
+  String? title;
 
   String? description;
   String? urlCover;
@@ -14,8 +15,8 @@ class PlaylistDto {
   List<SongDto>? songs;
 
   PlaylistDto({
-    required this.id,
-    required this.title,
+    this.id,
+    this.title,
     this.description,
     this.urlCover,
     this.numSongs,
@@ -31,9 +32,7 @@ class PlaylistDto {
       description: map['description'],
       urlCover: map['url_cover'],
       numSongs: map['nb_songs'],
-      author: map['author'] != null
-          ? UsuarioDto.fromMap(map['author'])
-          : null,
+      author: map['author'] != null ? UsuarioDto.fromMap(map['author']) : null,
       duration: map['duration'] != null
           ? parseIso8601Duration(map['duration'])
           : null,
@@ -50,7 +49,26 @@ class PlaylistDto {
       'description': description,
       'url_cover': urlCover,
       'num_songs': numSongs,
-      'duration': duration?.inSeconds, // exemplo
+      'duration': duration?.inSeconds,
     };
+  }
+
+  factory PlaylistDto.fromData(PlaylistData data) {
+    return PlaylistDto(
+      id: data.id,
+      title: data.title ?? '',
+      description: data.description,
+      urlCover: data.urlCover,
+      numSongs: data.songs?.length ?? 0,
+
+      author: data.author != null
+          ? UsuarioDto.fromData(data.author!)
+          : null,
+
+      duration: data.duration,
+      songs: data.songs != null
+          ? data.songs!.map((songData) => SongDto.fromData(songData)).toList()
+          : [],
+    );
   }
 }

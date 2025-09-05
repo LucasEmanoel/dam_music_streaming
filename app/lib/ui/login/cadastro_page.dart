@@ -249,7 +249,7 @@ class _CadastroPageState extends State<CadastroPage> {
         data: {'username': username, 'email': email, 'password': password},
         options: Options(
           headers: {'Content-Type': 'application/json'},
-          extra: {'auth': false}, // sem Bearer em /auth/*
+          extra: {'auth': false},
         ),
       );
 

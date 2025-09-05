@@ -24,10 +24,8 @@ class _LoginInicioState extends State<LoginInicio> {
   bool obscure = true;
   bool _loading = false;
 
-  // Web Client ID do projeto (OAuth 2.0) — é o correto para emitir idToken no Android/iOS
   static const _webClientId = '940448057923-jbu82iq5eutmg54kfiphcgl9q8kfgrr5.apps.googleusercontent.com';
 
-  // GoogleSignIn com serverClientId garante idToken no mobile
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     serverClientId: _webClientId,
     scopes: <String>['email'],
@@ -58,7 +56,6 @@ class _LoginInicioState extends State<LoginInicio> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // Altura fixa no PageView evita assert do sliver
                       const SizedBox(height: 140, child: CoverCarousel(covers: _covers)),
                       const SizedBox(height: 24),
 
@@ -183,16 +180,15 @@ class _LoginInicioState extends State<LoginInicio> {
     );
   }
 
-  // Troca Google ID Token por JWT (text/plain)
   Future<void> _exchangeGoogleIdToken(String googleIdToken) async {
     if (googleIdToken.isEmpty) throw Exception('Google ID Token vazio.');
     try {
       final res = await ApiClient().dio.post(
-        '/auth/google', // se baseUrl já tem /api, mantenha só /auth/google
-        data: googleIdToken, // somente a string do token
+        '/auth/google',
+        data: googleIdToken,
         options: Options(
           headers: {'Content-Type': 'text/plain'},
-          extra: {'auth': false}, // não injeta Bearer
+          extra: {'auth': false},
         ),
       );
 
@@ -226,7 +222,7 @@ class _LoginInicioState extends State<LoginInicio> {
         data: {'email': email, 'password': pass},
         options: Options(
           headers: {'Content-Type': 'application/json'},
-          extra: {'auth': false}, // não injeta Bearer
+          extra: {'auth': false},
         ),
       );
 
@@ -279,14 +275,13 @@ class _LoginInicioState extends State<LoginInicio> {
 
         await _exchangeGoogleIdToken(idToken);
       } else {
-        await _googleSignIn.signOut(); // evita sessão antiga
+        await _googleSignIn.signOut();
         final googleUser = await _googleSignIn.signIn();
         if (googleUser == null) throw Exception('Login cancelado.');
 
         final googleAuth = await googleUser.authentication;
         var googleIdToken = googleAuth.idToken;
 
-        // fallback silencioso caso venha nulo
         if (googleIdToken == null || googleIdToken.isEmpty) {
           final silent = await _googleSignIn.signInSilently();
           final silentAuth = await silent?.authentication;
@@ -298,7 +293,6 @@ class _LoginInicioState extends State<LoginInicio> {
               'Verifique Web Client ID e SHA-1 no Firebase.');
         }
 
-        // (opcional) refletir sessão no Firebase local
         final credential = GoogleAuthProvider.credential(
           accessToken: googleAuth.accessToken,
           idToken: googleIdToken,

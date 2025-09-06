@@ -510,3 +510,16 @@ INSERT INTO song (id,id_deezer,readable,title,title_short,title_version,isrc,lin
 INSERT INTO song (id,id_deezer,readable,title,title_short,title_version,isrc,link,duration,track_position,disk_number,rank,explicit_lyrics,explicit_content_lyrics,explicit_content_cover,preview,md5_image,type,download_url,genre_id,artist_id,album_id) VALUES (409, 144938544, true, 'Take Off Version 2 (Zabriskie Point Remix)', 'Take Off Version 2', '(Zabriskie Point Remix)', 'GBN9Y1600211', 'https://www.deezer.com/track/144938544', 72, 11, 2, 102875, false, 0, 0, 'https://cdnt-preview.dzcdn.net/api/1/1/0/8/9/0/0897bcc765265a96a7f47c3637cfac7e.mp3?hdnea=exp=1756777603~acl=/api/1/1/0/8/9/0/0897bcc765265a96a7f47c3637cfac7e.mp3*~data=user_id=0,application_id=42~hmac=400c074319d0ff400dc31b0f4a40ff175b7f48c355a01dbf17e870e518c93944', 'b75a9d4c6847ab2c47b3c399ec393964', 'track', 'https://dam-harmony.s3.us-east-1.amazonaws.com/144938544.mp3', 1, 6, 36);
 INSERT INTO song (id,id_deezer,readable,title,title_short,title_version,isrc,link,duration,track_position,disk_number,rank,explicit_lyrics,explicit_content_lyrics,explicit_content_cover,preview,md5_image,type,download_url,genre_id,artist_id,album_id) VALUES (412, 144938550, true, 'Unknown Song (Take 1) (Zabriskie Point)', 'Unknown Song (Take 1)', '(Zabriskie Point)', 'GBN9Y1600214', 'https://www.deezer.com/track/144938550', 356, 14, 2, 116150, false, 0, 0, 'https://cdnt-preview.dzcdn.net/api/1/1/d/2/4/0/d24eff375ca83c753ad4b2bcdfd4e02b.mp3?hdnea=exp=1756777603~acl=/api/1/1/d/2/4/0/d24eff375ca83c753ad4b2bcdfd4e02b.mp3*~data=user_id=0,application_id=42~hmac=3d66cfa623d0dc360f1e45632826de8f0f8b68b830b6cdfdfafce02861cef40f', 'b75a9d4c6847ab2c47b3c399ec393964', 'track', 'https://dam-harmony.s3.us-east-1.amazonaws.com/144938550.mp3', 1, 6, 36);
 
+INSERT INTO playlist (id, title, description, url_cover, author_id) VALUES
+(102, 'Manhã de Sol', 'Músicas pop e animadas para um dia claro e ensolarado.', 'https://dam-harmony.s3.us-east-1.amazonaws.com/pop_cover.jpg', 1),
+(103, 'Tarde Nublada', 'Rock e indie para dias de nuvens e reflexão.', 'https://dam-harmony.s3.us-east-1.amazonaws.com/rock_cover.jpg', 1),
+(104, 'Garoa e Café', 'Músicas acústicas e jazz para uma tarde de garoa.', 'https://dam-harmony.s3.us-east-1.amazonaws.com/jazz_cover.jpg', 1),
+(105, 'Tempestade de Ritmos', 'Músicas pesadas e intensas para um clima de trovoadas.', 'https://dam-harmony.s3.us-east-1.amazonaws.com/metal_cover.jpg', 1),
+(106, 'Neve e Calmaria', 'Clássicos e instrumentais para momentos de paz e serenidade.', 'https://dam-harmony.s3.us-east-1.amazonaws.com/classical_cover.jpg', 1);
+
+INSERT INTO playlist_songs (playlist_id, song_id) VALUES
+(102, 112), (102, 115), (102, 116), (102, 117),
+(103, 121), (103, 122), (103, 124), (103, 125),
+(104, 242), (104, 243), (104, 246), (104, 247),
+(105, 230), (105, 234), (105, 238), (105, 240),
+(106, 132), (106, 133), (106, 135), (106, 136);

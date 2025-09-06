@@ -24,38 +24,49 @@ public class Song {
 //    private Duration duration; // The track's duration in seconds
 //    private Double bpm; //Beats per minute
 //    private Double gain; //Signal strength
-	
-	private int idDeezer;
+	@Column(name = "id_deezer")
+	private Long idDeezer;
 	private boolean readable;
 	private String title;
+	@Column(name = "title_short")
 	private String titleShort;
+	@Column(name = "title_version")
 	private String titleVersion;
 	private String isrc;
 	private String link;
-	private int duration;
-	private int trackPosition;
+	private Integer duration;
+	@Column(name = "track_position")
+	private Integer trackPosition;
+	@Column(name = "disk_number")
 	private int diskNumber;
 	private int rank;
+	@Column(name = "explicit_lyrics")
 	private boolean explicitLyrics;
-	private int explicitContentLyrics;
-	private int explicitContentCover;
+	@Column(name = "explicit_content_lyrics")
+	private Integer explicitContentLyrics;
+	@Column(name = "explicit_content_cover")
+	private Integer explicitContentCover;
 	@Column(columnDefinition = "text")
 	private String preview;
 	@Column(name = "md5_image")
 	private String md5Image;
 	private String type;
+	@Column(name = "download_url")
 	private String downloadUrl;
 	
 //	@ManyToOne(fetch = FetchType.LAZY)
 	@ManyToOne
+	@JoinColumn(name = "genre_id")
 	private Genre genre;
 	
 //    @ManyToOne(fetch = FetchType.LAZY)
 	@ManyToOne
+	@JoinColumn(name = "artist_id")
     private Artist artist;
     
 //    @ManyToOne(fetch = FetchType.LAZY)
 	@ManyToOne
+	@JoinColumn(name = "album_id")
 	private Album album;
 	
 	

@@ -79,6 +79,7 @@ public class PlaylistResponseDTO {
         private Long id;
         private String title;
         private Duration duration;
+       
         private AlbumInSongPlaylistResponseDTO album;
         private ArtistInSongPlaylistResponseDTO artist;
         
@@ -101,11 +102,14 @@ public class PlaylistResponseDTO {
     public static class AlbumInSongPlaylistResponseDTO {
         private Long id;
         private String title;
+        @JsonProperty("url_cover")
+    	private String coverMedium;
         
         public static AlbumInSongPlaylistResponseDTO fromEntity(Album entity) {
             if (entity == null) return null;
             var dto = new AlbumInSongPlaylistResponseDTO();
             dto.setId(entity.getId());
+            dto.setCoverMedium(entity.getCoverMedium());
             dto.setTitle(entity.getTitle());
 
             return dto;

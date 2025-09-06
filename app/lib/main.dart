@@ -1,7 +1,10 @@
+import 'package:dam_music_streaming/consts.dart';
 import 'package:dam_music_streaming/ui/core/themes/light.dart';
 import 'package:dam_music_streaming/ui/core/ui/svg_icon.dart';
 import "package:flutter/material.dart";
+import 'package:geolocator/geolocator.dart';
 import "package:path_provider/path_provider.dart";
+import 'package:weather/weather.dart';
 import 'dart:io';
 import 'ui/playlists/widgets/playlists_view.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -48,8 +51,11 @@ class HarmonyApp extends StatelessWidget {
 }
 
 class HomeScaffold extends StatelessWidget {
+
+  final WeatherFactory _weatherFactory = WeatherFactory(OPENWEATHER_API_KEY);
+
   final Directory docsDir;
-  const HomeScaffold({super.key, required this.docsDir});
+  HomeScaffold({super.key, required this.docsDir});
 
   @override
   Widget build(BuildContext context) {
@@ -63,10 +69,10 @@ class HomeScaffold extends StatelessWidget {
                 toolbarHeight: 70,
                 title: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
-                  children: const [
+                  children: [
                     SvgIcon(assetName: 'assets/icons/Logo.svg', size: 40),
                     SizedBox(width: 6),
-                    Text("Harmony"),
+                    Text("Harmony")
                   ],
                 ),
               ),

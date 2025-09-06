@@ -153,21 +153,7 @@ class ArtistDetailView extends StatelessWidget {
               }
 
               return InfoTile(
-                leading: ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: Image.network(
-                    song.urlCover ?? '',
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      width: 50,
-                      height: 50,
-                      color: Colors.grey.shade300,
-                      child: const Icon(Icons.music_note),
-                    ),
-                  ),
-                ),
+                imageUrl: song.urlCover ?? '',
                 title: song.title ?? 'Música desconhecida',
                 subtitle: 'Single', //TODO: alguma informacao util que nao seja o nome do artista
                 trailing: IconButton(

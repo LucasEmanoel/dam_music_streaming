@@ -1,10 +1,15 @@
 package ufape.dam.harmony.business.service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.checkerframework.checker.units.qual.K;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +20,8 @@ import ufape.dam.harmony.business.dto.res.PlaylistResponseDTO;
 import ufape.dam.harmony.business.entity.Playlist;
 import ufape.dam.harmony.business.entity.Song;
 import ufape.dam.harmony.business.entity.Usuario;
+import ufape.dam.harmony.business.entity.Weather;
+import ufape.dam.harmony.business.entity.WeatherMapGenre;
 import ufape.dam.harmony.data.PlaylistRepository;
 import ufape.dam.harmony.data.SongRepository;
 import ufape.dam.harmony.security.SecurityUser;
@@ -27,6 +34,9 @@ public class PlaylistService {
 
 	@Autowired
 	private SongRepository songRepository;
+	
+	@Autowired
+	private WeatherMapGenre weatherMapGenre;
 
 	@Transactional
 	public PlaylistResponseDTO createPlaylist(PlaylistRequestDTO request, SecurityUser user) {
@@ -121,6 +131,45 @@ public class PlaylistService {
 		
 	}
 	
+	@Transactional
+	public List<PlaylistResponseDTO> getPlaylistsByWeather(Weather weather){
+		// a ideia aqui é fazer uma media de bpm e gain da playlist
+		// falta essa informacao nas entities
+		Set<String> preferredGenres = weatherMapGenre.mapWeatherGenre.get(weather); //ficou muito verboso mas quero deixar fora mesmo
+		System.out.println(preferredGenres.toString());
+		List<Playlist> playlists = playlistRepository.findAll();
+		Map<Playlist, Long> filteredPlaylists = new HashMap<Playlist, Long>(); // a contagem de generos de frio/calor a cada playlist
+		
+		for(Playlist p : playlists) {
+			long genCount = 0;
+			for (Song s : p.getSongs()) {
+				
+				if(preferredGenres.contains(s.getGenre().getName())) { 
+					genCount++;
+				}
+				
+				if (genCount > 0) {
+					filteredPlaylists.put(p, genCount);
+				}
+			}
+			
+			System.out.println(p.getDescription());
+			System.out.println(genCount);
+		}
+		
+        List<Map.Entry<Playlist, Long>> sortedEntries = new ArrayList<>(filteredPlaylists.entrySet());		
+        Collections.sort(sortedEntries, (entry1, entry2) -> Long.compare(entry2.getValue(), entry1.getValue()));
+        
+        List<PlaylistResponseDTO> result = new ArrayList<>();
+        
+        for (Map.Entry<Playlist, Long> entry : sortedEntries) {
+            result.add(PlaylistResponseDTO.fromEntity(entry.getKey(), null));
+        }
+        
+        return result;
+        
+        
+	}	
 	
 
 

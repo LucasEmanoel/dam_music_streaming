@@ -66,4 +66,15 @@ class PlaylistApiService {
 
     return PlaylistDto.fromMap(response.data);
   }
+
+  Future<List<PlaylistDto>> fetchPlaylistsByWeather(String weather) async {
+    final response = await _dio.get(
+      '/suggestions',
+      queryParameters: {'weather': weather},
+    );
+    final List<dynamic> jsonList = response.data;
+    return jsonList
+        .map((map) => PlaylistDto.fromMap(map as Map<String, dynamic>))
+        .toList();
+  }
 }

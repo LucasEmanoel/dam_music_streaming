@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ufape.dam.harmony.business.dto.res.ArtistResponseDTO;
+import ufape.dam.harmony.business.dto.res.ArtistResponseDTO;
 import ufape.dam.harmony.business.entity.Artist;
 import ufape.dam.harmony.business.entity.Album;
 import ufape.dam.harmony.business.entity.Song;

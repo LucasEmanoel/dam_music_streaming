@@ -26,6 +26,10 @@ class AlbumDto {
   });
 
   factory AlbumDto.fromMap(Map<String, dynamic> map) {
+
+    final albumCoverUrl = map['url_cover'] as String?;
+
+
     return AlbumDto(
       id: map['id'] ?? -1,
       title: map['title'] ?? '',
@@ -39,14 +43,14 @@ class AlbumDto {
           ? DateTime.parse(map['release_date'])
           : null,
 
-      urlCover: map['md5_image'],
+      urlCover: map['url_cover'],
 
       artist: map['artist'] != null
           ? ArtistDto.fromMap(map['artist'] as Map<String, dynamic>)
           : null,
 
       songs: (map['songs'] as List<dynamic>?)
-          ?.map((s) => SongDto.fromMap(s as Map<String, dynamic>))
+          ?.map((s) => SongDto.fromMap(s as Map<String, dynamic>, albumCoverUrl: albumCoverUrl))
           .toList(),
     );
   }

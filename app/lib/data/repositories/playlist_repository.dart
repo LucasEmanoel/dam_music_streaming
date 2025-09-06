@@ -47,4 +47,10 @@ class PlaylistRepository {
   Future<void> removeSongFromPlaylist(int playlistId, int songId) async {
     await api.removeSong(playlistId, songId);
   }
+
+  Future<List<PlaylistData>> fetchPlaylistsByWeather(String weather) async {
+    final List<PlaylistDto> playlists = await api.fetchPlaylistsByWeather(weather);
+    return playlists.map((dto) => PlaylistData.fromDto(dto)).toList();
+  }
+
 }

@@ -58,6 +58,14 @@ class PlaylistApiService {
     await _dio.delete('/playlists/$playlistId/songs/$songId');
   }
 
+  Future<List<SongDto>> fetchAllSongs() async {
+    final response = await _dio.get('/songs');
+    final List<dynamic> jsonList = response.data;
+    return jsonList
+        .map((map) => SongDto.fromMap(map as Map<String, dynamic>))
+        .toList();
+  }
+
   Future<PlaylistDto> postSongs(int id, List<int> songsIds) async {
     final response = await _dio.post(
       '/playlists/$id/songs',

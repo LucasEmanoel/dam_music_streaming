@@ -4,7 +4,6 @@ class LocationService {
   Future<Position?> getCurrentPosition() async {
     bool serviceEnabled;
     LocationPermission permission;
-    //howdy partner
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
 
     if (!serviceEnabled) {
@@ -15,14 +14,12 @@ class LocationService {
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
-      // ohh no
       if (permission == LocationPermission.denied) {
         print('Location permissions are denied.');
         return null;
       }
     }
 
-    // ooooohh no, that's really bad buddy
     if (permission == LocationPermission.deniedForever) {
       print('Location permissions are permanently denied.');
       return null;

@@ -41,6 +41,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                 		.requestMatchers("/auth/**").permitAll()
                 		.requestMatchers("/songs/**").permitAll()
+                        .requestMatchers("api/genres/**").permitAll()
                 		.requestMatchers("/albums/**").permitAll()
                 		.requestMatchers("/artists/**").permitAll()
                 		.requestMatchers("/genres/**").permitAll()

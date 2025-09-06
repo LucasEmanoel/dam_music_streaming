@@ -24,7 +24,13 @@ public class GenreController {
 		List<GenreListResponseDto> list = genreService.findAll();
 		return ResponseEntity.ok(list);
     }
-	
+    @GetMapping("/by-song/{songId}")
+    public ResponseEntity<GenreListResponseDto> getBySong(@PathVariable Long songId) {
+        return genreService.findGenreBySongId(songId)
+                .map(g -> ResponseEntity.ok(GenreListResponseDto.fromEntity(g)))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
 	@GetMapping("/{id}")
     public ResponseEntity<GenreResponseDTO> getAlbumById(@PathVariable Long id) {
 		GenreResponseDTO genre = genreService.findByIdWithArtistsAlbumsSongs(id).orElse(null);

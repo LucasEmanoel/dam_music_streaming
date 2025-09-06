@@ -85,7 +85,7 @@ class _SearchPageState extends State<SearchPage> {
         builder: (context, vm, _) {
           return Scaffold(
             appBar: AppBar(
-              toolbarHeight: 72,
+              toolbarHeight: 70,
               titleSpacing: 16,
               title: TextField(
                 controller: _ctrl,

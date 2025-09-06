@@ -13,6 +13,7 @@ import 'config/token_manager.dart';
 import 'ui/home/widgets/home_feed.dart';
 import 'ui/login/cadastro_page.dart';
 import 'ui/splash/splash_page.dart';
+import 'ui/search/search_page.dart';
 
 
 void main() async {
@@ -78,7 +79,7 @@ class HomeScaffold extends StatelessWidget {
               ),
               body: HomeFeed()
             ),
-            const Center(child: Text("Search")),
+            const SearchPage(),
             const Center(child: Text("Tocando")),
             PlaylistsView(docsDir: docsDir),
           ],

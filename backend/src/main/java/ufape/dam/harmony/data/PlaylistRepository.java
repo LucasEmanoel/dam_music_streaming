@@ -12,13 +12,10 @@ import ufape.dam.harmony.business.entity.Usuario;
 
 
 public interface PlaylistRepository extends JpaRepository<Playlist, Long>{
+
+	List<Playlist> findByAuthorId(Long authorId);
 	
-	@Query("SELECT p FROM Playlist p LEFT JOIN FETCH p.author WHERE p.author = :author")
-    List<Playlist> findByAuthor(@Param("author") Usuario author);
-	
-    @Query("SELECT p FROM Playlist p LEFT JOIN FETCH p.songs LEFT JOIN FETCH p.author WHERE p.id = :id")
-    Optional<Playlist> findByIdWithSongs(@Param("id") Long id);
-	
-	
+	@Query("SELECT p FROM Playlist p LEFT JOIN FETCH p.songs s LEFT JOIN FETCH p.author a WHERE p.id = :id")
+	Optional<Playlist> findByIdWithSongs(@Param("id") Long id);
 
 }

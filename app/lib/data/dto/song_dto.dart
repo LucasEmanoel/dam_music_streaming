@@ -1,57 +1,50 @@
-import '../../domain/models/music_data.dart';
+import 'package:dam_music_streaming/data/dto/album_dto.dart';
+import 'package:dam_music_streaming/data/dto/artist_dto.dart';
+import 'package:dam_music_streaming/domain/models/song_data.dart';
+import 'package:dam_music_streaming/utils/duration_conversor.dart';
 
 class SongDto {
-  String? id;
-  String? apiId;
-  String? title;
-  String? genre;
-  String? artist;
-  String? album;
-  String? coverUrl;
+  int id;
+  String title;
+
+  ArtistDto? artist;
+  String? urlCover;
+  AlbumDto? album;
+  Duration? duration;
 
   SongDto({
-    this.id,
-    this.apiId,
-    this.title,
-    this.genre,
+    required this.id,
+    required this.title,
     this.artist,
     this.album,
-    this.coverUrl,
+    this.urlCover,
+    this.duration,
   });
 
   factory SongDto.fromMap(Map<String, dynamic> map) {
     return SongDto(
-      id: map['id'] ?? '0',
-      apiId: map['apiId'] ?? '',
+      id: map['id'] ?? -1,
       title: map['title'] ?? '',
-      genre: map['genre'] ?? '',
-      artist: map['artist'] ?? '',
-      album: map['album'] ?? '',
-      coverUrl: map['coverUrl'] ?? '',
+      duration: map['duration'] != null
+          ? parseIso8601Duration(map['duration'])
+          : null,
+      urlCover: map['url_cover'],
+      artist: map['artist'] != null
+          ? ArtistDto.fromMap(map['artist'] as Map<String, dynamic>)
+          : null,
+      album: map['album'] != null
+          ? AlbumDto.fromMap(map['album'] as Map<String, dynamic>)
+          : null,
     );
   }
 
   factory SongDto.fromData(SongData data) {
     return SongDto(
-      id: data.id ?? '',
+      id: data.id ?? -1,
       title: data.title ?? '',
-      artist: data.artist ?? '',
-      album: data.album ?? '',
-      coverUrl: data.coverUrl ?? '',
-      apiId: data.apiId ?? '',
-      genre: data.genre ?? '',
+      artist: data.artist != null ? ArtistDto.fromData(data.artist!) : null,
+      album: data.album != null ? AlbumDto.fromData(data.album!) : null,
+      urlCover: data.urlCover ?? '',
     );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'apiId': apiId,
-      'title': title,
-      'genre': genre,
-      'artist': artist,
-      'album': album,
-      'coverUrl': coverUrl,
-    };
   }
 }

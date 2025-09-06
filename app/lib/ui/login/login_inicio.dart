@@ -3,6 +3,9 @@ import 'package:dam_music_streaming/domain/models/user_data_l.dart';
 import 'package:dam_music_streaming/ui/core/user/view_model/user_view_model.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'package:dam_music_streaming/config/token_manager.dart';
+import 'package:dam_music_streaming/data/services/api_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:dam_music_streaming/ui/core/ui/svg_icon.dart';
@@ -23,6 +26,13 @@ class _LoginInicioState extends State<LoginInicio> {
   bool lembrar = false;
   bool obscure = true;
   bool _loading = false;
+
+  static const _webClientId = '940448057923-jbu82iq5eutmg54kfiphcgl9q8kfgrr5.apps.googleusercontent.com';
+
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    serverClientId: _webClientId,
+    scopes: <String>['email'],
+  );
 
   @override
   void dispose() {
@@ -51,7 +61,7 @@ class _LoginInicioState extends State<LoginInicio> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const CoverCarousel(covers: _covers),
+                      const SizedBox(height: 140, child: CoverCarousel(covers: _covers)),
                       const SizedBox(height: 24),
 
                       const Text(
@@ -118,7 +128,6 @@ class _LoginInicioState extends State<LoginInicio> {
                           ),
                         ],
                       ),
-
                       const SizedBox(height: 10),
                       SizedBox(
                         height: 48,
@@ -227,9 +236,34 @@ class _LoginInicioState extends State<LoginInicio> {
     );
   }
 
+  Future<void> _exchangeGoogleIdToken(String googleIdToken) async {
+    if (googleIdToken.isEmpty) throw Exception('Google ID Token vazio.');
+    try {
+      final res = await ApiClient().dio.post(
+        '/auth/google',
+        data: googleIdToken,
+        options: Options(
+          headers: {'Content-Type': 'text/plain'},
+          extra: {'auth': false},
+        ),
+      );
+
+      final data = res.data as Map<String, dynamic>;
+      final jwt = (data['token'] as String?) ?? '';
+      if (jwt.isEmpty) throw Exception('Backend não retornou o campo "token".');
+
+      await saveToken(jwt);
+    } on DioException catch (e) {
+      _toast('Falha ao trocar token (${e.type}) ${e.response?.statusCode ?? ''}');
+      rethrow;
+    } catch (e) {
+      _toast('Falha ao trocar token: $e');
+      rethrow;
+    }
+  }
+
   Future<void> _entrar(BuildContext context) async {
     final UserViewModel userViewModel = context.read<UserViewModel>();
-
     final email = emailCtrl.text.trim();
     final pass = passCtrl.text;
 
@@ -240,10 +274,21 @@ class _LoginInicioState extends State<LoginInicio> {
 
     setState(() => _loading = true);
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email,
-        password: pass,
+      final res = await ApiClient().dio.post(
+        '/auth/login',
+        data: {'email': email, 'password': pass},
+        options: Options(
+          headers: {'Content-Type': 'application/json'},
+          extra: {'auth': false},
+        ),
       );
+
+      final data = res.data as Map<String, dynamic>;
+      final jwt = (data['token'] as String?) ?? '';
+      if (jwt.isEmpty) throw Exception('Backend não retornou o campo "token".');
+
+      await saveToken(jwt);
+
       final UsuarioData user = UsuarioData(
         id: 123,
         fullName: 'Teste da Silva',
@@ -254,9 +299,13 @@ class _LoginInicioState extends State<LoginInicio> {
       userViewModel.addLoggedUser(user);
       userViewModel.setProfilePicture();
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/home');
-    } on FirebaseAuthException catch (e) {
-      _toast(_mapAuthError(e));
+      Navigator.pushNamedAndRemoveUntil(context, '/home', (_) => false);
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        _toast('E-mail ou senha inválidos.');
+      } else {
+        _toast('Falha ao entrar (${e.type}) ${e.response?.statusCode ?? ''}');
+      }
     } catch (e) {
       _toast('Falha ao entrar. Tente novamente.');
     } finally {
@@ -286,18 +335,44 @@ class _LoginInicioState extends State<LoginInicio> {
           GoogleAuthProvider(),
         );
         if (cred.user == null) throw Exception('Login cancelado.');
+
+        final oauthCred = cred.credential as OAuthCredential?;
+        final idToken = oauthCred?.idToken;
+        if (idToken == null || idToken.isEmpty) {
+          throw Exception('Não foi possível obter o Google ID Token (web).');
+        }
+
+        await _exchangeGoogleIdToken(idToken);
       } else {
-        final googleUser = await GoogleSignIn().signIn();
+        await _googleSignIn.signOut();
+        final googleUser = await _googleSignIn.signIn();
         if (googleUser == null) throw Exception('Login cancelado.');
+
         final googleAuth = await googleUser.authentication;
+        var googleIdToken = googleAuth.idToken;
+
+        if (googleIdToken == null || googleIdToken.isEmpty) {
+          final silent = await _googleSignIn.signInSilently();
+          final silentAuth = await silent?.authentication;
+          googleIdToken = silentAuth?.idToken;
+        }
+
+        if (googleIdToken == null || googleIdToken.isEmpty) {
+          throw Exception('Não foi possível obter o Google ID Token (mobile). '
+              'Verifique Web Client ID e SHA-1 no Firebase.');
+        }
+
         final credential = GoogleAuthProvider.credential(
           accessToken: googleAuth.accessToken,
-          idToken: googleAuth.idToken,
+          idToken: googleIdToken,
         );
         await FirebaseAuth.instance.signInWithCredential(credential);
+
+        await _exchangeGoogleIdToken(googleIdToken);
       }
+
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushNamedAndRemoveUntil(context, '/home', (_) => false);
     } on FirebaseAuthException catch (e) {
       _toast(_mapAuthError(e));
     } catch (e) {
@@ -314,9 +389,9 @@ class _LoginInicioState extends State<LoginInicio> {
   String _mapAuthError(FirebaseAuthException e) {
     switch (e.code) {
       case 'user-not-found':
-        return 'Usuário não encontrado.';
+        return 'Usuário não encontrado com e-mail:';
       case 'wrong-password':
-      case 'invalid-credential':
+      case 'Bad credentials.':
         return 'E-mail ou senha inválidos.';
       case 'too-many-requests':
         return 'Muitas tentativas. Tente novamente mais tarde.';

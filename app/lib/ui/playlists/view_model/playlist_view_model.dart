@@ -1,23 +1,20 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dam_music_streaming/data/services/storage_service.dart';
 import 'package:dam_music_streaming/domain/models/playlist_data.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:dam_music_streaming/domain/models/song_data.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 
 import '../../../data/repositories/playlist_repository.dart';
 
 class PlaylistViewModel extends ChangeNotifier {
-
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  final FirebaseStorage  _firestore = FirebaseStorage.instance;
-  //final storageRef = FirebaseStorage.instance.ref();
-
+  final StorageService storageService = StorageService();
   final PlaylistRepository repository = PlaylistRepository();
 
   int _stackIndex = 0;
-  
+
   List<PlaylistData> _playlists = [];
   PlaylistData? entityBeingVisualized;
   PlaylistData? entityBeingEdited;
@@ -32,7 +29,6 @@ class PlaylistViewModel extends ChangeNotifier {
 
     try {
       _playlists = await repository.getPlaylists();
-      print(_playlists);
     } catch (e) {
       print('error: $e');
     } finally {
@@ -42,54 +38,89 @@ class PlaylistViewModel extends ChangeNotifier {
   }
 
   Future<void> savePlaylist() async {
+    final playlistToSave = entityBeingEdited;
+    if (playlistToSave == null) {
+      return;
+    }
+
     _isLoading = true;
-    notifyListeners();
-
-    print('EN?TIDADE');
-    print(entityBeingEdited?.toMap());
-    print('IMAGEMMMM');
-    print(_pickedImageFile);
-
-    if (entityBeingEdited == null) return;
 
     try {
-      final savedPlaylist = (entityBeingEdited!.id == null)
-          ? await repository.createPlaylist(entityBeingEdited!)
-          : await repository.updatePlaylist(entityBeingEdited!.id!, entityBeingEdited!);
+      if (playlistToSave.id == null) {
+        print(entityBeingEdited.toString());
+        var createdPlaylist = await repository.createPlaylist(playlistToSave);
+        print(createdPlaylist.toString());
 
-      if (_pickedImageFile != null) {
-        final playlistId = savedPlaylist.id ?? FirebaseFirestore.instance.collection('temp').doc().id;
+        if (_pickedImageFile != null && createdPlaylist.id != null) {
+          final imageUrl = await storageService.uploadPlaylistCover(
+            playlistId: createdPlaylist.id!,
+            imageFile: _pickedImageFile!,
+          );
 
-        final ref = _firestore.ref('playlist_covers/$playlistId.jpg');
-        final uploadTask = await ref.putFile(_pickedImageFile!);
-
-        final imageUrl = await uploadTask.ref.getDownloadURL();
-        savedPlaylist.urlCover = imageUrl;
+          createdPlaylist.urlCover = imageUrl;
+          await repository.updatePlaylist(createdPlaylist.id!, createdPlaylist);
+        }
+      } else {
+        if (_pickedImageFile != null) {
+          final imageUrl = await storageService.uploadPlaylistCover(
+            playlistId: playlistToSave.id!,
+            imageFile: _pickedImageFile!,
+          );
+          playlistToSave.urlCover = imageUrl;
+        }
+        await repository.updatePlaylist(playlistToSave.id!, playlistToSave);
       }
 
-      await repository.updatePlaylist(savedPlaylist.id!, savedPlaylist);
       await loadPlaylists();
-    } catch (e) {
-      print('error ao salvar: $e');
+    } catch (e, s) {
+      print('Erro ao salvar playlist: $e\n$s');
     } finally {
-      _isLoading = false;
       _pickedImageFile = null;
       setStackIndex(0);
+      _isLoading = false;
+    }
+  }
+
+  Future<void> addSongsToCurrentPlaylist(int id, Set<SongData> songs) async {
+    _isLoading = true;
+    try {
+      final musicApiIds = songs.map((song) => song.id!).toList();
+      PlaylistData updated = await repository.addSongsToPlaylist(
+        id,
+        musicApiIds,
+      );
+      entityBeingVisualized = updated;
+      notifyListeners();
+    } catch (e) {
+      print('Erro ao adicionar músicas: $e');
+    } finally {
+      _isLoading = false;
     }
   }
 
   Future<void> deletePlaylist(int id) async {
-    if (entityBeingVisualized == null) return;
-    
+    _isLoading = true;
     try {
-      final ref = _firestore.ref('playlist_covers/$id.jpg');
-      await ref.delete().catchError((e) => print("Imagem não encontrada para deletar: $e"));
+      await storageService.deletePlaylistCover(id);
       await repository.deletePlaylist(id);
       await loadPlaylists();
     } catch (e) {
-      print('error ao deletar: $e');
+      print('Erro ao deletar playlist: $e');
     } finally {
       setStackIndex(0);
+    }
+  }
+
+  Future<void> removeSongFromPlaylist(int playlistId, int songId) async {
+    _isLoading = true;
+    try {
+      await repository.removeSongFromPlaylist(playlistId, songId);
+      entityBeingVisualized?.songs?.removeWhere((song) => song.id == songId);
+      await loadPlaylists();
+    } catch (e) {
+      print('Erro ao remove musuca de playlist: $e');
+    } finally {
+      _isLoading = false;
     }
   }
 
@@ -108,24 +139,29 @@ class PlaylistViewModel extends ChangeNotifier {
 
   void startEditing({PlaylistData? playlist}) {
     _pickedImageFile = null;
-    entityBeingEdited = playlist ??
-        PlaylistData(
-            title: '', urlCover: '', numSongs: 0, description: '');
+    entityBeingEdited =
+        playlist ??
+        PlaylistData(title: '', urlCover: '', numSongs: 0, description: '');
     notifyListeners();
   }
 
-  void startView({PlaylistData? playlist}) {
-    entityBeingVisualized = playlist ??
-        PlaylistData(
-            title: '', urlCover: '', numSongs: 0, description: '');
+  void startView({required int id}) async {
+    _isLoading = true;
     notifyListeners();
+
+    try {
+      final playlistComMusicas = await repository.getPlaylistWithSongs(id);
+      entityBeingVisualized = playlistComMusicas;
+    } catch (e) {
+      print(e);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   void setPickedImage(File? file) {
     _pickedImageFile = file;
-  }
-
-  void triggerRebuild() {
     notifyListeners();
   }
 }

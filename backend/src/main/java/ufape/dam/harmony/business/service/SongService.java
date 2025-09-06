@@ -1,37 +1,39 @@
 package ufape.dam.harmony.business.service;
 
 import java.util.List;
-import java.util.Optional;
-
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import ufape.dam.harmony.business.entity.Song;
+import ufape.dam.harmony.business.dto.res.SongResponseDTO;
 import ufape.dam.harmony.data.SongRepository;
 
 @Service
 public class SongService {
-	@Autowired
-	private SongRepository songRepository;
 
+    @Autowired
+    private SongRepository songRepository;
 
-    public Song saveSong(Song song) {
-        return songRepository.save(song);
+    public List<SongResponseDTO> findAllSongs() {
+        return songRepository.findAll().stream()
+                .map(SongResponseDTO::fromEntity)
+                .collect(Collectors.toList());
     }
 
-    public Optional<Song> findSongById(Long id) {
-        return songRepository.findById(id);
+    public List<SongResponseDTO> searchSongs(String q) {
+        return songRepository.findByTitleContainingIgnoreCase(q).stream()
+                .map(SongResponseDTO::fromEntity)
+                .collect(Collectors.toList());
     }
 
-    public Optional<Song> findSongByApiId(String apiId) {
-        return songRepository.findByApiId(apiId);
+    public List<SongResponseDTO> findAlbumSongs(Long albumId) {
+        return songRepository.findAllByAlbumId(albumId).stream()
+                .map(SongResponseDTO::fromEntity)
+                .collect(Collectors.toList());
     }
 
-    public List<Song> findAllSongs() {
-        return songRepository.findAll();
-    }
-
-    public void deleteSong(Long id) {
-        songRepository.deleteById(id);
+    public SongResponseDTO findById(Long id) {
+        return songRepository.findById(id)
+                .map(SongResponseDTO::fromEntity)
+                .orElseThrow(() -> new RuntimeException("Song not found with id: " + id));
     }
 }

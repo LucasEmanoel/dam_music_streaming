@@ -4,17 +4,17 @@ import 'package:flutter/material.dart';
 
 class InfoTile extends StatelessWidget {
   final String? imageUrl;
-  final String title;
-  final String subtitle;
+  final String? title;
+  final String? subtitle;
   final Widget? leading;
   final Widget? trailing;
   final GestureTapCallback? onTap;
 
   const InfoTile({
     super.key,
-    required this.imageUrl,
-    required this.title,
-    required this.subtitle,
+    this.imageUrl,
+    this.title,
+    this.subtitle,
     this.leading,
     this.trailing,
     this.onTap
@@ -31,7 +31,7 @@ class InfoTile extends StatelessWidget {
         height: 50,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8.0),
-          image: hasImage 
+          image: hasImage
               ? DecorationImage(
                   image: NetworkImage(imageUrl!),
                   fit: BoxFit.cover,
@@ -42,18 +42,19 @@ class InfoTile extends StatelessWidget {
         child: hasImage
           ? null
           : Center(
-            child: SvgIcon(assetName: 'assets/icons/Music.svg', size: 30,color: Colors.white,) 
+            child: SvgIcon(assetName: 'assets/icons/Music.svg', size: 30,color: Colors.white,)
           )
       ),
 
-      title: Text(title),
-      subtitle: Text(subtitle,
+      title: Text(title ?? ''),
+      subtitle: Text(subtitle ?? '',
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
       contentPadding: EdgeInsets.only(left: 7),
       trailing: trailing,
       onTap: onTap,
+      shape: null
     );
   }
 }

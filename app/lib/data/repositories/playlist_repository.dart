@@ -13,6 +13,8 @@ class PlaylistRepository {
 
   Future<PlaylistData> getPlaylistById(int id) async {
     final PlaylistDto dto = await api.getById(id);
+    print('OQ VEM DO BAK');
+    print(dto.toMap());
     return PlaylistData.fromDto(dto);
   }
 
@@ -28,8 +30,21 @@ class PlaylistRepository {
     return PlaylistData.fromDto(updatedDto);
   }
 
+  Future<PlaylistData> addSongsToPlaylist(int id, List<int> songsIds) async {
+    final PlaylistDto updatedDto = await api.postSongs(id, songsIds);
+    return PlaylistData.fromDto(updatedDto);
+  }
+
+  Future<PlaylistData> getPlaylistWithSongs(int id) async {
+    final PlaylistDto dto = await api.getById(id);
+    print(dto.toMap());
+    return PlaylistData.fromDto(dto);
+  }
+
   Future<void> deletePlaylist(int id) async {
     await api.delete(id);
   }
-
+  Future<void> removeSongFromPlaylist(int playlistId, int songId) async {
+    await api.removeSong(playlistId, songId);
+  }
 }

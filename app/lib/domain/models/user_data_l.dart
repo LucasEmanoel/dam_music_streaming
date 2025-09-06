@@ -3,16 +3,16 @@ import '../../data/dto/user_dto_l.dart';
 class UsuarioData {
   int? id;
   String? fullName;
-  String username;
-  String email;
-  String role;
+  String? username;
+  String? email;
+  String? role;
 
   UsuarioData({
     this.id,
     this.fullName,
-    required this.username,
-    required this.email,
-    required this.role,
+    this.username,
+    this.email,
+    this.role,
   });
 
   factory UsuarioData.fromDto(UsuarioDto dto) {
@@ -21,9 +21,9 @@ class UsuarioData {
       fullName: dto.fullName != null && dto.fullName!.isNotEmpty
           ? dto.fullName
           : null,
-      username: dto.username.isNotEmpty ? dto.username : 'Usuário desconhecido',
+      username: dto.username,
       email: dto.email,
-      role: dto.role.isNotEmpty ? dto.role : 'USER',
+      role: dto.role,
     );
   }
 

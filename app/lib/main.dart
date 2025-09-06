@@ -18,10 +18,6 @@ import 'ui/splash/splash_page.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final String tokenParaTestes =
-      "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNhc0BnbWFpbC5jb20iLCJ1c2VybmFtZSI6Imx1Y2FzdHcxNSIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzU1OTU1NjEzLCJleHAiOjE3NjM3MzE2MTN9.6gM46jOYRope-4-viY6tU-CWlWsS0J2w-SJU7_GxO8c";
-  await saveToken(tokenParaTestes);
-
   Directory docsDir = await startMeUp();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(HarmonyApp(docsDir: docsDir));

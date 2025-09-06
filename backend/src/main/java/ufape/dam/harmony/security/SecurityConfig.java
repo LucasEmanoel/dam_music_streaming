@@ -41,6 +41,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                 		.requestMatchers("/auth/**").permitAll()
                 		.requestMatchers("/songs/**").permitAll()
+                		.requestMatchers("/albums/**").permitAll()
+                		.requestMatchers("/artists/**").permitAll()
+                		.requestMatchers("/genres/**").permitAll()
                 		.requestMatchers("/playlists/**").authenticated()
                         //.requestMatchers(allowedEndpoints).permitAll()
                         .anyRequest().authenticated()

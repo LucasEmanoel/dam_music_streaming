@@ -1,6 +1,14 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'package:dam_music_streaming/config/token_manager.dart';
+import 'package:dam_music_streaming/data/services/api_service.dart';
+import 'package:dam_music_streaming/ui/core/ui/svg_icon.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
 import 'widgets/cover_carousel.dart';
 
 class CadastroPage extends StatefulWidget {
@@ -12,12 +20,21 @@ class CadastroPage extends StatefulWidget {
 }
 
 class _CadastroPageState extends State<CadastroPage> {
-  final nomeCtrl = TextEditingController();
+  final nomeCtrl  = TextEditingController();
   final emailCtrl = TextEditingController();
   final passCtrl  = TextEditingController();
 
   bool obscure = true;
   bool aceitouTermos = false;
+  bool _loading = false;
+
+  static const _webClientId = '940448057923-jbu82iq5eutmg54kfiphcgl9q8kfgrr5.apps.googleusercontent.com';
+
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    serverClientId: _webClientId,
+    scopes: <String>['email'],
+  );
+
 
   @override
   void dispose() {
@@ -113,8 +130,11 @@ class _CadastroPageState extends State<CadastroPage> {
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
-                        onPressed: aceitouTermos ? _cadastrar : null,
-                        child: const Row(
+                        onPressed: (!aceitouTermos || _loading) ? null : _cadastrar,
+                        child: _loading
+                            ? const SizedBox(height: 22, width: 22,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                            : const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text('Cadastrar', style: TextStyle(fontWeight: FontWeight.w700)),
@@ -126,26 +146,38 @@ class _CadastroPageState extends State<CadastroPage> {
                     ),
 
                     const SizedBox(height: 16),
-                    OutlinedButton(
-                      onPressed: _cadastrarComGoogle,
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        side: BorderSide(color: Colors.grey.shade300),
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.black87,
-                      ),
-                      child: const Text('Continue with Google'),
+                  OutlinedButton(
+                    onPressed: _loading ? null : _cadastrarComGoogle,
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      side: BorderSide(color: Colors.grey.shade300),
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black87,
                     ),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        const Text('Continue with Google'),
+                        const Align(
+                          alignment: Alignment.centerLeft,
+                          child: Padding(
+                            padding: EdgeInsets.only(left: 16),
+                            child: SvgIcon(assetName: 'assets/icons/google.svg', size: 20),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
 
-                    const SizedBox(height: 18),
+                  const SizedBox(height: 18),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text('Já possui conta?', style: TextStyle(color: Colors.grey[700])),
                         const SizedBox(width: 6),
                         GestureDetector(
-                          onTap: () => Navigator.pop(context), // volta pro login
+                          onTap: () => Navigator.pop(context),
                           child: Text('Faça Login',
                               style: TextStyle(
                                 color: scheme.primary,
@@ -165,20 +197,146 @@ class _CadastroPageState extends State<CadastroPage> {
     );
   }
 
-  // MOCK: quando integrar com Firebase, crie o usuário e então navegue.
-  void _cadastrar() {
-    if (nomeCtrl.text.isEmpty || emailCtrl.text.isEmpty || passCtrl.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Preencha todos os campos.')),
-      );
-      return;
+  Future<void> _exchangeAndGoHome() async {
+    final user = FirebaseAuth.instance.currentUser;
+    final idToken = await user?.getIdToken(true);
+    if (idToken == null || idToken.isEmpty) {
+      throw Exception('Falha ao obter Google ID Token.');
     }
+
+    await _exchangeGoogleIdToken(idToken);
+
+    if (!mounted) return;
     Navigator.pushReplacementNamed(context, '/home');
   }
 
-  void _cadastrarComGoogle() {
-    // TODO: google_sign_in; depois redirecionar
-    _cadastrar();
+
+  Future<void> _exchangeGoogleIdToken(String googleIdToken) async {
+    if (googleIdToken.isEmpty) throw Exception('Google ID Token vazio.');
+    final res = await ApiClient().dio.post(
+      '/auth/google',
+      data: googleIdToken,
+      options: Options(
+        headers: {'Content-Type': 'text/plain'},
+        extra: {'auth': false},
+      ),
+    );
+    final data = res.data as Map<String, dynamic>;
+    final jwt = (data['token'] as String?) ?? '';
+    if (jwt.isEmpty) throw Exception('Backend não retornou o campo "token".');
+    await saveToken(jwt);
+  }
+
+
+  Future<void> _cadastrar() async {
+    final username = nomeCtrl.text.trim();
+    final email    = emailCtrl.text.trim();
+    final password = passCtrl.text;
+
+    if (username.isEmpty || email.isEmpty || password.isEmpty) {
+      _toast('Preencha todos os campos.');
+      return;
+    }
+    if (password.length < 6) {
+      _toast('A senha precisa ter pelo menos 6 caracteres.');
+      return;
+    }
+
+    setState(() => _loading = true);
+    try {
+      final res = await ApiClient().dio.post(
+        '/auth/register',
+        data: {'username': username, 'email': email, 'password': password},
+        options: Options(
+          headers: {'Content-Type': 'application/json'},
+          extra: {'auth': false},
+        ),
+      );
+
+      final data = res.data as Map<String, dynamic>;
+      final jwt = (data['token'] as String?) ?? '';
+      if (jwt.isEmpty) throw Exception('Backend não retornou o campo "token".');
+
+      await saveToken(jwt);
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/home');
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 409) {
+        _toast('Este e-mail já está em uso.');
+      } else {
+        _toast('Falha ao cadastrar (${e.type}) ${e.response?.statusCode ?? ''}');
+      }
+    } catch (_) {
+      _toast('Não foi possível criar sua conta. Tente novamente.');
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+
+  Future<void> _cadastrarComGoogle() async {
+    setState(() => _loading = true);
+    try {
+      if (kIsWeb) {
+        final cred = await FirebaseAuth.instance.signInWithPopup(GoogleAuthProvider());
+        if (cred.user == null) throw Exception('Cadastro cancelado.');
+
+        final oauthCred = cred.credential as OAuthCredential?;
+        final idToken = oauthCred?.idToken;
+        if (idToken == null || idToken.isEmpty) {
+          throw Exception('Não foi possível obter o Google ID Token (web).');
+        }
+
+        await _exchangeGoogleIdToken(idToken);
+      } else {
+        await _googleSignIn.signOut();
+        final googleUser = await _googleSignIn.signIn();
+        if (googleUser == null) throw Exception('Cadastro cancelado.');
+
+        final googleAuth = await googleUser.authentication;
+        final googleIdToken = googleAuth.idToken;
+        if (googleIdToken == null || googleIdToken.isEmpty) {
+          throw Exception('Não foi possível obter o Google ID Token (mobile).');
+        }
+
+        final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleIdToken,
+        );
+        await FirebaseAuth.instance.signInWithCredential(credential);
+
+        await _exchangeGoogleIdToken(googleIdToken);
+      }
+
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/home');
+    } on FirebaseAuthException catch (e) {
+      _toast(_mapAuthError(e));
+    } catch (e) {
+      _toast('Não foi possível continuar com Google.');
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+
+  void _toast(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+  }
+
+  String _mapAuthError(FirebaseAuthException e) {
+    switch (e.code) {
+      case 'email-already-in-use':
+        return 'Este e-mail já está em uso.';
+      case 'invalid-email':
+        return 'E-mail inválido.';
+      case 'weak-password':
+        return 'Senha fraca. Use 6+ caracteres.';
+      case 'network-request-failed':
+        return 'Sem conexão. Verifique sua internet.';
+      default:
+        return 'Erro: ${e.message ?? e.code}';
+    }
   }
 }
 
@@ -213,8 +371,8 @@ Widget _input({
 }
 
 const _covers = <String>[
-  'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400'
-      'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400',
+  'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400',
+  'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400',
   'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=400',
   'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400',
   'https://images.unsplash.com/photo-1518972559570-7cc1309f3229?w=400',

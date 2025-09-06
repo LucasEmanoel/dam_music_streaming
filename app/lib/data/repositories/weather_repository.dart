@@ -1,7 +1,6 @@
 import 'package:dam_music_streaming/consts.dart';
 import 'package:dam_music_streaming/data/services/geolocator_service.dart';
 import 'package:dam_music_streaming/data/services/weather_service.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:weather/weather.dart';
 
 class WeatherRepository {

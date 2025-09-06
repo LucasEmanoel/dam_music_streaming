@@ -2,43 +2,58 @@ import { PrismaClient } from '../generated/prisma';
 const prisma = new PrismaClient();
 
 import fs from 'fs';
-// import { fileURLToPath } from 'url';
-import path, {dirname} from 'path';
-
-
+import path from 'path';
 
 async function seed() {
-    // Código para inserir dados iniciais
     console.log('Database started seeded');
 
     const genres = [
         {
+            name: 'pop',
+            idDeezer:132
+        },
+        {
             name: 'rock',
             idDeezer:152
+        },
+        {
+            name: 'rAndb',
+            idDeezer:165
+        },
+        {
+            name: 'mpb',
+            idDeezer:78
+        },
+        {
+            name: 'alt',
+            idDeezer:85
+        },
+        {
+            name: 'rAndb',
+            idDeezer:116
         }
     ];
 
-    genres.forEach(async genre=>{
-        const __dirname =  path.resolve();
+    for (const genre of genres) { // <-- Use for...of aqui
+        const __dirname = path.resolve();
         const filePath = path.join(__dirname, `../${genre.name}_final.json`);
         const file = fs.readFileSync(filePath, "utf-8");
         const genreData = JSON.parse(file);
 
         console.log('Criando Gênero');
         const createdGenre = await prisma.genre.create({
-            data:{
+            data: {
                 name: genre.name,
                 idDeezer: genre.idDeezer
             }
-        })
+        });
 
         console.log('Gênero criado', createdGenre.id);
 
-
-        genreData.forEach(async (artist:any)=>{
+        for (const artist of genreData) { // <-- E aqui
             console.log('Criando Artista');
             const createdArtist = await prisma.artist.create({
-                data:{
+                data: {
                     idDeezer: artist['id'],
                     name: artist['name'],
                     picture: artist['picture'],
@@ -49,19 +64,19 @@ async function seed() {
                     radio: artist['radio'],
                     tracklist: artist['tracklist'],
                     type: artist['type'],
-                    genre:{
+                    genre: {
                         connect: {
                             id: createdGenre.id
                         }
                     }
                 }
-            })
+            });
             console.log('Artista criado', createdArtist.id);
 
-            artist.albums.forEach(async (album:any) => {
+            for (const album of artist.albums) { // <-- E aqui
                 console.log('Criando Album');
                 const createdAlbum = await prisma.album.create({
-                    data:{
+                    data: {
                         idDeezer: album['id'],
                         title: album['title'],
                         link: album['link'],
@@ -78,24 +93,24 @@ async function seed() {
                         tracklist: album['tracklist'],
                         explicitLyrics: album['explicit_lyrics'],
                         type: album['type'],
-                        genre:{
+                        genre: {
                             connect: {
                                 id: createdGenre.id
                             }
                         },
                         artist: {
-                            connect:{
+                            connect: {
                                 id: createdArtist.id
                             }
                         }
                     }
-                })
+                });
                 console.log('Album criado', createdAlbum.id);
 
-                album.tracks.forEach(async (track: any) => {
+                for (const track of album.tracks) { // <-- E por fim, aqui também
                     console.log('Criando Musica');
                     const createdSong = await prisma.song.create({
-                        data:{
+                        data: {
                             idDeezer: track['id'],
                             readable: track['readable'],
                             title: track['title'],
@@ -114,30 +129,28 @@ async function seed() {
                             md5Image: track['md5_image'],
                             type: track['type'],
                             downloadUrl: `https://dam-harmony.s3.us-east-1.amazonaws.com/${track['id']}.mp3`,
-                            genre:{
+                            genre: {
                                 connect: {
                                     id: createdGenre.id
                                 }
                             },
                             artist: {
-                                connect:{
+                                connect: {
                                     id: createdArtist.id
                                 }
                             },
                             album: {
-                                connect:{
+                                connect: {
                                     id: createdAlbum.id
                                 }
                             }
                         }
-                    })
+                    });
                     console.log('Musica criada', createdSong.id);
-                })
-            })
-        })
-        
-    })
-
+                }
+            }
+        }
+    }
 
     await prisma.$disconnect();
 }

@@ -9,6 +9,9 @@ class SuggestionsViewModel extends ChangeNotifier {
   final PlaylistRepository _playlistRepository = PlaylistRepository();
   final WeatherRepository _weatherRepository = WeatherRepository();
 
+  String? _currentWeather = null;
+  String? get currentWeather => _currentWeather;
+
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
@@ -27,16 +30,19 @@ class SuggestionsViewModel extends ChangeNotifier {
       if (weather != null) {
         final condition = weather.weatherMain?.toUpperCase() ?? '';
         final weatherEnum = EnumWeather.values.byName(condition);
+        _currentWeather = weatherEnum.name;
 
         fetchedPlaylists = await _playlistRepository.fetchPlaylistsByWeather(
           weatherEnum.name,
         );
       } else {
-        fetchedPlaylists = await _playlistRepository.getPlaylists(); // pegar o top10
+        fetchedPlaylists = await _playlistRepository
+            .getPlaylists(); // pegar o top10
       }
     } catch (e) {
       print(e);
-      fetchedPlaylists = await _playlistRepository.getPlaylists(); // pegar o top10, TODO: mudar para uma lista de playlists padrão
+      fetchedPlaylists = await _playlistRepository
+          .getPlaylists(); // pegar o top10, TODO: mudar para uma lista de playlists padrão
     } finally {
       _playlists.clear();
       _playlists.addAll(fetchedPlaylists);
@@ -47,6 +53,7 @@ class SuggestionsViewModel extends ChangeNotifier {
 
   void clearItemsBeingViewed() {
     _playlists.clear();
+    _currentWeather = null;
     _isLoading = false;
     notifyListeners();
   }

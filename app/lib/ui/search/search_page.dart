@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/repositories/song_repository.dart';
+import '../../data/services/genre_service.dart';
 import '../../domain/models/song_data.dart';
 import '../../domain/models/playlist_data.dart';
 import '../album/widgets/album_detail.dart';
@@ -11,6 +12,7 @@ import '../artist/widgets/artist_detail.dart';
 import '../core/ui/info_tile.dart';
 import '../core/ui/loading.dart';
 import '../core/ui/button_sheet.dart';
+import '../genre/widgets/genre_detail.dart';
 import '../playlists/view_model/playlist_view_model.dart';
 
 class SearchViewModel2 extends ChangeNotifier {
@@ -30,15 +32,26 @@ class SearchViewModel2 extends ChangeNotifier {
   Future<void> search(String q) async {
     _query = q.trim();
     _error = null;
+
     if (_query.isEmpty) {
       _results = [];
       notifyListeners();
       return;
     }
+
     _loading = true;
     notifyListeners();
+
     try {
-      _results = await repo.searchSongs(_query); // mesmo endpoint da playlist
+      final fetched = await repo.searchSongs(_query);
+
+      final qn = _query.toLowerCase();
+      _results = fetched.where((s) {
+        final title  = (s.title ?? '').toLowerCase();
+        final artist = (s.artist?.name ?? '').toLowerCase();
+        final album  = (s.album?.title ?? '').toLowerCase();
+        return title.contains(qn) || artist.contains(qn) || album.contains(qn);
+      }).toList();
     } catch (e) {
       _error = 'Falha ao buscar. Tente novamente.';
       _results = [];
@@ -47,6 +60,7 @@ class SearchViewModel2 extends ChangeNotifier {
       notifyListeners();
     }
   }
+
 
   void clear() {
     _query = '';
@@ -155,7 +169,6 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  // BottomSheet com o mesmo "estilo" da tela de playlist
   void _showSongActions(BuildContext context, SongData song) {
     final playlistVM = context.read<PlaylistViewModel?>();
     final PlaylistData? currentPlaylist = playlistVM?.entityBeingVisualized;
@@ -207,6 +220,50 @@ class _SearchPageState extends State<SearchPage> {
                           builder: (_) =>
                               AlbumDetailView(albumId: song.album!.id ?? -1),
                         ),
+                      );
+                    }
+                  },
+                ),
+                ButtonCustomSheet(
+                  icon: 'Genre',
+                  text: 'Ver gênero',
+                  onTap: () async {
+                    Navigator.pop(context);
+
+                    if (song.id == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Id da música inválido.')),
+                      );
+                      return;
+                    }
+
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (_) => const Center(child: CircularProgressIndicator()),
+                    );
+
+                    try {
+                      final genre = await GenreApiService().fetchBySong(song.id!);
+                      Navigator.pop(context); // fecha o loading
+
+                      if (genre == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Esta música não possui gênero associado.')),
+                        );
+                        return;
+                      }
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => GenreDetailPage(genreId: genre.id),
+                        ),
+                      );
+                    } catch (_) {
+                      Navigator.pop(context); // fecha o loading
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Falha ao carregar gênero.')),
                       );
                     }
                   },

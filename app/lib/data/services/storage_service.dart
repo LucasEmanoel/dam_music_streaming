@@ -18,5 +18,19 @@ class StorageService {
     }
   }
 
+  Future<String> uploadUserProfilePicture({
+    required int profileId,
+    required File imageFile,
+  }) async {
+    try {
+      final ref = _storage.ref('users_pics/$profileId.jpg');
+      final uploadTask = await ref.putFile(imageFile);
+      return await uploadTask.ref.getDownloadURL();
+    } on FirebaseException catch (e) {
+      print('Erro no upload para o Firebase Storage: $e');
+      rethrow;
+    }
+  }
+
   Future<void> deletePlaylistCover(int id) async {}
 }

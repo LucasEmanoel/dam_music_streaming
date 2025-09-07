@@ -6,6 +6,7 @@ class UsuarioData {
   String? username;
   String? email;
   String? role;
+  String? profilePicUrl;
 
   UsuarioData({
     this.id,
@@ -13,6 +14,7 @@ class UsuarioData {
     this.username,
     this.email,
     this.role,
+    this.profilePicUrl,
   });
 
   factory UsuarioData.fromDto(UsuarioDto dto) {
@@ -24,6 +26,7 @@ class UsuarioData {
       username: dto.username,
       email: dto.email,
       role: dto.role,
+      profilePicUrl: dto.profilePicUrl,
     );
   }
 
@@ -34,11 +37,12 @@ class UsuarioData {
       'username': username,
       'email': email,
       'role': role,
+      'profilePicUrl': profilePicUrl,
     };
   }
 
   @override
   String toString() {
-    return 'UsuarioData{id: $id, fullName: $fullName, username: $username, email: $email, role: $role}';
+    return 'UsuarioData{id: $id, fullName: $fullName, username: $username, email: $email, role: $role, profilePicUrl: $profilePicUrl}';
   }
 }

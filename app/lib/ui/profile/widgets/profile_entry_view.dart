@@ -1,9 +1,13 @@
+import 'dart:io';
+
+import 'package:dam_music_streaming/data/services/api_service.dart';
 import 'package:dam_music_streaming/domain/models/user_data_l.dart';
 import 'package:dam_music_streaming/ui/core/ui/image_edit.dart';
 import 'package:dam_music_streaming/ui/core/ui/input_global.dart';
 import 'package:dam_music_streaming/ui/core/user/view_model/user_view_model.dart';
 import 'package:dam_music_streaming/ui/profile/view_model/profile_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class ProfileEntryView extends StatelessWidget {
@@ -16,15 +20,15 @@ class ProfileEntryView extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final UserViewModel userViewModel = context.read<UserViewModel>();
-    final UsuarioData loggedUser = userViewModel.loggedUser!;
-    print(loggedUser.toString());
+    final ProfileViewModel profileViewModel = context.read<ProfileViewModel>();
+    final UsuarioData? userProfile = profileViewModel?.userProfile;
 
     final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
     return Consumer<ProfileViewModel>(
       builder: (context, profileViewModel, child) {
-        _fullNameController.text = loggedUser.fullName ?? '';
-        _usernameController.text = loggedUser.username;
+        _fullNameController.text = userProfile?.fullName ?? '';
+        _usernameController.text = userProfile?.username ?? '';
 
         return Scaffold(
           appBar: AppBar(
@@ -63,9 +67,15 @@ class ProfileEntryView extends StatelessWidget {
                           child: Column(
                             children: [
                               ImageRoundEdit(
-                                // localImageFile: vm.pickedImageFile,
-                                // networkImageUrl: vm.entityBeingEdited?.urlCover,
-                                onTap: () => {},
+                                localImageFile:
+                                    profileViewModel.pickedImageFile,
+                                networkImageUrl: profileViewModel
+                                    .entityBeingEdited
+                                    ?.profilePicUrl,
+                                onTap: () => _selectCoverProfile(
+                                  context,
+                                  profileViewModel,
+                                ),
                               ),
                               const SizedBox(height: 24),
                               Column(
@@ -154,7 +164,7 @@ class ProfileEntryView extends StatelessWidget {
     ProfileViewModel profileViewModel,
     UserViewModel userViewModel,
   ) async {
-    userViewModel.updateLoggedUser(profileViewModel.entityBeingEdited);
+    await profileViewModel.updateLoggedUser();
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -166,6 +176,53 @@ class ProfileEntryView extends StatelessWidget {
 
     profileViewModel.setStackIndex(0);
   }
+}
+
+Future<void> _selectCoverProfile(
+  BuildContext context,
+  ProfileViewModel vm,
+) async {
+  await showDialog(
+    context: context,
+    builder: (ctx) {
+      return AlertDialog(
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: [
+              GestureDetector(
+                child: Text("Take a picture"),
+                onTap: () async {
+                  final image = await ImagePicker().pickImage(
+                    source: ImageSource.camera,
+                    imageQuality: 80,
+                  );
+                  if (image != null) {
+                    final file = File(image.path);
+                    vm.setPickedImage(file);
+                  }
+                  Navigator.of(ctx).pop();
+                },
+              ),
+              Padding(padding: EdgeInsets.all(10)),
+              GestureDetector(
+                child: Text("Select From Gallery"),
+                onTap: () async {
+                  final image = await ImagePicker().pickImage(
+                    source: ImageSource.gallery,
+                  );
+                  if (image != null) {
+                    final file = File(image.path);
+                    vm.setPickedImage(file);
+                  }
+                  Navigator.of(ctx).pop();
+                },
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
 }
 
 class ProfileTextInputField extends StatelessWidget {

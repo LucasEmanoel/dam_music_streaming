@@ -1,10 +1,12 @@
 -- Usuários (sem alteração)
 -- Inserindo usuários com senhas criptografadas (BCrypt)
 -- VERSÃO CORRIGIDA (SEM ID MANUAL)
-INSERT INTO usuario (username, email, password, role) VALUES
-('carla_santos', 'carla.santos@example.com', '$2a$10$8VjnmPRt66YC/MpNezspYev/yo7T5z0DU52i00dCb9RaD87HH5f8i', 'USER'),
-('bruno_costa', 'bruno.costa@example.com', '$2a$10$8VjnmPRt66YC/MpNezspYev/yo7T5z0DU52i00dCb9RaD87HH5f8i', 'USER'),
-('admin', 'admin@example.com', '$2a$10$8VjnmPRt66YC/MpNezspYev/yo7T5z0DU52i00dCb9RaD87HH5f8i', 'ADMIN');
+INSERT INTO usuario (username, full_name, email, password, role, profile_pic_url) VALUES
+('carla_santos', 'Carla Santos', 'carla.santos@example.com', '$2a$10$8VjnmPRt66YC/MpNezspYev/yo7T5z0DU52i00dCb9RaD87HH5f8i', 'USER', ''),
+('bruno_costa', 'Bruno Costa','bruno.costa@example.com', '$2a$10$8VjnmPRt66YC/MpNezspYev/yo7T5z0DU52i00dCb9RaD87HH5f8i', 'USER', ''),
+('admin', 'admin', 'admin@example.com', '$2a$10$8VjnmPRt66YC/MpNezspYev/yo7T5z0DU52i00dCb9RaD87HH5f8i', 'ADMIN', ''),
+('juan', 'Juan Zika','juan@email.com', '$2a$10$TTRgCtmyHjYT2vJ82VldrOlpzU2PzBiwh.dp2IL7jAQsHgd0DwzmK', 'ADMIN', ''),
+('removerson', 'usuário p/remover','remove@email.com', '$2a$10$TTRgCtmyHjYT2vJ82VldrOlpzU2PzBiwh.dp2IL7jAQsHgd0DwzmK', 'USER', '');
 
 --
 -- Data for Name: genre; Type: TABLE DATA; Schema: public; Owner: postgres

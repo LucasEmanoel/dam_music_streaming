@@ -27,7 +27,8 @@ class _LoginInicioState extends State<LoginInicio> {
   bool obscure = true;
   bool _loading = false;
 
-  static const _webClientId = '940448057923-jbu82iq5eutmg54kfiphcgl9q8kfgrr5.apps.googleusercontent.com';
+  static const _webClientId =
+      '940448057923-jbu82iq5eutmg54kfiphcgl9q8kfgrr5.apps.googleusercontent.com';
 
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     serverClientId: _webClientId,
@@ -61,7 +62,10 @@ class _LoginInicioState extends State<LoginInicio> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const SizedBox(height: 140, child: CoverCarousel(covers: _covers)),
+                      const SizedBox(
+                        height: 140,
+                        child: CoverCarousel(covers: _covers),
+                      ),
                       const SizedBox(height: 24),
 
                       const Text(
@@ -254,7 +258,9 @@ class _LoginInicioState extends State<LoginInicio> {
 
       await saveToken(jwt);
     } on DioException catch (e) {
-      _toast('Falha ao trocar token (${e.type}) ${e.response?.statusCode ?? ''}');
+      _toast(
+        'Falha ao trocar token (${e.type}) ${e.response?.statusCode ?? ''}',
+      );
       rethrow;
     } catch (e) {
       _toast('Falha ao trocar token: $e');
@@ -289,15 +295,15 @@ class _LoginInicioState extends State<LoginInicio> {
 
       await saveToken(jwt);
 
+      var userData = await getTokenData(jwt);
       final UsuarioData user = UsuarioData(
-        id: 123,
-        fullName: 'Teste da Silva',
-        username: 'teste_zika',
-        email: "teste@email.com",
-        role: 'user',
+        id: userData['id'],
+        fullName: userData['fullName'],
+        username: userData['username'],
+        email: userData['email'],
+        role: userData['role'],
       );
-      userViewModel.addLoggedUser(user);
-      userViewModel.setProfilePicture();
+      userViewModel.setLoggedUser(user);
       if (!mounted) return;
       Navigator.pushNamedAndRemoveUntil(context, '/home', (_) => false);
     } on DioException catch (e) {
@@ -358,8 +364,10 @@ class _LoginInicioState extends State<LoginInicio> {
         }
 
         if (googleIdToken == null || googleIdToken.isEmpty) {
-          throw Exception('Não foi possível obter o Google ID Token (mobile). '
-              'Verifique Web Client ID e SHA-1 no Firebase.');
+          throw Exception(
+            'Não foi possível obter o Google ID Token (mobile). '
+            'Verifique Web Client ID e SHA-1 no Firebase.',
+          );
         }
 
         final credential = GoogleAuthProvider.credential(

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dam_music_streaming/ui/core/user/view_model/user_view_model.dart';
 import 'package:dam_music_streaming/ui/profile/view_model/profile_view_model.dart';
 import 'package:dam_music_streaming/ui/profile/widgets/profile_entry_view.dart';
 import 'package:dam_music_streaming/ui/profile/widgets/profile_show_view.dart';
@@ -16,7 +17,10 @@ class ProfileView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<ProfileViewModel>(
       create: (context) {
-        final vm = ProfileViewModel();
+        final UserViewModel userViewModel = context.read<UserViewModel>();
+
+        final vm = ProfileViewModel(userViewModel);
+        vm.getUserProfile();
         return vm;
       },
       child: Consumer<ProfileViewModel>(

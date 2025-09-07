@@ -6,6 +6,7 @@ class UsuarioDto {
   final String username;
   final String email;
   final String role;
+  final String? profilePicUrl;
 
   UsuarioDto({
     required this.id,
@@ -13,6 +14,7 @@ class UsuarioDto {
     required this.username,
     required this.email,
     required this.role,
+    this.profilePicUrl,
   });
 
   factory UsuarioDto.fromMap(Map<String, dynamic> map) {
@@ -22,6 +24,7 @@ class UsuarioDto {
       username: map['username'] ?? '',
       email: map['email'] ?? '',
       role: map['role'] ?? '',
+      profilePicUrl: map['profilePicUrl'] ?? '',
     );
   }
 
@@ -32,6 +35,7 @@ class UsuarioDto {
       username: data.username ?? '',
       email: data.email ?? '',
       role: data.role ?? '',
+      profilePicUrl: data.profilePicUrl ?? '',
     );
   }
 
@@ -42,6 +46,21 @@ class UsuarioDto {
       'username': username,
       'email': email,
       'role': role,
+      'profilePicUrl': profilePicUrl,
+    };
+  }
+
+  Map<String, dynamic> toProfileMap() {
+    String? full_name = fullName == null || fullName!.isEmpty ? null : fullName;
+    String? user_name = username.isEmpty ? null : username;
+    String? profile_pic_url = profilePicUrl == null || profilePicUrl!.isEmpty
+        ? null
+        : profilePicUrl;
+
+    return {
+      'fullName': full_name,
+      'username': user_name,
+      'profilePicUrl': profile_pic_url,
     };
   }
 }

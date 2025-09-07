@@ -1,3 +1,4 @@
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 final secureStorage = FlutterSecureStorage();
@@ -12,4 +13,14 @@ Future<String?> getToken() async {
 
 Future<void> deleteToken() async {
   await secureStorage.delete(key: 'jwt');
+}
+
+Future<Map<String, dynamic>> getTokenData(String token) async {
+  String? token = await getToken();
+
+  if (token == null) return {};
+
+  final jwt = JWT.decode(token);
+  print(jwt.payload);
+  return jwt.payload;
 }

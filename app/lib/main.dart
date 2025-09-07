@@ -59,8 +59,9 @@ class HarmonyApp extends StatelessWidget {
 class HomeScaffold extends StatelessWidget {
   final Directory docsDir;
   File? avatarFile;
+  final initialIndex;
 
-  HomeScaffold({super.key, required this.docsDir}) {}
+  HomeScaffold({super.key, required this.docsDir, this.initialIndex = 0}) {}
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +69,7 @@ class HomeScaffold extends StatelessWidget {
 
     return DefaultTabController(
       length: 4,
+      initialIndex: initialIndex,
       child: Scaffold(
         body: TabBarView(
           children: [

@@ -44,6 +44,7 @@ public class SecurityConfig {
                 		.requestMatchers("/albums/**").permitAll()
                 		.requestMatchers("/artists/**").permitAll()
                 		.requestMatchers("/genres/**").permitAll()
+                		.requestMatchers("/user/**").authenticated()
                 		.requestMatchers("/playlists/**").authenticated()
                         //.requestMatchers(allowedEndpoints).permitAll()
                         .anyRequest().authenticated()

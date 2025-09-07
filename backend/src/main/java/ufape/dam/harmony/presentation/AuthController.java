@@ -84,7 +84,8 @@ public class AuthController {
         Usuario user = userOpt.orElseGet(() -> {
             Usuario novo = new Usuario();
             novo.setEmail(email);
-            novo.setUsername(name);
+            novo.setFullName(name);
+            novo.setUsername(email);
             novo.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
             novo.setRole("USER");
             return usuarioRepository.save(novo);
@@ -101,7 +102,8 @@ public class AuthController {
         }
 
         Usuario newUser = new Usuario();
-        newUser.setUsername(request.getUsername());
+        newUser.setFullName(request.getFullName());
+        newUser.setUsername(request.getEmail());
         newUser.setEmail(request.getEmail());
         newUser.setPassword(passwordEncoder.encode(request.getPassword()));
         newUser.setRole("USER");

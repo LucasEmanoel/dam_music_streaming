@@ -55,7 +55,13 @@ public class GenreService {
 
         return Optional.of(response);
     }
-    
+
+    @Transactional(readOnly = true)
+    public Optional<Genre> findGenreBySongId(Long songId) {
+        return songRepository.findById(songId)
+                .map(Song::getAlbum)
+                .map(Album::getGenre);
+    }
 
     @Transactional(readOnly = true)
     public List<GenreListResponseDto> findAll() {

@@ -34,13 +34,25 @@ public class SecurityUser implements UserDetails  {
     public String getUsername() {
         return user.getEmail();
     }
+    
+    public String getRealUsername() {
+    	return user.getUsername();
+    }
 
-    public String getNomeReal() {
-        return user.getUsername();
+    public String getFullName() {
+        return user.getFullName();
+    }
+    
+    public String getEmail() {
+    	return user.getEmail();
     }
     
     public Usuario getUsuario() {
         return this.user;
+    }
+    
+    public long getId() {
+    	return this.user.getId();
     }
     
     @Override public boolean isAccountNonExpired() { return true; }

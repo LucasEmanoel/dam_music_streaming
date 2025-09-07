@@ -63,8 +63,11 @@ public class JwtService {
 
     return Jwts.builder()
             .setSubject(user.getUsername())
-            .claim("username", user.getNomeReal())
+            .claim("fullName", user.getFullName())
+            .claim("username", user.getRealUsername())
+            .claim("email", user.getEmail())
             .claim("role", role)
+            .claim("id", user.getId())
             .setIssuedAt(new Date())
             .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
             .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -124,9 +127,12 @@ public class JwtService {
         String role = user.getRole();
 
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(user.getUsername())
+                .claim("fullName", user.getFullName())
                 .claim("username", user.getUsername())
+                .claim("email", user.getEmail())
                 .claim("role", role)
+                .claim("id", user.getId())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)

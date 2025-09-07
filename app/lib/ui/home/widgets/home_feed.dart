@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../data/services/playlist_service.dart';
 import '../../../data/dto/song_dto.dart';
-import '../../player/player_view_model.dart';
+import '../../core/player/view_model/player_view_model.dart';
 
 import 'package:dam_music_streaming/domain/models/song_data.dart';
 import 'package:dam_music_streaming/domain/models/artist_data.dart';
@@ -46,16 +46,21 @@ class _HomeFeedState extends State<HomeFeed> {
     id: s.id,
     title: s.title,
     urlCover: s.urlCover ?? s.album?.urlCover,
-    artist: s.artist != null ? ArtistData(id: s.artist!.id, name: s.artist!.name) : null,
+    artist: s.artist != null
+        ? ArtistData(id: s.artist!.id, name: s.artist!.name)
+        : null,
     album: s.album != null
         ? AlbumData(
-      id: s.album!.id,
-      title: s.album!.title,
-      urlCover: s.album!.urlCover,
-      artist: s.album!.artist != null
-          ? ArtistData(id: s.album!.artist!.id, name: s.album!.artist!.name)
-          : null,
-    )
+            id: s.album!.id,
+            title: s.album!.title,
+            urlCover: s.album!.urlCover,
+            artist: s.album!.artist != null
+                ? ArtistData(
+                    id: s.album!.artist!.id,
+                    name: s.album!.artist!.name,
+                  )
+                : null,
+          )
         : null,
   );
 
@@ -70,7 +75,10 @@ class _HomeFeedState extends State<HomeFeed> {
             future: _songsFuture,
             builder: (context, snap) {
               if (snap.connectionState != ConnectionState.done) {
-                return const SizedBox(height: 168, child: Center(child: CircularProgressIndicator()));
+                return const SizedBox(
+                  height: 168,
+                  child: Center(child: CircularProgressIndicator()),
+                );
               }
               if (snap.hasError) {
                 return _ErrorBox('Falha ao carregar músicas: ${snap.error}');
@@ -86,12 +94,15 @@ class _HomeFeedState extends State<HomeFeed> {
                 children: [
                   _RecommendationsCarousel(
                     items: featured,
-                    onTap: (s) => context.read<PlayerViewModel>().play(_toSongData(s)),
+                    onTap: (s) =>
+                        context.read<PlayerViewModel>().play(_toSongData(s)),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Recomendações',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ],
               );
@@ -103,7 +114,10 @@ class _HomeFeedState extends State<HomeFeed> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Músicas', style: TextStyle(fontWeight: FontWeight.w700)),
+              const Text(
+                'Músicas',
+                style: TextStyle(fontWeight: FontWeight.w700),
+              ),
               InkWell(
                 onTap: () => setState(() => _showAll = !_showAll),
                 child: Text(
@@ -122,7 +136,10 @@ class _HomeFeedState extends State<HomeFeed> {
             future: _songsFuture,
             builder: (context, snap) {
               if (snap.connectionState != ConnectionState.done) {
-                return const SizedBox(height: 320, child: Center(child: CircularProgressIndicator()));
+                return const SizedBox(
+                  height: 320,
+                  child: Center(child: CircularProgressIndicator()),
+                );
               }
               if (snap.hasError) {
                 return _ErrorBox('Falha ao carregar músicas: ${snap.error}');
@@ -150,7 +167,8 @@ class _HomeFeedState extends State<HomeFeed> {
                   final s = visible[i];
                   return _SongCard(
                     song: s,
-                    onTap: () => context.read<PlayerViewModel>().play(_toSongData(s)),
+                    onTap: () =>
+                        context.read<PlayerViewModel>().play(_toSongData(s)),
                   );
                 },
               );
@@ -186,7 +204,11 @@ class _RecommendationsCarousel extends StatelessWidget {
             padding: const EdgeInsets.only(right: 14),
             child: Ink(
               decoration: BoxDecoration(
-                gradient: LinearGradient(colors: g, begin: Alignment.topLeft, end: Alignment.bottomRight),
+                gradient: LinearGradient(
+                  colors: g,
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
                 borderRadius: BorderRadius.circular(18),
               ),
               child: InkWell(
@@ -200,7 +222,11 @@ class _RecommendationsCarousel extends StatelessWidget {
                       '${t.title}\n${t.artist?.name ?? ""}',
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                   ),
                 ),
@@ -233,11 +259,11 @@ class _SongCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               child: cover != null && cover.isNotEmpty
                   ? Image.network(
-                cover,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) =>
-                    Container(color: Colors.grey.shade300),
-              )
+                      cover,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) =>
+                          Container(color: Colors.grey.shade300),
+                    )
                   : Container(color: Colors.grey.shade300),
             ),
           ),
@@ -266,6 +292,9 @@ class _ErrorBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 16),
-    child: Text(msg, style: TextStyle(color: Colors.red.shade700, fontSize: 12)),
+    child: Text(
+      msg,
+      style: TextStyle(color: Colors.red.shade700, fontSize: 12),
+    ),
   );
 }

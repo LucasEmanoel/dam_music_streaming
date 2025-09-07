@@ -1,3 +1,6 @@
+import 'package:audioplayers/audioplayers.dart';
+import 'package:dam_music_streaming/domain/models/user_data_l.dart';
+import 'package:dam_music_streaming/ui/core/player/view_model/player_view_model.dart';
 import 'package:dam_music_streaming/ui/core/themes/light.dart';
 import 'package:dam_music_streaming/ui/core/ui/svg_icon.dart';
 import 'package:dam_music_streaming/ui/core/user/view_model/user_view_model.dart';
@@ -5,6 +8,7 @@ import 'package:dam_music_streaming/ui/player/widgets/player_view.dart';
 import 'package:dam_music_streaming/ui/profile/widgets/profile_view.dart';
 import 'package:dam_music_streaming/consts.dart';
 import 'package:dam_music_streaming/ui/suggestions/widgets/suggestions_weather.dart';
+import 'package:flutter/foundation.dart';
 import "package:flutter/material.dart";
 import "package:path_provider/path_provider.dart";
 import 'package:provider/provider.dart';
@@ -23,26 +27,50 @@ void main() async {
 
   Directory docsDir = await startMeUp();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(HarmonyApp(docsDir: docsDir));
+  AudioPlayer audioPlayer = setAudioPlayer();
+  runApp(HarmonyApp(docsDir: docsDir, player: audioPlayer));
 }
 
 Future<Directory> startMeUp() async {
   return await getApplicationDocumentsDirectory();
 }
 
+AudioPlayer setAudioPlayer() {
+  AudioPlayer player = AudioPlayer();
+
+  return player;
+}
+
 class HarmonyApp extends StatelessWidget {
   final Directory _docsDir;
+  final AudioPlayer _audioPlayer;
 
-  const HarmonyApp({super.key, required Directory docsDir})
-    : _docsDir = docsDir;
+  const HarmonyApp({
+    super.key,
+    required Directory docsDir,
+    required AudioPlayer player,
+  }) : _docsDir = docsDir,
+       _audioPlayer = player;
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) {
-        UserViewModel userModel = UserViewModel(_docsDir);
-        return userModel;
-      },
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<UserViewModel>(
+          create: (context) {
+            UserViewModel userModel = UserViewModel(_docsDir);
+            return userModel;
+          },
+        ),
+        ChangeNotifierProvider<PlayerViewModel>(
+          create: (context) {
+            PlayerViewModel playerViewModel = PlayerViewModel(
+              player: _audioPlayer,
+            );
+            return playerViewModel;
+          },
+        ),
+      ],
       child: MaterialApp(
         theme: LightTheme.lightTheme,
         debugShowCheckedModeBanner: false,
@@ -60,7 +88,6 @@ class HarmonyApp extends StatelessWidget {
 }
 
 class HomeScaffold extends StatelessWidget {
-
   final Directory docsDir;
   File? avatarFile;
   final initialIndex;

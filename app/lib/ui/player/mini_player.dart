@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../domain/models/song_data.dart';
-import 'player_view_model.dart';
+import '../core/player/view_model/player_view_model.dart';
 
 class MiniPlayer extends StatelessWidget {
   final VoidCallback? onOpenFullPlayer;
@@ -13,9 +13,9 @@ class MiniPlayer extends StatelessWidget {
       builder: (_, vm, __) {
         final s = vm.current;
         final show = vm.hasTrack;
-        final progress = (vm.duration.inMilliseconds == 0)
+        final progress = (vm.duration!.inMilliseconds == 0)
             ? 0.0
-            : vm.position.inMilliseconds / vm.duration.inMilliseconds;
+            : vm.position!.inMilliseconds / vm.duration!.inMilliseconds;
 
         return AnimatedSlide(
           duration: const Duration(milliseconds: 200),
@@ -40,9 +40,20 @@ class MiniPlayer extends StatelessWidget {
                               // capa
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(6),
-                                child: s?.urlCover != null && s!.urlCover!.isNotEmpty
-                                    ? Image.network(s.urlCover!, width: 44, height: 44, fit: BoxFit.cover)
-                                    : Container(width: 44, height: 44, color: Colors.grey[400]),
+                                child:
+                                    s?.urlCover != null &&
+                                        s!.urlCover!.isNotEmpty
+                                    ? Image.network(
+                                        s.urlCover!,
+                                        width: 44,
+                                        height: 44,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Container(
+                                        width: 44,
+                                        height: 44,
+                                        color: Colors.grey[400],
+                                      ),
                               ),
                               const SizedBox(width: 10),
                               Expanded(
@@ -54,7 +65,9 @@ class MiniPlayer extends StatelessWidget {
                                       s?.title ?? '—',
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(fontWeight: FontWeight.w600),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
@@ -62,14 +75,18 @@ class MiniPlayer extends StatelessWidget {
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
-                                        color: Theme.of(context).textTheme.bodySmall?.color,
+                                        color: Theme.of(
+                                          context,
+                                        ).textTheme.bodySmall?.color,
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
                               IconButton(
-                                icon: Icon(vm.isPlaying ? Icons.pause : Icons.play_arrow),
+                                icon: Icon(
+                                  vm.isPlaying ? Icons.pause : Icons.play_arrow,
+                                ),
                                 onPressed: vm.toggle,
                               ),
                               IconButton(

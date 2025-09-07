@@ -76,13 +76,30 @@ public class ArtistResponseDTO {
         private Long id;
         private String title;
         private Duration duration;
+        private AlbumInSongResponseDTO album;
 
         public static SongInArtistResponseDTO fromEntity(Song entity) {
             if (entity == null) return null;
             var dto = new SongInArtistResponseDTO();
             dto.setId(entity.getId());
+            dto.setAlbum(AlbumInSongResponseDTO.fromEntity(entity.getAlbum()));
             dto.setTitle(entity.getTitle());
             dto.setDuration(Duration.ofSeconds(entity.getDuration()));
+            return dto;
+        }
+    }
+    
+    @Data
+    public static class AlbumInSongResponseDTO {
+        private Long id;
+        @JsonProperty("url_cover")
+        private String urlCover;
+
+        public static AlbumInSongResponseDTO fromEntity(Album entity) {
+            if (entity == null) return null;
+            var dto = new AlbumInSongResponseDTO();
+            dto.setId(entity.getId());
+            dto.setUrlCover(entity.getCoverMedium());
             return dto;
         }
     }

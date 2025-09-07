@@ -21,14 +21,19 @@ class SongDto {
     this.duration,
   });
 
-  factory SongDto.fromMap(Map<String, dynamic> map) {
+  factory SongDto.fromMap(Map<String, dynamic> map, {String? albumCoverUrl}) {
+    
+    String? coverFromAlbum = (map['album'] as Map<String, dynamic>?)?['url_cover'] as String?;
+
+    final finalCoverUrl = coverFromAlbum ?? albumCoverUrl;
+    
     return SongDto(
       id: map['id'] ?? -1,
       title: map['title'] ?? '',
       duration: map['duration'] != null
           ? parseIso8601Duration(map['duration'])
           : null,
-      urlCover: map['url_cover'],
+      urlCover: finalCoverUrl,
       artist: map['artist'] != null
           ? ArtistDto.fromMap(map['artist'] as Map<String, dynamic>)
           : null,

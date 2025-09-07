@@ -1,5 +1,13 @@
 import 'package:flutter/material.dart';
-import '../../../data/services/music_service.dart';
+import 'package:provider/provider.dart';
+
+import '../../../data/services/playlist_service.dart';
+import '../../../data/dto/song_dto.dart';
+import '../../player/player_view_model.dart';
+
+import 'package:dam_music_streaming/domain/models/song_data.dart';
+import 'package:dam_music_streaming/domain/models/artist_data.dart';
+import 'package:dam_music_streaming/domain/models/album_data.dart';
 
 class HomeFeed extends StatefulWidget {
   const HomeFeed({super.key});
@@ -8,13 +16,28 @@ class HomeFeed extends StatefulWidget {
 }
 
 class _HomeFeedState extends State<HomeFeed> {
-  final DeezerService api = DeezerService();
+  final _api = PlaylistApiService();
 
-  static const sharedUrl = 'https://link.deezer.com/s/30Oai2Rto3meko6tgOj2c';
+  late final Future<List<SongDto>> _songsFuture = _api.fetchAllSongs();
 
+  bool _showAll = false;
 
-  late final Future<DzPlaylist> _userPlaylist = api.playlistFromShareLink(sharedUrl);
-  late final Future<List<DzAlbum>> _albums = api.topAlbums(limit: 8);
+  SongData _toSongData(SongDto s) => SongData(
+    id: s.id,
+    title: s.title,
+    urlCover: s.urlCover ?? s.album?.urlCover,
+    artist: s.artist != null ? ArtistData(id: s.artist!.id, name: s.artist!.name) : null,
+    album: s.album != null
+        ? AlbumData(
+      id: s.album!.id,
+      title: s.album!.title,
+      urlCover: s.album!.urlCover,
+      artist: s.album!.artist != null
+          ? ArtistData(id: s.album!.artist!.id, name: s.album!.artist!.name)
+          : null,
+    )
+        : null,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -23,25 +46,33 @@ class _HomeFeedState extends State<HomeFeed> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          FutureBuilder<DzPlaylist>(
-            future: _userPlaylist,
+          FutureBuilder<List<SongDto>>(
+            future: _songsFuture,
             builder: (context, snap) {
               if (snap.connectionState != ConnectionState.done) {
                 return const SizedBox(height: 168, child: Center(child: CircularProgressIndicator()));
               }
               if (snap.hasError) {
-                return _ErrorBox('Falha ao carregar a playlist compartilhada: ${snap.error}');
+                return _ErrorBox('Falha ao carregar músicas: ${snap.error}');
               }
-              final pl = snap.data!;
-              final items = pl.tracks.take(6).toList();
+              final songs = snap.data ?? [];
+              if (songs.isEmpty) {
+                return const _ErrorBox('Nenhuma música cadastrada ainda.');
+              }
+
+              final featured = songs.take(6).toList();
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _RecommendationsCarousel(items: items),
+                  _RecommendationsCarousel(
+                    items: featured,
+                    onTap: (s) => context.read<PlayerViewModel>().play(_toSongData(s)),
+                  ),
                   const SizedBox(height: 8),
-                  Text(pl.title, style: const TextStyle(fontWeight: FontWeight.w700)),
-                  Text('de ${pl.creatorName}',
-                      style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+                  Text(
+                    'Recomendações',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+                  ),
                 ],
               );
             },
@@ -51,29 +82,55 @@ class _HomeFeedState extends State<HomeFeed> {
 
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text('Lançamentos', style: TextStyle(fontWeight: FontWeight.w700)),
-              Text('Ver todos'),
+            children: [
+              const Text('Músicas', style: TextStyle(fontWeight: FontWeight.w700)),
+              InkWell(
+                onTap: () => setState(() => _showAll = !_showAll),
+                child: Text(
+                  _showAll ? 'Ver menos' : 'Ver mais',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 10),
-          FutureBuilder<List<DzAlbum>>(
-            future: _albums,
+
+          FutureBuilder<List<SongDto>>(
+            future: _songsFuture,
             builder: (context, snap) {
               if (snap.connectionState != ConnectionState.done) {
                 return const SizedBox(height: 320, child: Center(child: CircularProgressIndicator()));
               }
               if (snap.hasError) {
-                return _ErrorBox('Não foi possível carregar lançamentos: ${snap.error}');
+                return _ErrorBox('Falha ao carregar músicas: ${snap.error}');
               }
-              final albums = snap.data ?? [];
+              final songs = snap.data ?? [];
+              if (songs.isEmpty) {
+                return const _ErrorBox('Nenhuma música cadastrada ainda.');
+              }
+
+              final visible = _showAll ? songs : songs.take(8).toList();
+
               return GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: .80),
-                itemCount: albums.length,
-                itemBuilder: (_, i) => _AlbumTile(album: albums[i]),
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: .86,
+                ),
+                itemCount: visible.length,
+                itemBuilder: (_, i) {
+                  final s = visible[i];
+                  return _SongCard(
+                    song: s,
+                    onTap: () => context.read<PlayerViewModel>().play(_toSongData(s)),
+                  );
+                },
               );
             },
           ),
@@ -83,10 +140,10 @@ class _HomeFeedState extends State<HomeFeed> {
   }
 }
 
-// --- UI helpers (mesmos do exemplo anterior) ---
 class _RecommendationsCarousel extends StatelessWidget {
-  final List<DzTrack> items;
-  const _RecommendationsCarousel({required this.items});
+  final List<SongDto> items;
+  final void Function(SongDto) onTap;
+  const _RecommendationsCarousel({required this.items, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -112,13 +169,13 @@ class _RecommendationsCarousel extends StatelessWidget {
               ),
               child: InkWell(
                 borderRadius: BorderRadius.circular(18),
-                onTap: () {}, // abrir player/detalhe
+                onTap: () => onTap(t),
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 18),
                   child: Align(
                     alignment: Alignment.bottomLeft,
                     child: Text(
-                      '${t.title}\n${t.artistName}',
+                      '${t.title}\n${t.artist?.name ?? ""}',
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800),
@@ -134,27 +191,49 @@ class _RecommendationsCarousel extends StatelessWidget {
   }
 }
 
-class _AlbumTile extends StatelessWidget {
-  final DzAlbum album;
-  const _AlbumTile({required this.album});
+class _SongCard extends StatelessWidget {
+  final SongDto song;
+  final VoidCallback onTap;
+  const _SongCard({required this.song, required this.onTap});
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: AspectRatio(
-            aspectRatio: 1,
-            child: Image.network(album.coverUrl, fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(color: Colors.grey.shade300)),
+    final cover = song.urlCover ?? song.album?.urlCover;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: cover != null && cover.isNotEmpty
+                  ? Image.network(
+                cover,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) =>
+                    Container(color: Colors.grey.shade300),
+              )
+                  : Container(color: Colors.grey.shade300),
+            ),
           ),
-        ),
-        const SizedBox(height: 6),
-        Text(album.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w700)),
-        Text(album.artistName, maxLines: 1, overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
-      ],
+          const SizedBox(height: 6),
+          Text(
+            song.title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontWeight: FontWeight.w700),
+          ),
+          Text(
+            song.artist?.name ?? 'Artista desconhecido',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -163,7 +242,8 @@ class _ErrorBox extends StatelessWidget {
   final String msg;
   const _ErrorBox(this.msg);
   @override
-  Widget build(BuildContext context) =>
-      Padding(padding: const EdgeInsets.symmetric(vertical: 16),
-          child: Text(msg, style: TextStyle(color: Colors.red.shade700, fontSize: 12)));
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 16),
+    child: Text(msg, style: TextStyle(color: Colors.red.shade700, fontSize: 12)),
+  );
 }

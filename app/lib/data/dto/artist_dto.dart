@@ -22,7 +22,7 @@ class ArtistDto {
     return ArtistDto(
       id: map['id'] ?? -1,
       name: map['name'] ?? '',
-      pictureBig: map['artistImage'] ?? '',
+      pictureBig: map['picture_url'] ?? '',
       albums: (map['albums'] as List<dynamic>?)
           ?.map((s) => AlbumDto.fromMap(s as Map<String, dynamic>))
           .toList(),
@@ -31,6 +31,7 @@ class ArtistDto {
           .toList(),
     );
   }
+
   factory ArtistDto.fromData(ArtistData data) {
     return ArtistDto(
       id: data.id ?? -1,

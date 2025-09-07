@@ -15,7 +15,7 @@ datasource db {
 }
 
 model Genre {
-  id Int @id @default(autoincrement())
+  id BigInt @id @default(autoincrement())
   idDeezer Int @map("id_deezer")
   name String
 
@@ -27,11 +27,11 @@ model Genre {
 }
 
 model Artist {
-  id Int @id @default(autoincrement())
+  id BigInt @id @default(autoincrement())
   idDeezer Int @map("id_deezer")
   name  String
   picture String
-  pictureSmall String  @map("picture_small")
+  pictureSmall String @map("picture_small")
   pictureMedium String @map("picture_medium")
   pictureBig String @map("picture_big")
   pictureXl String @map("picture_xl")
@@ -39,18 +39,17 @@ model Artist {
   tracklist String
   type String
 
-  genre Genre @relation(fields: [genreId], references: [id])
-  genreId Int @map("genre_id")
+  genre   Genre @relation(fields: [genreId], references: [id])
+  genreId BigInt @map("genre_id")
 
   album Album[]
-
   song Song[]
 
   @@map("artist")
 }
 
 model Album {
-  id Int @id @default(autoincrement())
+  id BigInt @id @default(autoincrement())
   idDeezer Int @map("id_deezer")
   title String
   link String
@@ -68,11 +67,11 @@ model Album {
   explicitLyrics Boolean @map("explicit_lyrics")
   type String
 
-  genre Genre @relation(fields: [genreId], references: [id])
-  genreId Int @map("genre_id")
+  genre   Genre @relation(fields: [genreId], references: [id])
+  genreId BigInt @map("genre_id")
 
-  artist Artist @relation(fields: [artistId], references: [id])
-  artistId Int @map("artist_id")
+  artist   Artist @relation(fields: [artistId], references: [id])
+  artistId BigInt @map("artist_id")
 
   song Song[]
 
@@ -80,7 +79,7 @@ model Album {
 }
 
 model Song{
-  id Int @id @default(autoincrement())
+  id BigInt @id @default(autoincrement())
   idDeezer Int @map("id_deezer")
   readable Boolean
   title String
@@ -101,14 +100,14 @@ model Song{
 
   downloadUrl String @map("download_url")
 
-  genre Genre @relation(fields: [genreId], references: [id])
-  genreId Int @map("genre_id")
+  genre   Genre @relation(fields: [genreId], references: [id])
+  genreId BigInt @map("genre_id")
 
-  artist Artist @relation(fields: [artistId], references: [id])
-  artistId Int @map("artist_id")
+  artist   Artist @relation(fields: [artistId], references: [id])
+  artistId BigInt @map("artist_id")
 
-  album Album @relation(fields: [albumId], references: [id])
-  albumId Int @map("album_id")
+  album   Album @relation(fields: [albumId], references: [id])
+  albumId BigInt @map("album_id")
 
   @@map("song")
 }

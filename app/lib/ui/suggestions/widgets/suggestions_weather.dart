@@ -1,5 +1,6 @@
 import 'package:dam_music_streaming/domain/models/artist_data.dart';
 import 'package:dam_music_streaming/domain/models/playlist_data.dart';
+import 'package:dam_music_streaming/domain/models/song_data.dart';
 import 'package:dam_music_streaming/ui/core/ui/album_tile.dart';
 import 'package:dam_music_streaming/ui/core/ui/info_tile.dart';
 import 'package:dam_music_streaming/ui/core/ui/loading.dart';
@@ -82,7 +83,7 @@ class WeatherSuggestionsView extends StatelessWidget {
         children: [
           Container(
             child: Center(
-              child: Lottie.asset('assets/animations/rain.json',
+              child: Lottie.asset('assets/animations/Guitarist.json',
                   width: 150, height: 150, fit: BoxFit.fill, options: LottieOptions(enableMergePaths: true)),
             ),
           ),
@@ -220,4 +221,56 @@ class WeatherSuggestionsView extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildSongs(BuildContext context, List<SongData> songs) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Músicas para você",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            height: 220,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: songs.length,
+              itemBuilder: (context, index) {
+                final song = songs[index];
+
+                if (song == null) {
+                  return Container();
+                }
+
+                return Container(
+                  width: 160,
+                  margin: const EdgeInsets.only(right: 16.0),
+                  child: MediaTile(
+                    imageUrl: song.urlCover ?? '',
+                    title: song.title ?? 'Música desconhecida',
+                    subtitle: song.title ?? '',
+                    onTap: () {
+                      print('Clicou na música:');
+                    },
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+    
 }

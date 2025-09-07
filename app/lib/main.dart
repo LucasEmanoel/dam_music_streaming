@@ -38,13 +38,6 @@ Future<Directory> startMeUp() async {
 AudioPlayer setAudioPlayer() {
   AudioPlayer player = AudioPlayer();
 
-  player.onPlayerStateChanged.listen((state) {
-    print("STATE: $state");
-  });
-  player.onPlayerComplete.listen((_) {
-    print("COMPLETED");
-  });
-
   return player;
 }
 
@@ -95,7 +88,6 @@ class HarmonyApp extends StatelessWidget {
 }
 
 class HomeScaffold extends StatelessWidget {
-
   final Directory docsDir;
   File? avatarFile;
   final initialIndex;

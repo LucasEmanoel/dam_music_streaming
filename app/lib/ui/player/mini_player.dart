@@ -13,9 +13,9 @@ class MiniPlayer extends StatelessWidget {
       builder: (_, vm, __) {
         final s = vm.current;
         final show = vm.hasTrack;
-        final progress = (vm.duration.inMilliseconds == 0)
+        final progress = (vm.duration!.inMilliseconds == 0)
             ? 0.0
-            : vm.position.inMilliseconds / vm.duration.inMilliseconds;
+            : vm.position!.inMilliseconds / vm.duration!.inMilliseconds;
 
         return AnimatedSlide(
           duration: const Duration(milliseconds: 200),

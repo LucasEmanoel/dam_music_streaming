@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:dam_music_streaming/ui/core/player/view_model/player_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:dam_music_streaming/ui/artist/widgets/artist_detail.dart';
@@ -13,7 +14,6 @@ import 'package:dam_music_streaming/data/dto/song_dto.dart';
 import 'package:dam_music_streaming/domain/models/song_data.dart';
 import 'package:dam_music_streaming/domain/models/artist_data.dart';
 import 'package:dam_music_streaming/domain/models/album_data.dart';
-import 'package:dam_music_streaming/ui/player/player_view_model.dart';
 import 'package:dam_music_streaming/ui/core/ui/info_tile.dart';
 
 class GenreDetailPage extends StatefulWidget {
@@ -26,8 +26,9 @@ class GenreDetailPage extends StatefulWidget {
 
 class _GenreDetailPageState extends State<GenreDetailPage> {
   final _api = GenreApiService();
-  late final Future<GenreDetailDto> _future =
-  _api.fetchGenreDetail(widget.genreId);
+  late final Future<GenreDetailDto> _future = _api.fetchGenreDetail(
+    widget.genreId,
+  );
 
   SongData _toSongData(SongDto s) => SongData(
     id: s.id,
@@ -38,16 +39,16 @@ class _GenreDetailPageState extends State<GenreDetailPage> {
         : null,
     album: s.album != null
         ? AlbumData(
-      id: s.album!.id,
-      title: s.album!.title,
-      urlCover: s.album!.urlCover,
-      artist: s.album!.artist != null
-          ? ArtistData(
-        id: s.album!.artist!.id,
-        name: s.album!.artist!.name,
-      )
-          : null,
-    )
+            id: s.album!.id,
+            title: s.album!.title,
+            urlCover: s.album!.urlCover,
+            artist: s.album!.artist != null
+                ? ArtistData(
+                    id: s.album!.artist!.id,
+                    name: s.album!.artist!.name,
+                  )
+                : null,
+          )
         : null,
   );
 
@@ -66,8 +67,9 @@ class _GenreDetailPageState extends State<GenreDetailPage> {
           return Scaffold(
             appBar: AppBar(),
             body: Center(
-              child:
-              Text('Erro ao carregar gênero: ${snap.error ?? "desconhecido"}'),
+              child: Text(
+                'Erro ao carregar gênero: ${snap.error ?? "desconhecido"}',
+              ),
             ),
           );
         }
@@ -77,7 +79,7 @@ class _GenreDetailPageState extends State<GenreDetailPage> {
         final genreCover = g.coverUrl?.isNotEmpty == true
             ? g.coverUrl!
             : _genreCovers[g.name.toLowerCase()] ??
-            'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400';
+                  'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400';
 
         return Scaffold(
           body: CustomScrollView(
@@ -90,12 +92,15 @@ class _GenreDetailPageState extends State<GenreDetailPage> {
                   builder: (context, c) {
                     final hero = _genreHeroImage(g.coverUrl, g.name);
                     final artistsCount = data.topArtists.length;
-                    final albumsCount  = data.recentAlbums.length;
-                    final songsCount   = data.topSongs.length;
+                    final albumsCount = data.recentAlbums.length;
+                    final songsCount = data.topSongs.length;
 
                     return FlexibleSpaceBar(
                       collapseMode: CollapseMode.parallax,
-                      titlePadding: const EdgeInsetsDirectional.only(start: 51, bottom: 16),
+                      titlePadding: const EdgeInsetsDirectional.only(
+                        start: 51,
+                        bottom: 16,
+                      ),
                       title: Text(
                         g.name,
                         maxLines: 1,
@@ -104,7 +109,11 @@ class _GenreDetailPageState extends State<GenreDetailPage> {
                           fontWeight: FontWeight.w800,
                           letterSpacing: .2,
                           shadows: [
-                            Shadow(blurRadius: 8, color: Colors.white, offset: Offset(0, 1))
+                            Shadow(
+                              blurRadius: 8,
+                              color: Colors.white,
+                              offset: Offset(0, 1),
+                            ),
                           ],
                         ),
                       ),
@@ -114,7 +123,10 @@ class _GenreDetailPageState extends State<GenreDetailPage> {
                           // imagem (network com fallback por gênero)
                           DecoratedBox(
                             decoration: BoxDecoration(
-                              image: DecorationImage(image: hero, fit: BoxFit.cover),
+                              image: DecorationImage(
+                                image: hero,
+                                fit: BoxFit.cover,
+                              ),
                             ),
                             child: const SizedBox.expand(),
                           ),
@@ -122,7 +134,9 @@ class _GenreDetailPageState extends State<GenreDetailPage> {
                           Positioned.fill(
                             child: BackdropFilter(
                               filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
-                              child: Container(color: Colors.black.withOpacity(0.10)),
+                              child: Container(
+                                color: Colors.black.withOpacity(0.10),
+                              ),
                             ),
                           ),
                           // gradiente para legibilidade
@@ -164,8 +178,9 @@ class _GenreDetailPageState extends State<GenreDetailPage> {
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                     child: Text(
                       'Top artistas',
-                      style: theme.textTheme.titleMedium
-                          ?.copyWith(fontWeight: FontWeight.w700),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ),
@@ -186,7 +201,8 @@ class _GenreDetailPageState extends State<GenreDetailPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => ArtistDetailView(artistId: a.id),
+                                builder: (_) =>
+                                    ArtistDetailView(artistId: a.id),
                               ),
                             );
                           },
@@ -194,14 +210,27 @@ class _GenreDetailPageState extends State<GenreDetailPage> {
                             children: [
                               CircleAvatar(
                                 radius: 36,
-                                backgroundImage: a.pictureBig.isNotEmpty ? NetworkImage(a.pictureBig) : null,
+                                backgroundImage: a.pictureBig.isNotEmpty
+                                    ? NetworkImage(a.pictureBig)
+                                    : null,
                                 backgroundColor: Colors.grey.shade300,
-                                child: a.pictureBig.isEmpty ? Text(a.name.isNotEmpty ? a.name.characters.first : '?') : null,
+                                child: a.pictureBig.isEmpty
+                                    ? Text(
+                                        a.name.isNotEmpty
+                                            ? a.name.characters.first
+                                            : '?',
+                                      )
+                                    : null,
                               ),
                               const SizedBox(height: 6),
                               SizedBox(
                                 width: 90,
-                                child: Text(a.name, maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center),
+                                child: Text(
+                                  a.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
                             ],
                           ),
@@ -218,8 +247,9 @@ class _GenreDetailPageState extends State<GenreDetailPage> {
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                     child: Text(
                       'Álbuns recentes',
-                      style: theme.textTheme.titleMedium
-                          ?.copyWith(fontWeight: FontWeight.w700),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ),
@@ -228,50 +258,65 @@ class _GenreDetailPageState extends State<GenreDetailPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   sliver: SliverGrid(
                     gridDelegate:
-                    const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                      childAspectRatio: 0.75,
-                    ),
-                    delegate: SliverChildBuilderDelegate(
-                          (_, i) {
-                        final alb = data.recentAlbums[i];
-                        final cover = alb.urlCover ?? '';
-                        return InkWell(
-                          borderRadius: BorderRadius.circular(12),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => AlbumDetailView(albumId: alb.id),
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 12,
+                          childAspectRatio: 0.75,
+                        ),
+                    delegate: SliverChildBuilderDelegate((_, i) {
+                      final alb = data.recentAlbums[i];
+                      final cover = alb.urlCover ?? '';
+                      return InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => AlbumDetailView(albumId: alb.id),
+                            ),
+                          );
+                        },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: AspectRatio(
+                                aspectRatio: 1,
+                                child: (alb.urlCover ?? '').isNotEmpty
+                                    ? Image.network(
+                                        alb.urlCover!,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => Container(
+                                          color: Colors.grey.shade300,
+                                        ),
+                                      )
+                                    : Container(color: Colors.grey.shade300),
                               ),
-                            );
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: AspectRatio(
-                                  aspectRatio: 1,
-                                  child: (alb.urlCover ?? '').isNotEmpty
-                                      ? Image.network(alb.urlCover!, fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) => Container(color: Colors.grey.shade300))
-                                      : Container(color: Colors.grey.shade300),
-                                ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              alb.title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
                               ),
-                              const SizedBox(height: 6),
-                              Text(alb.title, maxLines: 1, overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(fontWeight: FontWeight.w700)),
-                              Text(alb.artist?.name ?? '', maxLines: 1, overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
-                            ],
-                          ),
-                        );
-                          },
-                      childCount: data.recentAlbums.length,
-                    ),
+                            ),
+                            Text(
+                              alb.artist?.name ?? '',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: Colors.grey.shade600,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }, childCount: data.recentAlbums.length),
                   ),
                 ),
 
@@ -282,32 +327,29 @@ class _GenreDetailPageState extends State<GenreDetailPage> {
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                     child: Text(
                       'Músicas populares',
-                      style: theme.textTheme.titleMedium
-                          ?.copyWith(fontWeight: FontWeight.w700),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ),
               if (data.topSongs.isNotEmpty)
                 SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                        (_, i) {
-                      final s = data.topSongs[i];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: InfoTile(
-                          imageUrl:
-                          s.urlCover ?? s.album?.urlCover ?? '',
-                          title: s.title,
-                          subtitle: s.artist?.name ?? '',
-                          trailing: const Icon(Icons.play_arrow),
-                          onTap: () => context
-                              .read<PlayerViewModel>()
-                              .play(_toSongData(s)),
+                  delegate: SliverChildBuilderDelegate((_, i) {
+                    final s = data.topSongs[i];
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: InfoTile(
+                        imageUrl: s.urlCover ?? s.album?.urlCover ?? '',
+                        title: s.title,
+                        subtitle: s.artist?.name ?? '',
+                        trailing: const Icon(Icons.play_arrow),
+                        onTap: () => context.read<PlayerViewModel>().play(
+                          _toSongData(s),
                         ),
-                      );
-                    },
-                    childCount: data.topSongs.length,
-                  ),
+                      ),
+                    );
+                  }, childCount: data.topSongs.length),
                 ),
 
               const SliverToBoxAdapter(child: SizedBox(height: 24)),
@@ -345,23 +387,30 @@ class _StatChip extends StatelessWidget {
 }
 
 const Map<String, String> _genreCovers = {
-  'pop':        'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1200',
-  'rock':       'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=1200',
-  'hiphop':     'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1200',
-  'rap':        'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1200',
-  'r&b':        'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1200',
-  'randb':      'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1200',
-  'jazz':       'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=1200',
-  'classical':  'https://images.unsplash.com/photo-1518972559570-7cc1309f3229?w=1200',
-  'electronic': 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=1200',
-  'indie':      'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=1200',
-  'sertanejo':  'https://images.unsplash.com/photo-1508057198894-247b23fe5ade?w=1200',
-  'default':    'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1200',
+  'pop': 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1200',
+  'rock': 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=1200',
+  'hiphop':
+      'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1200',
+  'rap': 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1200',
+  'r&b': 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1200',
+  'randb':
+      'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1200',
+  'jazz': 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=1200',
+  'classical':
+      'https://images.unsplash.com/photo-1518972559570-7cc1309f3229?w=1200',
+  'electronic':
+      'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=1200',
+  'indie':
+      'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=1200',
+  'sertanejo':
+      'https://images.unsplash.com/photo-1508057198894-247b23fe5ade?w=1200',
+  'default':
+      'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1200',
 };
 
 ImageProvider _genreHeroImage(String? coverUrl, String name) {
-  final fromApi   = (coverUrl != null && coverUrl.isNotEmpty) ? coverUrl : null;
-  final fromMap   = _genreCovers[name.toLowerCase()];
-  final selected  = fromApi ?? fromMap ?? _genreCovers['default']!;
+  final fromApi = (coverUrl != null && coverUrl.isNotEmpty) ? coverUrl : null;
+  final fromMap = _genreCovers[name.toLowerCase()];
+  final selected = fromApi ?? fromMap ?? _genreCovers['default']!;
   return NetworkImage(selected);
 }

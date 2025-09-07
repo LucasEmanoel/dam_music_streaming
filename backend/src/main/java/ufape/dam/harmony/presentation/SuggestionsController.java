@@ -24,7 +24,7 @@ public class SuggestionsController {
 	public PlaylistService service;
 	
 	@GetMapping
-	public ResponseEntity<List<PlaylistResponseDTO>> getSuggestionsByWeather(@RequestParam String weather) { //@AuthenticationPrincipal SecurityUser user, aqui nao vou usar auth
+	public ResponseEntity<List<PlaylistResponseDTO>> getSuggestionsByWeather(@AuthenticationPrincipal SecurityUser user, @RequestParam String weather) { //@AuthenticationPrincipal SecurityUser user, aqui nao vou usar auth
 		// oq vou fazer
 		// 1. receber um clima, tipo frio/calor
 		// 2. pegar uma lista de playlists que tenham: media de bpm/ganho altos - simboliza uma playlist animada

@@ -142,6 +142,7 @@ public class PlaylistService {
 		
 		for(Playlist p : playlists) {
 			long genCount = 0;
+			System.out.println(p.getTitle());
 			for (Song s : p.getSongs()) {
 				
 				if(preferredGenres.contains(s.getGenre().getName())) { 
@@ -161,7 +162,7 @@ public class PlaylistService {
         Collections.sort(sortedEntries, (entry1, entry2) -> Long.compare(entry2.getValue(), entry1.getValue()));
         
         List<PlaylistResponseDTO> result = new ArrayList<>();
-        
+        System.out.println(result);
         for (Map.Entry<Playlist, Long> entry : sortedEntries) {
             result.add(PlaylistResponseDTO.fromEntity(entry.getKey(), null));
         }

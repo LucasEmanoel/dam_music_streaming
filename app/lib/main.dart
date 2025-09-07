@@ -1,3 +1,8 @@
+import 'package:dam_music_streaming/domain/models/user_data_l.dart';
+import 'package:dam_music_streaming/ui/core/themes/light.dart';
+import 'package:dam_music_streaming/ui/core/ui/svg_icon.dart';
+import 'package:dam_music_streaming/ui/core/user/view_model/user_view_model.dart';
+import 'package:dam_music_streaming/ui/profile/widgets/profile_view.dart';
 import 'package:dam_music_streaming/consts.dart';
 import 'package:dam_music_streaming/ui/core/themes/light.dart';
 import 'package:dam_music_streaming/ui/core/ui/svg_icon.dart';
@@ -5,6 +10,7 @@ import 'package:dam_music_streaming/ui/suggestions/widgets/suggestions_weather.d
 import "package:flutter/material.dart";
 import 'package:geolocator/geolocator.dart';
 import "package:path_provider/path_provider.dart";
+import 'package:provider/provider.dart';
 import 'package:weather/weather.dart';
 import 'dart:io';
 import 'ui/playlists/widgets/playlists_view.dart';
@@ -36,16 +42,23 @@ class HarmonyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: LightTheme.lightTheme,
-      debugShowCheckedModeBanner: false,
-
-      home: SplashPage(docsDir: _docsDir),
-      //home: HomeScaffold(docsDir: _docsDir),
-      routes: {
-        '/home': (_) => HomeScaffold(docsDir: _docsDir),
-        '/signup': (_) => CadastroPage(docsDir: _docsDir),
+    return ChangeNotifierProvider(
+      create: (context) {
+        UserViewModel userModel = UserViewModel(_docsDir);
+        return userModel;
       },
+      child: MaterialApp(
+        theme: LightTheme.lightTheme,
+        debugShowCheckedModeBanner: false,
+
+        home: SplashPage(docsDir: _docsDir),
+
+        routes: {
+          '/home': (_) => HomeScaffold(docsDir: _docsDir),
+          '/signup': (_) => CadastroPage(docsDir: _docsDir),
+          '/profile': (_) => ProfileView(docsDir: _docsDir),
+        },
+      ),
     );
   }
 }
@@ -54,24 +67,31 @@ class HomeScaffold extends StatelessWidget {
   final WeatherFactory _weatherFactory = WeatherFactory(OPENWEATHER_API_KEY);
 
   final Directory docsDir;
-  HomeScaffold({super.key, required this.docsDir});
+  File? avatarFile;
+  final initialIndex;
+
+  HomeScaffold({super.key, required this.docsDir, this.initialIndex = 0}) {}
 
   @override
   Widget build(BuildContext context) {
+    final UserViewModel userViewModel = context.watch<UserViewModel>();
+
     return DefaultTabController(
       length: 4,
+      initialIndex: initialIndex,
       child: Scaffold(
         body: TabBarView(
           children: [
             Scaffold(
               appBar: AppBar(
                 toolbarHeight: 70,
+                actionsPadding: EdgeInsets.only(right: 28),
                 title: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     SvgIcon(assetName: 'assets/icons/Logo.svg', size: 40),
                     SizedBox(width: 6),
-                    Text("Harmony"),
+                    Text("Harmony", style: TextStyle(fontSize: 16)),
                   ],
                 ),
                 actions: [
@@ -87,6 +107,16 @@ class HomeScaffold extends StatelessWidget {
                         ),
                       );
                     },
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushReplacementNamed(context, '/profile');
+                    },
+                    child: CircleAvatar(
+                      backgroundColor: Colors.indigoAccent,
+                      maxRadius: 16,
+                      backgroundImage: userViewModel.getUserProfilePicture(),
+                    ),
                   ),
                 ],
               ),

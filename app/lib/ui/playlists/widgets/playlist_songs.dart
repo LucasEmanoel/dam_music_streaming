@@ -6,9 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../data/repositories/song_repository.dart';
+import '../../../data/services/genre_service.dart';
 import '../../../domain/models/playlist_data.dart';
 import '../../../domain/models/song_data.dart';
 import '../../core/ui/button_sheet.dart';
+import '../../genre/widgets/genre_detail.dart';
 import '../view_model/playlist_view_model.dart';
 import '../view_model/search_view_model.dart';
 
@@ -317,6 +319,50 @@ class PlaylistSongs extends StatelessWidget {
                         builder: (_) =>
                             AlbumDetailView(albumId: song.album!.id ?? -1),
                       ),
+                    );
+                  }
+                },
+              ),
+              ButtonCustomSheet(
+                icon: 'Genre',
+                text: 'Ver gênero',
+                onTap: () async {
+                  Navigator.pop(context);
+
+                  if (song.id == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Id da música inválido.')),
+                    );
+                    return;
+                  }
+
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (_) => const Center(child: CircularProgressIndicator()),
+                  );
+
+                  try {
+                    final genre = await GenreApiService().fetchBySong(song.id!);
+                    Navigator.pop(context); // fecha o loading
+
+                    if (genre == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Esta música não possui gênero associado.')),
+                      );
+                      return;
+                    }
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => GenreDetailPage(genreId: genre.id),
+                      ),
+                    );
+                  } catch (_) {
+                    Navigator.pop(context); // fecha o loading
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Falha ao carregar gênero.')),
                     );
                   }
                 },

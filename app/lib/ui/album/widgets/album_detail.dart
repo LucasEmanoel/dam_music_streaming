@@ -3,7 +3,9 @@ import 'package:dam_music_streaming/ui/core/ui/button_sheet.dart';
 import 'package:dam_music_streaming/ui/core/ui/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../data/services/genre_service.dart';
 import '../../core/ui/info_tile.dart';
+import '../../genre/widgets/genre_detail.dart';
 import '../view_model/album_view_model.dart';
 
 class AlbumDetailView extends StatelessWidget {
@@ -173,7 +175,7 @@ class AlbumDetailView extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
-                              'Arctic Monkeys',
+                              'Duração',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
@@ -262,6 +264,50 @@ void _showSongActions(BuildContext context, AlbumViewModel vm, SongData song) {
               text: 'Adicionar a playlist',
               onTap: () {
                 Navigator.pop(context);
+              },
+            ),
+            ButtonCustomSheet(
+              icon: 'Genre',
+              text: 'Ver gênero',
+              onTap: () async {
+                Navigator.pop(context);
+
+                if (song.id == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Id da música inválido.')),
+                  );
+                  return;
+                }
+
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (_) => const Center(child: CircularProgressIndicator()),
+                );
+
+                try {
+                  final genre = await GenreApiService().fetchBySong(song.id!);
+                  Navigator.pop(context);
+
+                  if (genre == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Esta música não possui gênero associado.')),
+                    );
+                    return;
+                  }
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => GenreDetailPage(genreId: genre.id),
+                    ),
+                  );
+                } catch (_) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Falha ao carregar gênero.')),
+                  );
+                }
               },
             ),
             ButtonCustomSheet(

@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import '../../domain/models/song_data.dart';
+import '../../../../domain/models/song_data.dart';
 
 class PlayerViewModel extends ChangeNotifier {
+  final AudioPlayer _player;
+
   SongData? _current;
   bool _isPlaying = false;
 
@@ -17,6 +20,8 @@ class PlayerViewModel extends ChangeNotifier {
 
   bool get hasTrack => _current != null;
 
+  PlayerViewModel({required AudioPlayer player}) : this._player = player;
+
   void play(SongData s) {
     _current = s;
     _isPlaying = true;
@@ -26,14 +31,25 @@ class PlayerViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void toggle() {
+  Future<void> toggle() async {
     _isPlaying = !_isPlaying;
     if (_isPlaying) {
+      await _player.resume();
       _startTicker();
     } else {
+      await _player.stop();
       _ticker?.cancel();
     }
     notifyListeners();
+  }
+
+  void setCurrentSong(SongData song) {
+    this._current = song;
+    this._player.setSource(
+      UrlSource(
+        'https://dam-harmony.s3.us-east-1.amazonaws.com/${song.id}.mp3',
+      ),
+    );
   }
 
   void next() {

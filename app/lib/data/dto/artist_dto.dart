@@ -19,10 +19,18 @@ class ArtistDto {
   });
 
   factory ArtistDto.fromMap(Map<String, dynamic> map) {
+    final pic = (map['picture_url'] ??
+        map['url_cover'] ??
+        map['pictureBig'] ??
+        map['picture_big'] ??
+        map['picture'] ??
+        map['imageUrl'] ??
+        '') as String;
+
     return ArtistDto(
       id: map['id'] ?? -1,
       name: map['name'] ?? '',
-      pictureBig: map['picture_url'] ?? '',
+      pictureBig: pic,
       albums: (map['albums'] as List<dynamic>?)
           ?.map((s) => AlbumDto.fromMap(s as Map<String, dynamic>))
           .toList(),

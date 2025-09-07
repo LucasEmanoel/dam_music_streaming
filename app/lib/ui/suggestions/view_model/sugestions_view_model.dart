@@ -1,12 +1,14 @@
+import 'package:dam_music_streaming/data/repositories/suggestion_repository.dart';
 import 'package:dam_music_streaming/data/repositories/weather_repository.dart';
 import 'package:dam_music_streaming/domain/models/enum_weather.dart';
 import 'package:dam_music_streaming/domain/models/playlist_data.dart';
+import 'package:dam_music_streaming/domain/models/song_data.dart';
 import 'package:flutter/material.dart';
 import 'package:dam_music_streaming/data/repositories/playlist_repository.dart';
 
 class SuggestionsViewModel extends ChangeNotifier {
   //final AlbumRepository _albumRepository = AlbumRepository(); //vou colocar albunms depois só, se der tempo agr o foco é as playlists por tempo
-  final PlaylistRepository _playlistRepository = PlaylistRepository();
+  final SuggestionsRepository _suggestionRepository = SuggestionsRepository();
   final WeatherRepository _weatherRepository = WeatherRepository();
 
   String? _currentWeather = null;
@@ -14,6 +16,9 @@ class SuggestionsViewModel extends ChangeNotifier {
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+  
+  final List<SongData> _songs = [];
+  List<SongData> get songs => _songs;
 
   final List<PlaylistData> _playlists = [];
   List<PlaylistData> get playlists => _playlists;
@@ -23,6 +28,7 @@ class SuggestionsViewModel extends ChangeNotifier {
     notifyListeners();
 
     List<PlaylistData> fetchedPlaylists = [];
+    List<SongData> fetchedSongs = [];
 
     try {
       final weather = await _weatherRepository.getCurrentWeather();
@@ -32,20 +38,26 @@ class SuggestionsViewModel extends ChangeNotifier {
         final weatherEnum = EnumWeather.values.byName(condition);
         _currentWeather = weatherEnum.name;
 
-        fetchedPlaylists = await _playlistRepository.fetchPlaylistsByWeather(
-          weatherEnum.name,
-        );
+        final suggestionData = await _suggestionRepository
+            .fetchPlaylistsAndSongsByWeather(weatherEnum.name);
+
+        fetchedPlaylists = suggestionData.playlists;
+        fetchedSongs = suggestionData.songs;
       } else {
-        fetchedPlaylists = await _playlistRepository
-            .getPlaylists(); // pegar o top10
+        fetchedPlaylists = [];
+        fetchedSongs = []; // pegar o top10
       }
     } catch (e) {
       print(e);
-      fetchedPlaylists = await _playlistRepository
-          .getPlaylists(); // pegar o top10, TODO: mudar para uma lista de playlists padrão
+      fetchedPlaylists = [];
+      fetchedSongs = []; 
     } finally {
       _playlists.clear();
       _playlists.addAll(fetchedPlaylists);
+
+      _songs.clear();
+      _songs.addAll(fetchedSongs);
+
       _isLoading = false;
       notifyListeners();
     }
@@ -53,6 +65,7 @@ class SuggestionsViewModel extends ChangeNotifier {
 
   void clearItemsBeingViewed() {
     _playlists.clear();
+    _songs.clear();
     _currentWeather = null;
     _isLoading = false;
     notifyListeners();

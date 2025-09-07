@@ -54,6 +54,8 @@ dependencies:
   dart_jsonwebtoken: ^3.2.0
   geolocator: ^14.0.2
   weather: ^3.2.1
+  audioplayers: ^6.5.1
+  lottie: ^3.3.1
 
 dev_dependencies:
   flutter_test:
@@ -80,6 +82,8 @@ flutter:
   assets:
     - assets/icons/
     - assets/profile/
+    - assets/sounds/
+    - assets/animations/
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

@@ -26,4 +26,6 @@ class ArtistData {
       songs: dto.songs?.map((s) => SongData.fromDto(s)).toList(),
     );
   }
+
+  get urlCover => null;
 }

@@ -2,6 +2,7 @@ import 'package:dam_music_streaming/domain/models/user_data_l.dart';
 import 'package:dam_music_streaming/ui/core/themes/light.dart';
 import 'package:dam_music_streaming/ui/core/ui/svg_icon.dart';
 import 'package:dam_music_streaming/ui/core/user/view_model/user_view_model.dart';
+import 'package:dam_music_streaming/ui/player/widgets/player_view.dart';
 import 'package:dam_music_streaming/ui/profile/widgets/profile_view.dart';
 import 'package:dam_music_streaming/consts.dart';
 import 'package:dam_music_streaming/ui/core/themes/light.dart';
@@ -96,9 +97,7 @@ class HomeScaffold extends StatelessWidget {
                 ),
                 actions: [
                   IconButton(
-                    icon: Icon(
-                      Icons.wb_sunny_outlined,
-                    ),
+                    icon: Icon(Icons.wb_sunny_outlined),
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -124,7 +123,7 @@ class HomeScaffold extends StatelessWidget {
               body: HomeFeed(),
             ),
             const SearchPage(),
-            const Center(child: Text("Tocando")),
+            PlayerView(),
             PlaylistsView(docsDir: docsDir),
           ],
         ),

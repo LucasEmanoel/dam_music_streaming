@@ -5,6 +5,7 @@ import 'package:dam_music_streaming/ui/core/ui/info_tile.dart';
 import 'package:dam_music_streaming/ui/core/ui/loading.dart';
 import 'package:dam_music_streaming/ui/suggestions/view_model/sugestions_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
 class WeatherSuggestionsView extends StatelessWidget {
@@ -62,7 +63,9 @@ class WeatherSuggestionsView extends StatelessWidget {
     switch (vm.currentWeather) {
       case 'RAIN' || 'DRIZZLE':
         return _buildChillHeader();
-      case 'CLOUDS' || 'SUNNY':
+      case 'CLOUDS':
+        return _buildChillHeader();
+      case 'SUNNY':
         return _buildEnergyHeader();
       case 'THUNDERSTORM': // my special touch
         return _buildHeavyMetalHeader();
@@ -79,7 +82,8 @@ class WeatherSuggestionsView extends StatelessWidget {
         children: [
           Container(
             child: Center(
-              child: Icon(Icons.umbrella, size: 150, color: Colors.blueAccent),
+              child: Lottie.asset('assets/animations/rain.json',
+                  width: 150, height: 150, fit: BoxFit.fill, options: LottieOptions(enableMergePaths: true)),
             ),
           ),
           Center(

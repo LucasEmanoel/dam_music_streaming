@@ -12,6 +12,7 @@ class LightTheme {
     
     //Inputs
     dividerColor: Colors.grey[400],
+
     colorScheme: const ColorScheme.light(
       primary: Color(0xFF6C63FF),
       secondary:  Color(0xFF6C63FF),
@@ -29,9 +30,14 @@ class LightTheme {
       indicatorSize: TabBarIndicatorSize.tab,
     ),
 
+    iconTheme: const IconThemeData(
+      color: Color(0xFF6C63FF),
+    ),
+    
     // global
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFFF5F5F5),
+      backgroundColor: const Color(0xFFF5F5F5),
+      foregroundColor: Colors.black,
       elevation: 1,
       iconTheme: IconThemeData(color:  Color(0xFF6C63FF)),
       titleTextStyle: TextStyle(

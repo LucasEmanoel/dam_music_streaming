@@ -1,4 +1,5 @@
 import "package:dam_music_streaming/domain/models/playlist_data.dart";
+import "package:dam_music_streaming/ui/core/themes/light.dart";
 import "package:dam_music_streaming/ui/core/ui/button_sheet.dart";
 import "package:dam_music_streaming/ui/core/ui/loading.dart";
 import "package:flutter/material.dart";
@@ -23,13 +24,14 @@ class PlaylistListView extends StatelessWidget {
 
         return Scaffold(
           appBar: AppBar(
+            iconTheme: theme.iconTheme,
             title: const Text(
               'Minhas Playlists',
               style: TextStyle(color: Color(0xFFB7B0B0), fontSize: 18),
             ),
             actions: [
               IconButton(
-                icon: Icon(Icons.add, color: theme.iconTheme.color, size: 25),
+                icon: Icon(Icons.add, size: 25),
                 onPressed: () {
                   vm.startEditing();
                   vm.setStackIndex(1);
@@ -37,7 +39,7 @@ class PlaylistListView extends StatelessWidget {
               ),
             ],
             elevation: 0,
-            backgroundColor: theme.scaffoldBackgroundColor,
+            backgroundColor: theme.appBarTheme.backgroundColor,
           ),
           body: vm.playlists.isEmpty
               ? Center(

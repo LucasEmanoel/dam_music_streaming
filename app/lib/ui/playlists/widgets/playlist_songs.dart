@@ -6,9 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../data/repositories/song_repository.dart';
+import '../../../data/services/genre_service.dart';
 import '../../../domain/models/playlist_data.dart';
 import '../../../domain/models/song_data.dart';
 import '../../core/ui/button_sheet.dart';
+import '../../genre/widgets/genre_detail.dart';
 import '../view_model/playlist_view_model.dart';
 import '../view_model/search_view_model.dart';
 
@@ -63,6 +65,26 @@ class PlaylistSongs extends StatelessWidget {
         icon: Icon(Icons.arrow_back, color: theme.iconTheme.color, size: 25),
         onPressed: () => vm.setStackIndex(0),
       ),
+      actions: [
+        IconButton(
+          icon: Icon(Icons.add, color: theme.iconTheme.color, size: 25),
+          onPressed: () async {
+            if (playlist.id == null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Erro: ID da playlist é nulo.")),
+              );
+              return;
+            }
+
+            final searchVM = Provider.of<SearchViewModel>(
+              context,
+              listen: false,
+            );
+
+            await handleSearch(context, searchVM, playlist.id!, vm);
+          },
+        ),
+      ],
       flexibleSpace: FlexibleSpaceBar(
         background: Stack(
           fit: StackFit.expand,
@@ -200,7 +222,9 @@ class PlaylistSongs extends StatelessWidget {
               onPressed: () async {
                 if (playlist.id == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Erro: ID da playlist é nulo.")),
+                    const SnackBar(
+                      content: Text("Erro: ID da playlist é nulo."),
+                    ),
                   );
                   return;
                 }
@@ -209,26 +233,9 @@ class PlaylistSongs extends StatelessWidget {
                   context,
                   listen: false,
                 );
-                searchVM.clearSelection();
 
-                final Set<SongData>? selectedSongs =
-                    await showSearch<Set<SongData>>(
-                      context: context,
-                      delegate: CustomSearchDelegate(searchVM: searchVM),
-                    );
-
-                if (selectedSongs != null && selectedSongs.isNotEmpty) {
-                 
-                  vm.addSongsToCurrentPlaylist(playlist.id!, selectedSongs);
-                  
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        '${selectedSongs.length} músicas adicionadas!',
-                      ),
-                    ),
-                  );
-                }
+                // Chama a nova função reutilizável
+                await handleSearch(context, searchVM, playlist.id!, vm);
               },
             ),
           ],
@@ -322,6 +329,57 @@ class PlaylistSongs extends StatelessWidget {
                 },
               ),
               ButtonCustomSheet(
+                icon: 'Genre',
+                text: 'Ver gênero',
+                onTap: () async {
+                  Navigator.pop(context);
+
+                  if (song.id == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Id da música inválido.')),
+                    );
+                    return;
+                  }
+
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (_) =>
+                        const Center(child: CircularProgressIndicator()),
+                  );
+
+                  try {
+                    final genre = await GenreApiService().fetchBySong(song.id!);
+                    Navigator.pop(context); // fecha o loading
+
+                    if (genre == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Esta música não possui gênero associado.',
+                          ),
+                        ),
+                      );
+                      return;
+                    }
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => GenreDetailPage(genreId: genre.id),
+                      ),
+                    );
+                  } catch (_) {
+                    Navigator.pop(context); // fecha o loading
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Falha ao carregar gênero.'),
+                      ),
+                    );
+                  }
+                },
+              ),
+              ButtonCustomSheet(
                 icon: 'Playlist',
                 text: 'Adicionar a outra playlist',
                 onTap: () {
@@ -353,6 +411,28 @@ class PlaylistSongs extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+Future<void> handleSearch(
+  BuildContext context,
+  SearchViewModel searchVM,
+  int playlistId,
+  PlaylistViewModel vm,
+) async {
+  searchVM.clearSelection();
+
+  final Set<SongData>? selectedSongs = await showSearch<Set<SongData>>(
+    context: context,
+    delegate: CustomSearchDelegate(searchVM: searchVM),
+  );
+
+  if (selectedSongs != null && selectedSongs.isNotEmpty) {
+    vm.addSongsToCurrentPlaylist(playlistId, selectedSongs);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('${selectedSongs.length} músicas adicionadas!')),
     );
   }
 }
@@ -406,8 +486,77 @@ class CustomSearchDelegate extends SearchDelegate<Set<SongData>> {
             body: FutureBuilder<List<SongData>>(
               future: _searchSongs,
               builder: (context, snapshot) {
+
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return Center(child: CustomLoadingIndicator());
+                }
+
+                if (snapshot.hasError) {
+                  return Center(child: Text("Ocorreu um erro na busca."));
+                }
+
+                if (snapshot.data?.isEmpty ?? true) {
+                  return Center(child: Text("Nenhuma música encontrada."));
+                }
+
+                final songs = snapshot.data!;
+
+                return ListView.builder(
+                  itemCount: songs.length,
+                  itemBuilder: (context, index) {
+                    final song = songs[index];
+                    final isSelected = viewModel.selectedSongs.contains(song);
+                    return InfoTile(
+                      title: song.title ?? 'Título Desconhecido',
+                      subtitle: song.artist?.name ?? 'Artista Desconhecido',
+                      imageUrl: song.urlCover ?? '',
+                      trailing: Checkbox(
+                        value: isSelected,
+                        onChanged: (value) =>
+                            viewModel.toggleSongSelection(song),
+                      ),
+                      onTap: () => viewModel.toggleSongSelection(song),
+                    );
+                  },
+                );
+              },
+            ),
+            floatingActionButton: FloatingActionButton.extended(
+              onPressed: () {
+                close(context, viewModel.selectedSongs);
+              },
+              icon: Icon(Icons.check, color: Colors.white),
+              label: Text('Salvar', style: TextStyle(color: Colors.white)),
+            ),
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerFloat,
+          );
+        },
+      ),
+    );
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    if (query.isEmpty) {
+      return Container();
+    }
+    if (query != previousQuery) {
+      previousQuery = query;
+      _searchSongs = repo.searchSongs(query);
+    }
+
+    return ChangeNotifierProvider.value(
+      value: searchVM,
+      child: Consumer<SearchViewModel>(
+        builder: (context, viewModel, child) {
+          return Scaffold(
+            body: FutureBuilder<List<SongData>>(
+              future: _searchSongs,
+              builder: (context, snapshot) {
+
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CustomLoadingIndicator());
                 }
                 if (snapshot.hasError) {
                   return Center(child: Text("Ocorreu um erro na busca."));
@@ -443,15 +592,11 @@ class CustomSearchDelegate extends SearchDelegate<Set<SongData>> {
               icon: Icon(Icons.check, color: Colors.white),
               label: Text('Salvar', style: TextStyle(color: Colors.white)),
             ),
-            floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerFloat,
           );
         },
       ),
     );
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    return SizedBox.shrink();
   }
 }

@@ -15,6 +15,26 @@ class HomeFeed extends StatefulWidget {
   State<HomeFeed> createState() => _HomeFeedState();
 }
 
+List<SongDto> _capByArtist(List<SongDto> songs, {int perArtist = 5}) {
+  final Map<int, int> counts = {};
+  final List<SongDto> out = [];
+
+  for (final s in songs) {
+    final int? artistId = s.artist?.id;
+    if (artistId == null) {
+      out.add(s);
+      continue;
+    }
+    final c = counts[artistId] ?? 0;
+    if (c < perArtist) {
+      out.add(s);
+      counts[artistId] = c + 1;
+    }
+  }
+  return out;
+}
+
+
 class _HomeFeedState extends State<HomeFeed> {
   final _api = PlaylistApiService();
 
@@ -129,7 +149,9 @@ class _HomeFeedState extends State<HomeFeed> {
                 return const _ErrorBox('Nenhuma música cadastrada ainda.');
               }
 
-              final visible = _showAll ? songs : songs.take(8).toList();
+              final base = _capByArtist(songs, perArtist: 3);
+
+              final visible = _showAll ? base : base.take(8).toList();
 
               return GridView.builder(
                 shrinkWrap: true,

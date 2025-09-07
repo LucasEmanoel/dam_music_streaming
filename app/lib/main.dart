@@ -7,12 +7,9 @@ import 'package:dam_music_streaming/ui/core/user/view_model/user_view_model.dart
 import 'package:dam_music_streaming/ui/player/widgets/player_view.dart';
 import 'package:dam_music_streaming/ui/profile/widgets/profile_view.dart';
 import 'package:dam_music_streaming/consts.dart';
-import 'package:dam_music_streaming/ui/core/themes/light.dart';
-import 'package:dam_music_streaming/ui/core/ui/svg_icon.dart';
 import 'package:dam_music_streaming/ui/suggestions/widgets/suggestions_weather.dart';
 import 'package:flutter/foundation.dart';
 import "package:flutter/material.dart";
-import 'package:geolocator/geolocator.dart';
 import "package:path_provider/path_provider.dart";
 import 'package:provider/provider.dart';
 import 'package:weather/weather.dart';
@@ -20,7 +17,6 @@ import 'dart:io';
 import 'ui/playlists/widgets/playlists_view.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'config/token_manager.dart';
 import 'ui/home/widgets/home_feed.dart';
 import 'ui/login/cadastro_page.dart';
 import 'ui/splash/splash_page.dart';
@@ -99,7 +95,6 @@ class HarmonyApp extends StatelessWidget {
 }
 
 class HomeScaffold extends StatelessWidget {
-  final WeatherFactory _weatherFactory = WeatherFactory(OPENWEATHER_API_KEY);
 
   final Directory docsDir;
   File? avatarFile;

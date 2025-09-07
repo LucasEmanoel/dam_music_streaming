@@ -45,4 +45,6 @@ class UsuarioData {
   String toString() {
     return 'UsuarioData{id: $id, fullName: $fullName, username: $username, email: $email, role: $role, profilePicUrl: $profilePicUrl}';
   }
+
+  static fromMap(p) {}
 }

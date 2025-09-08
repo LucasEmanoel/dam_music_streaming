@@ -91,7 +91,9 @@ class MiniPlayer extends StatelessWidget {
                               ),
                               IconButton(
                                 icon: const Icon(Icons.skip_next),
-                                onPressed: vm.next,
+                                onPressed: () {
+                                  //
+                                },
                               ),
                             ],
                           ),

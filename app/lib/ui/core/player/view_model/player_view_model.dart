@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import '../../../../domain/models/song_data.dart';
@@ -10,9 +11,11 @@ class PlayerViewModel extends ChangeNotifier {
   SongData? _current;
   bool _isPlaying = false;
 
+  final Queue<SongData> _previousStack = Queue<SongData>();
+  final Queue<SongData> _queue = Queue<SongData>();
+
   Duration? _position;
   Duration? _duration;
-  Timer? _ticker;
 
   SongData? get current => _current;
   bool get isPlaying => _isPlaying;
@@ -21,26 +24,18 @@ class PlayerViewModel extends ChangeNotifier {
   String get durationText => _duration?.toString().split('.').first ?? '';
   String get positionText => _position?.toString().split('.').first ?? '';
 
-  bool get hasTrack => _current != null;
-
   StreamSubscription? _durationSubscription;
   StreamSubscription? _positionSubscription;
   StreamSubscription? _playerCompleteSubscription;
+
+  Timer? _ticker;
+  bool get hasTrack => _current != null;
 
   PlayerViewModel({required AudioPlayer player}) {
     this._player = player;
     this._position = Duration.zero;
     this._duration = Duration.zero;
     notifyListeners();
-
-    // player.getDuration().then(
-    //   (value) => (value) {
-    //     print(value);
-    //     _duration = value;
-    //     notifyListeners();
-    //   },
-    // );
-    // player.getCurrentPosition().then((value) => {_position = value});
 
     _initStreams();
   }
@@ -84,13 +79,9 @@ class PlayerViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setCurrentSong(SongData song) {
+  void _setCurrentSong(SongData song) {
     this._current = song;
     this._player.setSource(UrlSource('$songBaseUrl${song.id}.mp3'));
-  }
-
-  void next() {
-    // TODO: integrar com fila/playlist
   }
 
   // void _startTicker() {
@@ -110,6 +101,76 @@ class PlayerViewModel extends ChangeNotifier {
   void changeTimeMusicPlaying(double miliseconds) {
     _player.seek(Duration(milliseconds: miliseconds.round()));
     notifyListeners();
+  }
+
+  void addSongToQueue(SongData song) {
+    _queue.addFirst(song);
+  }
+
+  void playOneSong(SongData song) {
+    _player.stop();
+    _position = Duration.zero;
+    _duration = Duration.zero;
+
+    _current = null;
+    _queue.clear();
+    _previousStack.clear();
+
+    _setCurrentSong(song);
+  }
+
+  void addListToQueue({List<SongData>? list, int? index}) {
+    if (list == null || list.isEmpty) return;
+
+    _player.stop();
+    _position = Duration.zero;
+    _duration = Duration.zero;
+
+    _current = null;
+    _queue.clear();
+    _previousStack.clear();
+
+    list.forEach((SongData song) {
+      _queue.add(song);
+    });
+
+    if (index != null) {
+    } else {
+      SongData firstSong = _queue.removeFirst();
+      _current = firstSong;
+    }
+
+    _player.setSource(UrlSource('$songBaseUrl${_current!.id}.mp3'));
+  }
+
+  void jumpNextSong() {
+    if (hasNextSong()) {
+      SongData nextSong = _queue.removeFirst();
+      _previousStack.addFirst(_current!);
+      _position = Duration.zero;
+      _duration = Duration.zero;
+      _setCurrentSong(nextSong);
+      notifyListeners();
+    }
+  }
+
+  void jumpPreviousSong() {
+    if (hasPreviousSong()) {
+      SongData previousSong = _previousStack.removeFirst();
+      _queue.addFirst(_current!);
+      _position = Duration.zero;
+      _duration = Duration.zero;
+      _setCurrentSong(previousSong);
+      notifyListeners();
+    }
+  }
+
+  bool hasNextSong() {
+    return _queue.isNotEmpty;
+  }
+
+  bool hasPreviousSong() {
+    return _previousStack.isNotEmpty;
   }
 
   @override

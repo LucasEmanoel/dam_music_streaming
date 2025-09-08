@@ -144,7 +144,7 @@ class HomeScaffold extends StatelessWidget {
               body: HomeFeed(),
             ),
             const SearchPage(),
-            PlayerView(),
+            PlayerView(context: context), //context apenas para debug
             PlaylistsView(docsDir: docsDir),
           ],
         ),

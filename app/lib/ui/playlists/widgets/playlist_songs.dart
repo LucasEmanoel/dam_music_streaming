@@ -1,6 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dam_music_streaming/ui/album/widgets/album_detail.dart';
 import 'package:dam_music_streaming/ui/artist/widgets/artist_detail.dart';
 import 'package:dam_music_streaming/ui/core/player/view_model/player_view_model.dart';
+import 'package:dam_music_streaming/ui/core/ui/custom_snack.dart';
 import 'package:dam_music_streaming/ui/core/ui/info_tile.dart';
 import 'package:dam_music_streaming/ui/core/ui/loading.dart';
 import 'package:flutter/material.dart';
@@ -71,8 +73,11 @@ class PlaylistSongs extends StatelessWidget {
           icon: Icon(Icons.add, color: theme.iconTheme.color, size: 25),
           onPressed: () async {
             if (playlist.id == null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Erro: ID da playlist é nulo.")),
+              showCustomSnackBar(
+                context: context,
+                message: "Erro: ID da playlist é nulo.",
+                backgroundColor: Colors.red,
+                icon: Icons.error,
               );
               return;
             }
@@ -91,19 +96,12 @@ class PlaylistSongs extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             if (playlist.urlCover != null && playlist.urlCover!.isNotEmpty)
-              Image.network(
-                playlist.urlCover!,
+              CachedNetworkImage(
+                imageUrl: playlist.urlCover!,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: Colors.grey[700],
-                    child: Icon(
-                      Icons.music_note,
-                      color: Colors.white,
-                      size: 60,
-                    ),
-                  );
-                },
+                placeholder: (context, url) =>
+                    Center(child: CustomLoadingIndicator()),
+                errorWidget: (context, url, error) => Icon(Icons.error),
               )
             else
               Container(
@@ -194,21 +192,24 @@ class PlaylistSongs extends StatelessWidget {
                   shape: CircleBorder(),
                   child: Icon(Icons.play_arrow, size: 30),
                   onPressed: () {
-                    
                     final songs = playlist.songs;
 
                     if (songs != null && songs.isNotEmpty) {
-                      final vm = Provider.of<PlayerViewModel>(context, listen: false);
-                      
+                      final vm = Provider.of<PlayerViewModel>(
+                        context,
+                        listen: false,
+                      );
+
                       vm.addListToQueue(list: songs);
                       vm.play(songs[0]);
-
                     } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('A playlist está vazia.')),
+                      showCustomSnackBar(
+                        context: context,
+                        message: "A playlist está vazia.",
+                        backgroundColor: Colors.red,
+                        icon: Icons.error,
                       );
                     }
-                    
                   },
                 ),
               ],
@@ -238,10 +239,11 @@ class PlaylistSongs extends StatelessWidget {
               label: Text('Adicionar Músicas'),
               onPressed: () async {
                 if (playlist.id == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Erro: ID da playlist é nulo."),
-                    ),
+                  showCustomSnackBar(
+                    context: context,
+                    message: "Erro: ID da playlist é nulo.",
+                    backgroundColor: Colors.red,
+                    icon: Icons.error,
                   );
                   return;
                 }
@@ -352,8 +354,11 @@ class PlaylistSongs extends StatelessWidget {
                   Navigator.pop(context);
 
                   if (song.id == null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Id da música inválido.')),
+                    showCustomSnackBar(
+                      context: context,
+                      message: "Id da música inválido.",
+                      backgroundColor: Colors.red,
+                      icon: Icons.error,
                     );
                     return;
                   }
@@ -370,12 +375,11 @@ class PlaylistSongs extends StatelessWidget {
                     Navigator.pop(context); // fecha o loading
 
                     if (genre == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Esta música não possui gênero associado.',
-                          ),
-                        ),
+                      showCustomSnackBar(
+                        context: context,
+                        message: "Esta música não possui gênero associado.",
+                        backgroundColor: Colors.red,
+                        icon: Icons.error,
                       );
                       return;
                     }
@@ -388,10 +392,11 @@ class PlaylistSongs extends StatelessWidget {
                     );
                   } catch (_) {
                     Navigator.pop(context); // fecha o loading
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Falha ao carregar gênero.'),
-                      ),
+                    showCustomSnackBar(
+                      context: context,
+                      message: 'Falha ao carregar gênero.',
+                      backgroundColor: Colors.red,
+                      icon: Icons.error,
                     );
                   }
                 },
@@ -448,8 +453,11 @@ Future<void> handleSearch(
   if (selectedSongs != null && selectedSongs.isNotEmpty) {
     vm.addSongsToCurrentPlaylist(playlistId, selectedSongs);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('${selectedSongs.length} músicas adicionadas!')),
+    showCustomSnackBar(
+      context: context,
+      message: '${selectedSongs.length} músicas adicionadas!',
+      backgroundColor: Colors.green,
+      icon: Icons.check,
     );
   }
 }
@@ -503,7 +511,6 @@ class CustomSearchDelegate extends SearchDelegate<Set<SongData>> {
             body: FutureBuilder<List<SongData>>(
               future: _searchSongs,
               builder: (context, snapshot) {
-
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CustomLoadingIndicator());
                 }
@@ -571,7 +578,6 @@ class CustomSearchDelegate extends SearchDelegate<Set<SongData>> {
             body: FutureBuilder<List<SongData>>(
               future: _searchSongs,
               builder: (context, snapshot) {
-
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CustomLoadingIndicator());
                 }

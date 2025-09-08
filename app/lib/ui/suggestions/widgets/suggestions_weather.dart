@@ -1,10 +1,16 @@
 import 'package:dam_music_streaming/domain/models/playlist_data.dart';
 import 'package:dam_music_streaming/domain/models/song_data.dart';
+import 'package:dam_music_streaming/ui/album/widgets/album_detail.dart';
+import 'package:dam_music_streaming/ui/artist/widgets/artist_detail.dart';
 import 'package:dam_music_streaming/ui/core/player/view_model/player_view_model.dart';
 import 'package:dam_music_streaming/ui/core/ui/album_tile.dart';
 import 'package:dam_music_streaming/ui/core/ui/button_sheet.dart';
+import 'package:dam_music_streaming/ui/core/ui/custom_snack.dart';
 import 'package:dam_music_streaming/ui/core/ui/info_tile.dart';
 import 'package:dam_music_streaming/ui/core/ui/loading.dart';
+import 'package:dam_music_streaming/ui/playlists/view_model/playlist_view_model.dart';
+import 'package:dam_music_streaming/ui/playlists/widgets/playlist_songs.dart';
+import 'package:dam_music_streaming/ui/profile/widgets/profile_show_view.dart';
 import 'package:dam_music_streaming/ui/suggestions/view_model/sugestions_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -28,17 +34,24 @@ class WeatherSuggestionsView extends StatelessWidget {
 
           if (vm.isLoading) {
             return Scaffold(
-              appBar: AppBar(),
+              appBar: AppBar(
+                leading: Container(),
+                backgroundColor: Colors.transparent
+              ),
               body: const Center(child: CustomLoadingIndicator()),
             );
           }
 
           return Scaffold(
             appBar: AppBar(
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () => Navigator.pop(context),
+              leading: Container(),
+              title: Center(
+                child: Text(
+                  'Sugestões do Clima',
+                  style: TextStyle(color: Color(0xFFB7B0B0), fontSize: 18),
+                ),
               ),
+              actions: [Container(width: 48, height: 48)],
               backgroundColor: Colors.transparent,
               elevation: 0,
             ),
@@ -65,17 +78,17 @@ class WeatherSuggestionsView extends StatelessWidget {
 
     switch (vm.currentWeather) {
       case 'CLEAR':
-        return _buildClearHeader();
+        return _buildWeatherHeader('assets/animations/foggy.json', 'Dia ensolarado', 'Aproveite o sol com essas playlists!');
       case 'CLOUDS':
-        return _buildCloudsHeader();
+        return _buildWeatherHeader('assets/animations/windy.json', 'Dia nublado', 'Um dia perfeito para relaxar com música.');
       case 'SNOW':
-        return _buildChillHeader();
+        return _buildWeatherHeader('assets/animations/snow.json', 'Dia de neve', 'Aqueça-se com essas músicas aconchegantes.');
       case 'RAIN':
-        return _buildChillHeader();
+        return _buildWeatherHeader('assets/animations/rain.json', 'Dia de chuva', 'Perfeito para ouvir músicas calmas.');
       case 'DRIZZLE':
-        return _buildChillHeader();
+        return _buildWeatherHeader('assets/animations/rain.json', 'Dia de garoa', 'Uma trilha sonora suave para um dia tranquilo.');
       case 'THUNDERSTORM':
-        return _buildHeavyMetalHeader();
+        return _buildWeatherHeader('assets/animations/storm.json', 'Dia de tempestade', 'Aproveite a intensidade com essas músicas.');
       default:
         return Container();
     }
@@ -90,7 +103,7 @@ class WeatherSuggestionsView extends StatelessWidget {
           Container(
             child: Center(
               child: Lottie.asset(
-                'assets/animations/foggy.json',
+                'assets/animations/snow.json',
                 width: 150,
                 height: 150,
                 fit: BoxFit.fill,
@@ -116,7 +129,7 @@ class WeatherSuggestionsView extends StatelessWidget {
     );
   }
 
-  Widget _buildChillHeader() {
+  Widget _buildWeatherHeader(String animationFile, String title, String subtitle) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Column(
@@ -125,7 +138,7 @@ class WeatherSuggestionsView extends StatelessWidget {
           Container(
             child: Center(
               child: Lottie.asset(
-                'assets/animations/storm.json',
+                animationFile,
                 width: 150,
                 height: 150,
                 fit: BoxFit.fill,
@@ -135,115 +148,14 @@ class WeatherSuggestionsView extends StatelessWidget {
           ),
           Center(
             child: Text(
-              "Está chovendo lá fora?",
+              title,
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
           ),
           SizedBox(height: 8),
           Center(
             child: Text(
-              "Relaxe com essas playlists",
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildClearHeader() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            child: Center(
-              child: Lottie.asset(
-                'assets/animations/foggy.json',
-                width: 150,
-                height: 150,
-                fit: BoxFit.fill,
-                options: LottieOptions(enableMergePaths: true),
-              ),
-            ),
-          ),
-          Center(
-            child: Text(
-              "O céu está limpo!",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-          ),
-          SizedBox(height: 8),
-          Center(
-            child: Text(
-              "Aproveite o dia com essas playlists",
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEnergyHeader() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            child: Center(
-              child: Icon(
-                Icons.wb_sunny,
-                size: 150,
-                color: Colors.orangeAccent,
-              ),
-            ),
-          ),
-          Center(
-            child: Text(
-              "O sol está brilhando!",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-          ),
-          SizedBox(height: 8),
-          Center(
-            child: Text(
-              "Aproveite o dia com essas playlists",
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeavyMetalHeader() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            child: Center(
-              child: Icon(
-                Icons.flash_on,
-                size: 150,
-                color: Colors.purpleAccent,
-              ),
-            ),
-          ),
-          Center(
-            child: Text(
-              "Tempestade chegando?",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-          ),
-          SizedBox(height: 8),
-          Center(
-            child: Text(
-              "Prepare-se com essas playlists pesadas",
+              subtitle,
               style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
           ),
@@ -352,12 +264,17 @@ class WeatherSuggestionsView extends StatelessWidget {
   }
 
   void _showPlaylistActions(BuildContext context, PlaylistData playlist) {
+    
+    
+
     showModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (BuildContext context) {
+        //final playlistViewModel = context.read<PlaylistViewModel>();
+        
         return Padding(
           padding: EdgeInsets.all(20.0),
           child: Column(
@@ -372,15 +289,36 @@ class WeatherSuggestionsView extends StatelessWidget {
               SizedBox(height: 20),
               ButtonCustomSheet(
                 icon: 'Profile',
-                text: 'Ver Author', // chamar tela de visualizar perfil
-                onTap: () {},
+                text: 'Ver Author',
+                onTap: () => {},
+                /* // chamar tela de visualizar perfil
+                onTap: () {
+                  Navigator.pop(context);
+                  if (playlist.author != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            //ProfileShowView(artistId: playlist.author!.id ?? -1),
+                      ),
+                    );
+                  }
+                },*/
               ),
               ButtonCustomSheet(
                 icon: 'Music',
                 text: 'Ver Musicas',
                 onTap: () {
-                  Navigator.pop(context);
-                  if (playlist.id != null) {}
+                  if (playlist.id != null) {
+                    //playlistViewModel.entityBeingVisualized = playlist;
+                    
+                    //Navigator.push(
+                    //  context,
+                    //  MaterialPageRoute(
+                    //    builder: (context) => const PlaylistSongs(),
+                    //  ),
+                    //);
+                  }
                 },
               ),
               ButtonCustomSheet(
@@ -401,9 +339,13 @@ class WeatherSuggestionsView extends StatelessWidget {
                     vm.addListToQueue(list: playlist.songs!);
                     vm.play(playlist.songs![0]);
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('A playlist está vazia.')),
+                    showCustomSnackBar( // acho que nunca vai acontecer
+                      context: context,
+                      message: 'A playlist está vazia.',
+                      backgroundColor: Colors.red,
+                      icon: Icons.error,
                     );
+
                   }
                 },
               ),
@@ -452,7 +394,34 @@ class WeatherSuggestionsView extends StatelessWidget {
               ButtonCustomSheet(
                 icon: 'Profile',
                 text: 'Ver Author', // chamar tela de visualizar perfil
-                onTap: () {},
+                onTap: () {
+                  Navigator.pop(context);
+                  if (song.artist != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            ArtistDetailView(artistId: song.artist!.id ?? -1),
+                      ),
+                    );
+                  }
+                },
+              ),
+              ButtonCustomSheet(
+                icon: 'Album',
+                text: 'Ver Álbum',
+                onTap: () {
+                  Navigator.pop(context);
+                  if (song.album != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            AlbumDetailView(albumId: song.album!.id ?? -1),
+                      ),
+                    );
+                  }
+                },
               ),
               ButtonCustomSheet(
                 icon: 'Fila',

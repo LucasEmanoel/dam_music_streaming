@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:dam_music_streaming/domain/models/user_data_l.dart';
+import 'package:dam_music_streaming/ui/core/user/view_model/user_view_model.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +10,7 @@ import 'package:dam_music_streaming/data/services/api_service.dart';
 import 'package:dam_music_streaming/ui/core/ui/svg_icon.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:provider/provider.dart';
 
 import 'widgets/cover_carousel.dart';
 
@@ -229,6 +232,8 @@ class _CadastroPageState extends State<CadastroPage> {
 
 
   Future<void> _cadastrar() async {
+    final UserViewModel userViewModel = context.read<UserViewModel>();
+    
     final username = nomeCtrl.text.trim();
     final email    = emailCtrl.text.trim();
     final password = passCtrl.text;
@@ -259,6 +264,15 @@ class _CadastroPageState extends State<CadastroPage> {
 
       await saveToken(jwt);
       if (!mounted) return;
+      var userData = await getTokenData(jwt);
+      final UsuarioData user = UsuarioData(
+        id: userData['id'],
+        fullName: userData['fullName'],
+        username: userData['username'],
+        email: userData['email'],
+        role: userData['role'],
+      );
+      userViewModel.setLoggedUser(user);
       Navigator.pushReplacementNamed(context, '/home');
     } on DioException catch (e) {
       if (e.response?.statusCode == 409) {

@@ -1,18 +1,14 @@
 import 'package:audioplayers/audioplayers.dart';
-import 'package:dam_music_streaming/domain/models/user_data_l.dart';
 import 'package:dam_music_streaming/ui/core/player/view_model/player_view_model.dart';
 import 'package:dam_music_streaming/ui/core/themes/light.dart';
 import 'package:dam_music_streaming/ui/core/ui/svg_icon.dart';
 import 'package:dam_music_streaming/ui/core/user/view_model/user_view_model.dart';
 import 'package:dam_music_streaming/ui/player/widgets/player_view.dart';
 import 'package:dam_music_streaming/ui/profile/widgets/profile_view.dart';
-import 'package:dam_music_streaming/consts.dart';
 import 'package:dam_music_streaming/ui/suggestions/widgets/suggestions_weather.dart';
-import 'package:flutter/foundation.dart';
 import "package:flutter/material.dart";
 import "package:path_provider/path_provider.dart";
 import 'package:provider/provider.dart';
-import 'package:weather/weather.dart';
 import 'dart:io';
 import 'ui/playlists/widgets/playlists_view.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -99,7 +95,7 @@ class HomeScaffold extends StatelessWidget {
     final UserViewModel userViewModel = context.watch<UserViewModel>();
 
     return DefaultTabController(
-      length: 4,
+      length: 5,
       initialIndex: initialIndex,
       child: Scaffold(
         body: TabBarView(
@@ -117,7 +113,7 @@ class HomeScaffold extends StatelessWidget {
                   ],
                 ),
                 actions: [
-                  IconButton(
+                  /*IconButton(
                     icon: Icon(Icons.wb_sunny_outlined),
                     onPressed: () {
                       Navigator.push(
@@ -127,7 +123,7 @@ class HomeScaffold extends StatelessWidget {
                         ),
                       );
                     },
-                  ),
+                  ),*/
                   GestureDetector(
                     onTap: () {
                       Navigator.pushReplacementNamed(context, '/profile');
@@ -143,6 +139,7 @@ class HomeScaffold extends StatelessWidget {
 
               body: HomeFeed(),
             ),
+            WeatherSuggestionsView(),
             const SearchPage(),
             PlayerView(context: context), //context apenas para debug
             PlaylistsView(docsDir: docsDir),
@@ -153,6 +150,10 @@ class HomeScaffold extends StatelessWidget {
             Tab(
               height: 60,
               icon: SvgIcon(assetName: 'assets/icons/Home.svg', size: 35),
+            ),
+            Tab(
+              height: 60,
+              icon: Icon(Icons.cloud_outlined, size: 35),
             ),
             Tab(
               height: 60,

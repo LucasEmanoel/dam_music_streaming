@@ -16,7 +16,7 @@ class SuggestionsViewModel extends ChangeNotifier {
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
-  
+
   final List<SongData> _songs = [];
   List<SongData> get songs => _songs;
 
@@ -32,25 +32,47 @@ class SuggestionsViewModel extends ChangeNotifier {
 
     try {
       final weather = await _weatherRepository.getCurrentWeather();
+      print('Fetched weather: ${weather?.weatherDescription.toString()}');
 
       if (weather != null) {
         final condition = weather.weatherMain?.toUpperCase() ?? '';
         final weatherEnum = EnumWeather.values.byName(condition);
+        //_currentWeather = EnumWeather.CLEAR.name;
         _currentWeather = weatherEnum.name;
+        
+        String? description = weather.weatherDescription;
+
+        if (description?.contains('thunderstorm') == true) {
+          _currentWeather = EnumWeather.THUNDERSTORM.name;
+        } else if (description?.contains('drizzle') == true) {
+          _currentWeather = EnumWeather.RAIN.name;
+        } else if (description?.contains('rain') == true) {
+          _currentWeather = EnumWeather.RAIN.name;
+        } else if (description?.contains('snow') == true) {
+          _currentWeather = EnumWeather.SNOW.name;
+        } else if (description?.contains('clouds') == true) {
+          if((description == 'overcast clouds' || description == 'broken clouds') && weather.temperature!.celsius! <= 20){ //se tiver muito nublado e frio, considera chuva - achismo meu e de minha janela
+            _currentWeather = EnumWeather.RAIN.name;
+          } else {
+            _currentWeather = EnumWeather.CLOUDS.name;
+          }
+        } else {
+          _currentWeather = EnumWeather.CLEAR.name; // default
+        }
 
         final suggestionData = await _suggestionRepository
-            .fetchPlaylistsAndSongsByWeather(EnumWeather.DRIZZLE.name);
+            .fetchPlaylistsAndSongsByWeather(_currentWeather!);
 
         fetchedPlaylists = suggestionData.playlists;
         fetchedSongs = suggestionData.songs;
       } else {
         fetchedPlaylists = [];
-        fetchedSongs = []; // pegar o top10
+        fetchedSongs = [];
       }
     } catch (e) {
       print(e);
       fetchedPlaylists = [];
-      fetchedSongs = []; 
+      fetchedSongs = [];
     } finally {
       _playlists.clear();
       _playlists.addAll(fetchedPlaylists);

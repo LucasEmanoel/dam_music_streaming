@@ -146,6 +146,7 @@ class PlaylistViewModel extends ChangeNotifier {
   }
 
   void startView({required int id}) async {
+    entityBeingVisualized = null;
     _isLoading = true;
     notifyListeners();
 

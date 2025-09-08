@@ -1,4 +1,5 @@
 import "dart:io";
+import "package:dam_music_streaming/ui/core/ui/custom_snack.dart";
 import "package:dam_music_streaming/ui/core/ui/input_global.dart";
 import "package:dam_music_streaming/ui/core/ui/loading.dart";
 import "package:flutter/material.dart";
@@ -110,6 +111,12 @@ class PlaylistEntryView extends StatelessWidget{
                             hintText: 'Descrição',
                             iconData: Icons.description,
                             onChanged: (v) => vm.entityBeingEdited?.description = v,
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'A descrição é obrigatória.';
+                              }
+                              return null;
+                            },
 
                           ),
                         ],
@@ -165,6 +172,18 @@ class PlaylistEntryView extends StatelessWidget{
   }
 
   void _save(BuildContext context, PlaylistViewModel vm) async {
+    final bool hasLocalImage = vm.pickedImageFile != null;
+    final bool hasNetworkImage = vm.entityBeingEdited?.urlCover != null && vm.entityBeingEdited!.urlCover!.isNotEmpty;
+
+    if (!hasLocalImage && !hasNetworkImage) {
+      showCustomSnackBar(
+        context: context,
+        message: "A playlist deve ter uma capa.",
+        backgroundColor: Colors.red,
+        icon: Icons.error,
+      );
+      return; 
+    }
 
     if (!_formKey.currentState!.validate()) return;
 
@@ -174,12 +193,11 @@ class PlaylistEntryView extends StatelessWidget{
     _nameController.clear();
     _descController.clear();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
-        content: Text("Playlist criada"),
-      ),
+    showCustomSnackBar(
+      context: context,
+      message: "Playlist criada",
+      backgroundColor: Colors.green,
+      icon: Icons.check,
     );
   }
 }

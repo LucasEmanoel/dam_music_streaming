@@ -85,25 +85,30 @@ class PlayerShowView extends StatelessWidget {
                         new CircularProgressIndicator(),
                     errorWidget: (context, url, error) => new Icon(Icons.error),
                   ),
-                  Column(
-                    spacing: 5,
-                    children: [
-                      Text(
-                        vm.current?.title ?? '',
-                        style: TextStyle(
-                          color: Color(0xFF000000),
-                          fontSize: 25,
-                          fontWeight: FontWeight.w700,
+                  Container(
+                    padding: EdgeInsets.only(left: 30, right: 30),
+                    child: Column(
+                      spacing: 5,
+                      children: [
+                        Text(
+                          vm.current?.title ?? '',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Color(0xFF000000),
+                            fontSize: 25,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
-                      ),
-                      Text(
-                        vm.current?.artist?.name ?? '',
-                        style: TextStyle(
-                          color: Color(0xFFB7B0B0),
-                          fontSize: 14,
+                        Text(
+                          vm.current?.artist?.name ?? '',
+                          style: TextStyle(
+                            color: Color(0xFFB7B0B0),
+                            fontSize: 14,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ), // titulo e cantor
                 ],
               ), //Cover
@@ -121,8 +126,8 @@ class PlayerShowView extends StatelessWidget {
                           const SizedBox(height: 35),
                           IconButton(
                             icon: Icon(
-                              Icons.list,
-                              size: 35,
+                              Icons.queue_music_outlined,
+                              size: 26,
                               color: Color(0xFF000000),
                             ),
                             onPressed: () {

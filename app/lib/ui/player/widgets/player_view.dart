@@ -1,27 +1,91 @@
 import 'dart:io';
+import 'package:dam_music_streaming/data/services/genre_service.dart';
+import 'package:dam_music_streaming/domain/models/album_data.dart';
+import 'package:dam_music_streaming/domain/models/artist_data.dart';
 import 'package:dam_music_streaming/domain/models/song_data.dart';
+import 'package:dam_music_streaming/ui/album/view_model/album_view_model.dart';
 import 'package:dam_music_streaming/ui/core/player/view_model/player_view_model.dart';
+import 'package:dam_music_streaming/ui/core/ui/button_sheet.dart';
+import 'package:dam_music_streaming/ui/core/ui/info_tile.dart';
+import 'package:dam_music_streaming/ui/genre/widgets/genre_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class PlayerView extends StatelessWidget {
-  const PlayerView({super.key});
+  PlayerView({super.key, required BuildContext context}) {
+    //area apenas para debug
+    final PlayerViewModel vm = context.read<PlayerViewModel>();
+    List<SongData> songs = [
+      SongData(
+        id: 3498055531,
+        title: 'Hang On In There(B - Side)',
+        artist: ArtistData(
+          id: 73,
+          name: 'Queen',
+          pictureBig:
+              'https: //cdn-images.dzcdn.net/images/artist/71eeb9e2eeb375df35a3c0654a5a01ab/250x250-000000-80-0-0.jpg',
+        ),
+        album: AlbumData(
+          id: 434,
+          title: 'B - Sides',
+          urlCover:
+              'https://cdn-images.dzcdn.net/images/cover/704ca8f7cd13f5fbfed5cca939cd4266/250x250-000000-80-0-0.jpg',
+        ),
+      ),
+      SongData(
+        id: 3498055541,
+        title: 'See What A Fool I’ve Been(B - Side Version / Remastered 2011)',
+        artist: ArtistData(
+          id: 73,
+          name: 'Queen',
+          pictureBig:
+              'https://cdn-images.dzcdn.net/images/cover/704ca8f7cd13f5fbfed5cca939cd4266/250x250-000000-80-0-0.jpg',
+        ),
+        album: AlbumData(
+          id: 434,
+          title: 'B - Sides',
+          urlCover:
+              'https://cdn-images.dzcdn.net/images/cover/704ca8f7cd13f5fbfed5cca939cd4266/250x250-000000-80-0-0.jpg',
+        ),
+      ),
+      SongData(
+        id: 3498055551,
+        title: 'A Human Body(B - Side)',
+        artist: ArtistData(
+          id: 73,
+          name: 'Queen',
+          pictureBig:
+              'https: //cdn-images.dzcdn.net/images/artist/71eeb9e2eeb375df35a3c0654a5a01ab/250x250-000000-80-0-0.jpg',
+        ),
+        album: AlbumData(
+          id: 434,
+          title: 'B - Sides',
+          urlCover:
+              'https://cdn-images.dzcdn.net/images/cover/704ca8f7cd13f5fbfed5cca939cd4266/250x250-000000-80-0-0.jpg',
+        ),
+      ),
+    ];
+    vm.addListToQueue(list: songs);
+    // vm.playOneSong(songs[0]);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<PlayerViewModel>(
       builder: (context, vm, child) {
-        SongData song = SongData(
-          id: 475334192,
-          artist: null,
-          title: 'Get back',
-          album: null,
-          urlCover:
-              'https://cdn-images.dzcdn.net/images/cover/efacd27f64a06aa8dae8de0dea7f0ac4/500x500-000000-80-0-0.jpg',
-        );
-        vm.setCurrentSong(song);
+        // SongData song = SongData(
+        //   id: 475334192,
+        //   artist: null,
+        //   title: 'Get back',
+        //   album: null,
+        //   urlCover:
+        //       'https://cdn-images.dzcdn.net/images/cover/efacd27f64a06aa8dae8de0dea7f0ac4/500x500-000000-80-0-0.jpg',
+        // );
+        // vm.setCurrentSong(song);
+        SongData? song = vm.current;
 
+        //VALIDAR ESTADO CASO NÃO TENHA MÚSICA CURRENT
         return Scaffold(
           appBar: AppBar(
             leading: IconButton(
@@ -50,7 +114,7 @@ class PlayerView extends StatelessWidget {
                   color: Color(0xFF000000),
                 ),
                 onPressed: () {
-                  //
+                  // _showSongActions(context, song);
                 },
               ),
             ],
@@ -64,7 +128,7 @@ class PlayerView extends StatelessWidget {
                 spacing: 30,
                 children: [
                   CachedNetworkImage(
-                    imageUrl: vm.current!.urlCover ?? '',
+                    imageUrl: vm.current?.album?.urlCover ?? '',
                     imageBuilder: (context, imageProvider) => Container(
                       height: 300,
                       width: 300,
@@ -102,8 +166,8 @@ class PlayerView extends StatelessWidget {
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      const Text(
-                        'Pink Floyd',
+                      Text(
+                        vm.current?.artist?.name ?? '',
                         style: TextStyle(
                           color: Color(0xFFB7B0B0),
                           fontSize: 14,
@@ -178,7 +242,22 @@ class PlayerView extends StatelessWidget {
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      spacing: 20,
                       children: [
+                        IconButton(
+                          icon: Icon(
+                            Icons.skip_previous_outlined,
+                            size: 35,
+                            color: vm.hasPreviousSong()
+                                ? Color(0xFF000000)
+                                : Color(0xFF8E8E8E),
+                          ),
+                          onPressed: vm.hasPreviousSong()
+                              ? () {
+                                  vm.jumpPreviousSong();
+                                }
+                              : null,
+                        ),
                         FilledButton(
                           onPressed: () async {
                             await vm.toggle();
@@ -207,10 +286,123 @@ class PlayerView extends StatelessWidget {
                             },
                           ),
                         ),
+                        IconButton(
+                          icon: Icon(
+                            Icons.skip_next_outlined,
+                            size: 35,
+                            color: vm.hasNextSong()
+                                ? Color(0xFF000000)
+                                : Color(0xFF8E8E8E),
+                          ),
+                          onPressed: vm.hasNextSong()
+                              ? () {
+                                  vm.jumpNextSong();
+                                }
+                              : null,
+                        ),
                       ],
                     ),
                   ],
                 ), //music control
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showSongActions(BuildContext context, SongData song) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              InfoTile(
+                imageUrl: song.urlCover ?? '',
+                title: song.title ?? '',
+                subtitle: song.artist?.name ?? '',
+              ),
+              const SizedBox(height: 20),
+
+              ButtonCustomSheet(
+                icon: 'Profile',
+                text: 'Ver Artista',
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+              ButtonCustomSheet(
+                icon: 'Album',
+                text: 'Ver Album',
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+              ButtonCustomSheet(
+                icon: 'Playlist',
+                text: 'Adicionar a playlist',
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+              ButtonCustomSheet(
+                icon: 'Genre',
+                text: 'Ver gênero',
+                onTap: () async {
+                  Navigator.pop(context);
+
+                  if (song.id == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Id da música inválido.')),
+                    );
+                    return;
+                  }
+
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (_) =>
+                        const Center(child: CircularProgressIndicator()),
+                  );
+
+                  try {
+                    final genre = await GenreApiService().fetchBySong(song.id!);
+                    Navigator.pop(context);
+
+                    if (genre == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Esta música não possui gênero associado.',
+                          ),
+                        ),
+                      );
+                      return;
+                    }
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => GenreDetailPage(genreId: genre.id),
+                      ),
+                    );
+                  } catch (_) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Falha ao carregar gênero.'),
+                      ),
+                    );
+                  }
+                },
               ),
             ],
           ),

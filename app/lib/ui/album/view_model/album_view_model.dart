@@ -28,7 +28,6 @@ class AlbumViewModel extends ChangeNotifier {
     }
   }
 
-
   void clearAlbumBeingViewed() {
     _albumBeingViewed = null;
     notifyListeners();

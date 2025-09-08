@@ -145,6 +145,7 @@ class PlaylistListView extends StatelessWidget {
         );
       },
     );
+  
   }
 
   Future<void> _editPlaylist(

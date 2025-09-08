@@ -86,7 +86,7 @@ class PlayerViewModel extends ChangeNotifier {
 
   void _setCurrentSong(SongData song) {
     this._current = song;
-    this._player.setSource(UrlSource('$songBaseUrl${song.id}.mp3'));
+    this._player.setSource(UrlSource('$songBaseUrl${song.deezerId}.mp3'));
   }
 
   // void _startTicker() {
@@ -145,7 +145,7 @@ class PlayerViewModel extends ChangeNotifier {
       _current = firstSong;
     }
 
-    _player.setSource(UrlSource('$songBaseUrl${_current!.deezerId}.mp3'));
+    _player.setSource(UrlSource('$songBaseUrl${_current!.id}.mp3'));
   }
 
   void jumpNextSong() {

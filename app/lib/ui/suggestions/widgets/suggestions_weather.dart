@@ -1,6 +1,8 @@
 import 'package:dam_music_streaming/domain/models/playlist_data.dart';
 import 'package:dam_music_streaming/domain/models/song_data.dart';
+import 'package:dam_music_streaming/ui/core/player/view_model/player_view_model.dart';
 import 'package:dam_music_streaming/ui/core/ui/album_tile.dart';
+import 'package:dam_music_streaming/ui/core/ui/button_sheet.dart';
 import 'package:dam_music_streaming/ui/core/ui/info_tile.dart';
 import 'package:dam_music_streaming/ui/core/ui/loading.dart';
 import 'package:dam_music_streaming/ui/suggestions/view_model/sugestions_view_model.dart';
@@ -72,7 +74,7 @@ class WeatherSuggestionsView extends StatelessWidget {
         return _buildChillHeader();
       case 'DRIZZLE':
         return _buildChillHeader();
-      case 'THUNDERSTORM': 
+      case 'THUNDERSTORM':
         return _buildHeavyMetalHeader();
       default:
         return Container();
@@ -290,6 +292,7 @@ class WeatherSuggestionsView extends StatelessWidget {
                     subtitle: playlist.description ?? '',
                     onTap: () {
                       print('Clicou na playlist:');
+                      _showPlaylistActions(context, playlist);
                     },
                   ),
                 );
@@ -323,7 +326,7 @@ class WeatherSuggestionsView extends StatelessWidget {
           ListView.builder(
             scrollDirection: Axis.vertical,
             shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(), 
+            physics: const NeverScrollableScrollPhysics(),
             itemCount: songs.length,
             itemBuilder: (context, index) {
               final song = songs[index];
@@ -337,6 +340,7 @@ class WeatherSuggestionsView extends StatelessWidget {
                 title: song.title ?? 'Música desconhecida',
                 subtitle: song.title ?? '',
                 onTap: () {
+                  _showSongActions(context, song);
                   print('Clicou na música:');
                 },
               );
@@ -344,6 +348,122 @@ class WeatherSuggestionsView extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _showPlaylistActions(BuildContext context, PlaylistData playlist) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return Padding(
+          padding: EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              InfoTile(
+                imageUrl: playlist.urlCover ?? '',
+                title: playlist.title ?? '',
+                subtitle: playlist.description ?? '',
+              ),
+              SizedBox(height: 20),
+              ButtonCustomSheet(
+                icon: 'Profile',
+                text: 'Ver Author', // chamar tela de visualizar perfil
+                onTap: () {},
+              ),
+              ButtonCustomSheet(
+                icon: 'Music',
+                text: 'Ver Musicas',
+                onTap: () {
+                  Navigator.pop(context);
+                  if (playlist.id != null) {}
+                },
+              ),
+              ButtonCustomSheet(
+                icon: 'Fila',
+                iconColor: Colors.green,
+                text: 'Adicionar a fila de reprodução',
+                onTap: () {
+                  for (var song in playlist.songs ?? []) {
+                    print(' SONGGGGGGSSS ${song.deezerId}');
+                  }
+                  Navigator.pop(context);
+                  if (playlist.songs != null && playlist.songs!.isNotEmpty) {
+                    final vm = Provider.of<PlayerViewModel>(
+                      context,
+                      listen: false,
+                    );
+
+                    vm.addListToQueue(list: playlist.songs!);
+                    vm.play(playlist.songs![0]);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('A playlist está vazia.')),
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showSongActions(BuildContext context, SongData song) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return Padding(
+          padding: EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              InfoTile(
+                imageUrl: song.urlCover ?? '',
+                title: song.title ?? '',
+                subtitle: song.artist?.name ?? '',
+              ),
+              SizedBox(height: 20),
+
+              ButtonCustomSheet(
+                icon: 'Song',
+                iconColor: Colors.green,
+                text: 'Tocar agora',
+                onTap: () {
+                  if (song != null) {
+                    final vm = Provider.of<PlayerViewModel>(
+                      context,
+                      listen: false,
+                    );
+                    vm.playOneSong(song);
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+              ButtonCustomSheet(
+                icon: 'Profile',
+                text: 'Ver Author', // chamar tela de visualizar perfil
+                onTap: () {},
+              ),
+              ButtonCustomSheet(
+                icon: 'Fila',
+                iconColor: Colors.green,
+                text: 'Adicionar a fila de reprodução',
+                onTap: () {},
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

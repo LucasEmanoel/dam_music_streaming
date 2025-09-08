@@ -1,5 +1,6 @@
 import 'package:dam_music_streaming/ui/album/widgets/album_detail.dart';
 import 'package:dam_music_streaming/ui/artist/widgets/artist_detail.dart';
+import 'package:dam_music_streaming/ui/core/player/view_model/player_view_model.dart';
 import 'package:dam_music_streaming/ui/core/ui/info_tile.dart';
 import 'package:dam_music_streaming/ui/core/ui/loading.dart';
 import 'package:flutter/material.dart';
@@ -192,7 +193,23 @@ class PlaylistSongs extends StatelessWidget {
                 FloatingActionButton(
                   shape: CircleBorder(),
                   child: Icon(Icons.play_arrow, size: 30),
-                  onPressed: () {},
+                  onPressed: () {
+                    
+                    final songs = playlist.songs;
+
+                    if (songs != null && songs.isNotEmpty) {
+                      final vm = Provider.of<PlayerViewModel>(context, listen: false);
+                      
+                      vm.addListToQueue(list: songs);
+                      vm.play(songs[0]);
+
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('A playlist está vazia.')),
+                      );
+                    }
+                    
+                  },
                 ),
               ],
             ),

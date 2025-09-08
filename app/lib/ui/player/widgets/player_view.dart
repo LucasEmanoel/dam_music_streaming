@@ -19,6 +19,7 @@ class PlayerView extends StatelessWidget {
     List<SongData> songs = [
       SongData(
         id: 3498055531,
+        deezerId: 3498055531,
         title: 'Hang On In There(B - Side)',
         artist: ArtistData(
           id: 73,
@@ -35,6 +36,7 @@ class PlayerView extends StatelessWidget {
       ),
       SongData(
         id: 3498055541,
+        deezerId: 3498055541,
         title: 'See What A Fool I’ve Been(B - Side Version / Remastered 2011)',
         artist: ArtistData(
           id: 73,
@@ -51,6 +53,7 @@ class PlayerView extends StatelessWidget {
       ),
       SongData(
         id: 3498055551,
+        deezerId: 3498055551,
         title: 'A Human Body(B - Side)',
         artist: ArtistData(
           id: 73,
@@ -359,7 +362,7 @@ class PlayerView extends StatelessWidget {
                 onTap: () async {
                   Navigator.pop(context);
 
-                  if (song.id == null) {
+                  if (song.deezerId == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Id da música inválido.')),
                     );

@@ -11,9 +11,12 @@ class WeatherRepository {
 
   Future<Weather?> getCurrentWeather() async {
     final position = await locationService.getCurrentPosition();
-    
     if (position == null) return null;
 
-    return weatherService.getWeatherFromPosition(position);
+    final city = await locationService.getCityFromPosition(position);
+
+    if (city == null) return null;
+
+    return weatherService.getWeatherFromPosition(city);
   }
 }

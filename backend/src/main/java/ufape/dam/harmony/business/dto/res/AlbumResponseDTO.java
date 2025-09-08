@@ -78,6 +78,8 @@ public class AlbumResponseDTO {
 	@Data
 	public static class SongInsideAlbumDTO {
 		private Long id;
+		@JsonProperty("deezer_id")
+		private Long deezerId;
 	    private String title;
 	    private Duration duration;
 	    @JsonProperty("md5_image")
@@ -87,6 +89,7 @@ public class AlbumResponseDTO {
 	        if (entity == null) return null;
 	        SongInsideAlbumDTO dto = new SongInsideAlbumDTO();
 	        dto.setId(entity.getId());
+	        dto.setDeezerId(entity.getIdDeezer());
 	        dto.setTitle(entity.getTitle());
 	        dto.setMd5Image(entity.getMd5Image());
 	        dto.setDuration(Duration.ofSeconds(entity.getDuration()));

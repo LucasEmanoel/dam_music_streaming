@@ -59,6 +59,11 @@ class PlayerViewModel extends ChangeNotifier {
   }
 
   void play(SongData s) {
+
+    for (var song in _queue) {
+      print(song.deezerId);
+      break;
+    }
     _current = s;
     _isPlaying = true;
     _position = Duration.zero;
@@ -121,7 +126,7 @@ class PlayerViewModel extends ChangeNotifier {
 
   void addListToQueue({List<SongData>? list, int? index}) {
     if (list == null || list.isEmpty) return;
-
+  
     _player.stop();
     _position = Duration.zero;
     _duration = Duration.zero;
@@ -140,7 +145,7 @@ class PlayerViewModel extends ChangeNotifier {
       _current = firstSong;
     }
 
-    _player.setSource(UrlSource('$songBaseUrl${_current!.id}.mp3'));
+    _player.setSource(UrlSource('$songBaseUrl${_current!.deezerId}.mp3'));
   }
 
   void jumpNextSong() {

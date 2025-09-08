@@ -92,6 +92,8 @@ public class GenreResponseDTO {
 	@Data
 	public static class SongInsideGenreDTO {
 		private Long id;
+		@JsonProperty("deezer_id")
+		private Long deezerId;
 	    private String title;
 	    private Duration duration;
 
@@ -99,6 +101,7 @@ public class GenreResponseDTO {
 	        if (entity == null) return null;
 	        SongInsideGenreDTO dto = new SongInsideGenreDTO();
 	        dto.setId(entity.getId());
+	        dto.setDeezerId(entity.getIdDeezer());
 	        dto.setTitle(entity.getTitle());
 	        dto.setDuration(Duration.ofSeconds(entity.getDuration()));
 	        return dto;

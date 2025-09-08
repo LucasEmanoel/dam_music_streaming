@@ -9,12 +9,10 @@ class WeatherService {
 
 
 
-  Future<Weather?> getWeatherFromPosition(Position position) async {
+  Future<Weather?> getWeatherFromPosition(String city) async {
     try {
-      final weather = await _weatherFactory.currentWeatherByLocation(
-        position.latitude,
-        position.longitude,
-      );
+      print('CIDADEEEEEEEEEEEEEEEEEEE $city');
+      final weather = await _weatherFactory.currentWeatherByCityName(city);
       return weather;
     } catch (e) {
       print('An error occurred while getting the weather: $e');

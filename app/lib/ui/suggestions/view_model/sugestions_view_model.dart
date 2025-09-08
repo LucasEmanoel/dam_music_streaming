@@ -39,7 +39,7 @@ class SuggestionsViewModel extends ChangeNotifier {
         _currentWeather = weatherEnum.name;
 
         final suggestionData = await _suggestionRepository
-            .fetchPlaylistsAndSongsByWeather(weatherEnum.name);
+            .fetchPlaylistsAndSongsByWeather(EnumWeather.DRIZZLE.name);
 
         fetchedPlaylists = suggestionData.playlists;
         fetchedSongs = suggestionData.songs;

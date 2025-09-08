@@ -44,6 +44,7 @@ class PlaylistViewModel extends ChangeNotifier {
     }
 
     _isLoading = true;
+    notifyListeners();
 
     try {
       if (playlistToSave.id == null) {
@@ -78,6 +79,7 @@ class PlaylistViewModel extends ChangeNotifier {
       _pickedImageFile = null;
       setStackIndex(0);
       _isLoading = false;
+      notifyListeners();
     }
   }
 

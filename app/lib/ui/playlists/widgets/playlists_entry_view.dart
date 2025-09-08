@@ -31,6 +31,20 @@ class PlaylistEntryView extends StatelessWidget{
           _descController.text = entity.description ?? '';
         }
 
+        if (vm.isLoading) {
+          return Scaffold(
+            appBar: AppBar(),
+            body: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                CustomLoadingIndicator(),
+                Text('Salvando...'),
+              ],
+            ),
+          );
+        }
+
+
         return Scaffold(
           appBar: AppBar(
             leading: IconButton(
@@ -188,6 +202,7 @@ class PlaylistEntryView extends StatelessWidget{
     if (!_formKey.currentState!.validate()) return;
 
     _formKey.currentState!.save();
+    
     await vm.savePlaylist();
 
     _nameController.clear();

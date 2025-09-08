@@ -6,6 +6,7 @@ import 'package:dam_music_streaming/domain/models/song_data.dart';
 import 'package:dam_music_streaming/ui/album/view_model/album_view_model.dart';
 import 'package:dam_music_streaming/ui/core/player/view_model/player_view_model.dart';
 import 'package:dam_music_streaming/ui/core/ui/button_sheet.dart';
+import 'package:dam_music_streaming/ui/core/ui/custom_snack.dart';
 import 'package:dam_music_streaming/ui/core/ui/info_tile.dart';
 import 'package:dam_music_streaming/ui/genre/widgets/genre_detail.dart';
 import 'package:flutter/material.dart';
@@ -363,8 +364,11 @@ class PlayerView extends StatelessWidget {
                   Navigator.pop(context);
 
                   if (song.deezerId == null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Id da música inválido.')),
+                    showCustomSnackBar(
+                      context: context,
+                      message: 'Id da música inválido.',
+                      backgroundColor: Colors.red,
+                      icon: Icons.error,
                     );
                     return;
                   }
@@ -381,13 +385,13 @@ class PlayerView extends StatelessWidget {
                     Navigator.pop(context);
 
                     if (genre == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Esta música não possui gênero associado.',
-                          ),
-                        ),
+                      showCustomSnackBar(
+                        context: context,
+                        message: 'Esta música não possui gênero associado.',
+                        backgroundColor: Colors.red,
+                        icon: Icons.error,
                       );
+
                       return;
                     }
 
@@ -399,10 +403,11 @@ class PlayerView extends StatelessWidget {
                     );
                   } catch (_) {
                     Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Falha ao carregar gênero.'),
-                      ),
+                    showCustomSnackBar(
+                      context: context,
+                      message: 'Falha ao carregar gênero.',
+                      backgroundColor: Colors.red,
+                      icon: Icons.error,
                     );
                   }
                 },

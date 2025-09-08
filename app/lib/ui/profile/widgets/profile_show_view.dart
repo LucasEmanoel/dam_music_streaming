@@ -3,6 +3,7 @@ import "dart:io";
 import "package:dam_music_streaming/domain/models/user_data_l.dart";
 import "package:dam_music_streaming/main.dart";
 import "package:dam_music_streaming/ui/core/ui/button_sheet.dart";
+import "package:dam_music_streaming/ui/core/ui/custom_snack.dart";
 import "package:dam_music_streaming/ui/core/ui/loading.dart";
 import "package:dam_music_streaming/ui/core/ui/svg_icon.dart";
 import "package:dam_music_streaming/ui/core/user/view_model/user_view_model.dart";
@@ -274,12 +275,11 @@ class ProfileShowView extends StatelessWidget {
                             Navigator.of(ctx).pop();
                             Navigator.of(ctx).pop();
 
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                backgroundColor: Colors.red,
-                                duration: Duration(seconds: 2),
-                                content: Text("Erro ao remover usuário"),
-                              ),
+                            showCustomSnackBar(
+                              context: context,
+                              message: 'Erro ao remover usuário',
+                              backgroundColor: Colors.red,
+                              icon: Icons.error,
                             );
 
                             return;

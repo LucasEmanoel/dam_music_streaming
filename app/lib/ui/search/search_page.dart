@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:dam_music_streaming/ui/core/ui/custom_snack.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -48,9 +49,9 @@ class SearchViewModel2 extends ChangeNotifier {
 
       final qn = _query.toLowerCase();
       _results = fetched.where((s) {
-        final title  = (s.title ?? '').toLowerCase();
+        final title = (s.title ?? '').toLowerCase();
         final artist = (s.artist?.name ?? '').toLowerCase();
-        final album  = (s.album?.title ?? '').toLowerCase();
+        final album = (s.album?.title ?? '').toLowerCase();
         return title.contains(qn) || artist.contains(qn) || album.contains(qn);
       }).toList();
     } catch (e) {
@@ -61,7 +62,6 @@ class SearchViewModel2 extends ChangeNotifier {
       notifyListeners();
     }
   }
-
 
   void clear() {
     _query = '';
@@ -114,12 +114,12 @@ class _SearchPageState extends State<SearchPage> {
                   prefixIcon: const Icon(Icons.search),
                   suffixIcon: vm.query.isNotEmpty
                       ? IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: () {
-                      _ctrl.clear();
-                      vm.clear();
-                    },
-                  )
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            _ctrl.clear();
+                            vm.clear();
+                          },
+                        )
                       : null,
                   filled: true,
                   fillColor: theme.colorScheme.surfaceVariant.withOpacity(.6),
@@ -231,25 +231,35 @@ class _SearchPageState extends State<SearchPage> {
                     Navigator.pop(context);
 
                     if (song.id == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Id da música inválido.')),
+                      showCustomSnackBar(
+                        context: context,
+                        message: 'Id da música inválido.',
+                        backgroundColor: Colors.red,
+                        icon: Icons.error,
                       );
+
                       return;
                     }
 
                     showDialog(
                       context: context,
                       barrierDismissible: false,
-                      builder: (_) => const Center(child: CircularProgressIndicator()),
+                      builder: (_) =>
+                          const Center(child: CircularProgressIndicator()),
                     );
 
                     try {
-                      final genre = await GenreApiService().fetchBySong(song.id!);
+                      final genre = await GenreApiService().fetchBySong(
+                        song.id!,
+                      );
                       Navigator.pop(context);
 
                       if (genre == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Esta música não possui gênero associado.')),
+                        showCustomSnackBar(
+                          context: context,
+                          message: 'Esta música não possui gênero associado.',
+                          backgroundColor: Colors.red,
+                          icon: Icons.error,
                         );
                         return;
                       }
@@ -262,9 +272,13 @@ class _SearchPageState extends State<SearchPage> {
                       );
                     } catch (_) {
                       Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Falha ao carregar gênero.')),
+                      showCustomSnackBar(
+                        context: context,
+                        message: 'Falha ao carregar gênero.',
+                        backgroundColor: Colors.red,
+                        icon: Icons.error,
                       );
+                      return;
                     }
                   },
                 ),
@@ -272,15 +286,18 @@ class _SearchPageState extends State<SearchPage> {
                   ButtonCustomSheet(
                     icon: 'Playlist',
                     text:
-                    'Adicionar à playlist atual (${currentPlaylist!.title ?? "sem título"})',
+                        'Adicionar à playlist atual (${currentPlaylist!.title ?? "sem título"})',
                     onTap: () {
                       Navigator.pop(context);
                       playlistVM!.addSongsToCurrentPlaylist(
                         currentPlaylist.id!,
                         {song},
                       );
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Música adicionada!')),
+                      showCustomSnackBar(
+                        context: context,
+                        message: 'Música adicionada!',
+                        backgroundColor: Colors.green,
+                        icon: Icons.check_circle,
                       );
                     },
                   )
@@ -290,12 +307,12 @@ class _SearchPageState extends State<SearchPage> {
                     text: 'Adicionar a uma playlist',
                     onTap: () {
                       Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
+                      showCustomSnackBar(
+                        context: context,
+                        message:
                             'Abra uma playlist para adicionar rapidamente, ou implemente o seletor.',
-                          ),
-                        ),
+                        backgroundColor: Colors.orange,
+                        icon: Icons.info,
                       );
                     },
                   ),
@@ -303,33 +320,38 @@ class _SearchPageState extends State<SearchPage> {
                   icon: 'Fila',
                   iconColor: Colors.green,
                   text: 'Adicionar à fila de reprodução',
-                    onTap: () async {
-                      Navigator.pop(context);
-                      final player = context.read<PlayerViewModel>();
-                      final url = '${player.songBaseUrl}${song.id}.mp3';
+                  onTap: () async {
+                    Navigator.pop(context);
+                    final player = context.read<PlayerViewModel>();
+                    final url = '${player.songBaseUrl}${song.id}.mp3';
 
-                      final ok = await _urlOk(url);
-                      if (!ok) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Não foi possível acessar o áudio (${song.id}).')),
-                        );
-                        return;
-                      }
+                    final ok = await _urlOk(url);
+                    if (!ok) {
+                      showCustomSnackBar(
+                        context: context,
+                        message: 'Não foi possível acessar o áudio.',
+                        backgroundColor: Colors.red,
+                        icon: Icons.error,
+                      );
 
-                      if (!player.hasTrack) {
-                        player.playOneSong(song);
-                        await player.toggle();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Reproduzindo a música selecionada.')),
-                        );
-                      } else {
-                        player.addSongToQueue(song);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Música adicionada à fila.')),
-                        );
-                      }
+                      return;
                     }
 
+                    if (!player.hasTrack) {
+                      player.playOneSong(song);
+                      await player.toggle();
+                      showCustomSnackBar(
+                        context: context,
+                        message: 'Reproduzindo a música selecionada.',
+                      );
+                    } else {
+                      player.addSongToQueue(song);
+                      showCustomSnackBar(
+                        context: context,
+                        message: 'Música adicionada à fila.',
+                      );
+                    }
+                  },
                 ),
               ],
             ),
@@ -342,9 +364,12 @@ class _SearchPageState extends State<SearchPage> {
 
 Future<bool> _urlOk(String url) async {
   try {
-    final r = await http.head(Uri.parse(url)).timeout(const Duration(seconds: 5));
+    final r = await http
+        .head(Uri.parse(url))
+        .timeout(const Duration(seconds: 5));
     if (r.statusCode >= 200 && r.statusCode < 300) return true;
-    final g = await http.get(Uri.parse(url), headers: {'Range': 'bytes=0-1'})
+    final g = await http
+        .get(Uri.parse(url), headers: {'Range': 'bytes=0-1'})
         .timeout(const Duration(seconds: 5));
     return g.statusCode == 206 || (g.statusCode >= 200 && g.statusCode < 300);
   } catch (_) {

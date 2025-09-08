@@ -39,7 +39,7 @@ class SuggestionsViewModel extends ChangeNotifier {
         final weatherEnum = EnumWeather.values.byName(condition);
         //_currentWeather = EnumWeather.CLEAR.name;
         _currentWeather = weatherEnum.name;
-        
+
         String? description = weather.weatherDescription;
 
         if (description?.contains('thunderstorm') == true) {
@@ -51,15 +51,11 @@ class SuggestionsViewModel extends ChangeNotifier {
         } else if (description?.contains('snow') == true) {
           _currentWeather = EnumWeather.SNOW.name;
         } else if (description?.contains('clouds') == true) {
-          if((description == 'overcast clouds' || description == 'broken clouds') && weather.temperature!.celsius! <= 20){ //se tiver muito nublado e frio, considera chuva - achismo meu e de minha janela
-            _currentWeather = EnumWeather.RAIN.name;
-          } else {
-            _currentWeather = EnumWeather.CLOUDS.name;
-          }
+          _currentWeather = EnumWeather.CLOUDS.name;
         } else {
-          _currentWeather = EnumWeather.CLEAR.name; // default
+          _currentWeather = EnumWeather.CLEAR.name;
         }
-
+        //_currentWeather = EnumWeather.SNOW.name;
         final suggestionData = await _suggestionRepository
             .fetchPlaylistsAndSongsByWeather(_currentWeather!);
 

@@ -11,9 +11,13 @@ class WeatherService {
 
   Future<Weather?> getWeatherFromPosition(String city) async {
     try {
-      final weather = await _weatherFactory.currentWeatherByCityName(city);
-      print('Weather for $city: $weather');
-      return weather;
+      final List<Weather> forecast = await _weatherFactory.fiveDayForecastByCityName(city);
+
+      final now = DateTime.now();
+      final nextWeather = forecast.firstWhere(
+        (weather) => weather.date != null && weather.date!.isAfter(now),
+      );
+      return nextWeather;
     } catch (e) {
       print('An error occurred while getting the weather: $e');
       return null;

@@ -159,12 +159,45 @@ class WeatherSuggestionsView extends StatelessWidget {
               style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
           ),
+          SizedBox(height: 16),
         ],
       ),
     );
   }
 
   Widget _buildPlaylists(BuildContext context, List<PlaylistData> playlists) {
+
+    if (playlists.isEmpty) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Playlists para você",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Center(
+              child: Text(
+                "Nenhuma playlist disponível para o clima atual.",
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 16.0),
       child: Column(
@@ -217,6 +250,38 @@ class WeatherSuggestionsView extends StatelessWidget {
   }
 
   Widget _buildSongs(BuildContext context, List<SongData> songs) {
+
+    if (songs.isEmpty) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Músicas para você",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Center(
+              child: Text(
+                "Nenhuma música disponível para o clima atual.",
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 16.0),
       child: Column(

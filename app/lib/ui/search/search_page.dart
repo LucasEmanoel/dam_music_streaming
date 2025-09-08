@@ -1,6 +1,6 @@
-// lib/ui/search/search_page.dart
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 import '../../data/repositories/song_repository.dart';
@@ -9,6 +9,7 @@ import '../../domain/models/song_data.dart';
 import '../../domain/models/playlist_data.dart';
 import '../album/widgets/album_detail.dart';
 import '../artist/widgets/artist_detail.dart';
+import '../core/player/view_model/player_view_model.dart';
 import '../core/ui/info_tile.dart';
 import '../core/ui/loading.dart';
 import '../core/ui/button_sheet.dart';
@@ -70,7 +71,6 @@ class SearchViewModel2 extends ChangeNotifier {
   }
 }
 
-// =============== PAGE ===============
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
 
@@ -106,7 +106,7 @@ class _SearchPageState extends State<SearchPage> {
                 onChanged: (v) {
                   _debounce?.cancel();
                   _debounce = Timer(const Duration(milliseconds: 400), () {
-                    vm.search(v); // usa o vm dentro do Provider ✅
+                    vm.search(v);
                   });
                 },
                 decoration: InputDecoration(
@@ -245,7 +245,7 @@ class _SearchPageState extends State<SearchPage> {
 
                     try {
                       final genre = await GenreApiService().fetchBySong(song.id!);
-                      Navigator.pop(context); // fecha o loading
+                      Navigator.pop(context);
 
                       if (genre == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -261,7 +261,7 @@ class _SearchPageState extends State<SearchPage> {
                         ),
                       );
                     } catch (_) {
-                      Navigator.pop(context); // fecha o loading
+                      Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Falha ao carregar gênero.')),
                       );
@@ -303,10 +303,33 @@ class _SearchPageState extends State<SearchPage> {
                   icon: 'Fila',
                   iconColor: Colors.green,
                   text: 'Adicionar à fila de reprodução',
-                  onTap: () {
-                    Navigator.pop(context);
-                    // TODO: integrar com fila do player
-                  },
+                    onTap: () async {
+                      Navigator.pop(context);
+                      final player = context.read<PlayerViewModel>();
+                      final url = '${player.songBaseUrl}${song.id}.mp3';
+
+                      final ok = await _urlOk(url);
+                      if (!ok) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Não foi possível acessar o áudio (${song.id}).')),
+                        );
+                        return;
+                      }
+
+                      if (!player.hasTrack) {
+                        player.playOneSong(song);
+                        await player.toggle();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Reproduzindo a música selecionada.')),
+                        );
+                      } else {
+                        player.addSongToQueue(song);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Música adicionada à fila.')),
+                        );
+                      }
+                    }
+
                 ),
               ],
             ),
@@ -314,6 +337,18 @@ class _SearchPageState extends State<SearchPage> {
         );
       },
     );
+  }
+}
+
+Future<bool> _urlOk(String url) async {
+  try {
+    final r = await http.head(Uri.parse(url)).timeout(const Duration(seconds: 5));
+    if (r.statusCode >= 200 && r.statusCode < 300) return true;
+    final g = await http.get(Uri.parse(url), headers: {'Range': 'bytes=0-1'})
+        .timeout(const Duration(seconds: 5));
+    return g.statusCode == 206 || (g.statusCode >= 200 && g.statusCode < 300);
+  } catch (_) {
+    return false;
   }
 }
 

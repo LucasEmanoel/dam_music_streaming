@@ -21,7 +21,7 @@ public interface PlaylistRepository extends JpaRepository<Playlist, Long>{
 	Optional<Playlist> findByIdWithSongs(@Param("id") Long id);
 
 	@Query("SELECT p FROM Playlist p JOIN p.songs s WHERE s.genre.name IN :preferredGenres GROUP BY p ORDER BY COUNT(s) DESC")	
-	Page<Playlist> findBySongsGenreName(Set<String> preferredGenres, Pageable top5);
+	Page<Playlist> findBySongsGenreName(Set<String> preferredGenres, Pageable limit);
 
 	
 	

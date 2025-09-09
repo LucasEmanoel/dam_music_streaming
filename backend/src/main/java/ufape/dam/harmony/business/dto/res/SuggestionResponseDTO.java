@@ -20,14 +20,14 @@ public class SuggestionResponseDTO {
             dto.setPlaylists(playlists.stream()
                 .map(p -> PlaylistResponseDTO.fromEntity(p, p.getSongs()))
                 .collect(Collectors.toList()));
-        }
+        } 
 
         if (songs != null) {
             dto.setSongs(songs.stream()
                 .map(s -> SongResponseDTO.fromEntity(s))
                 .collect(Collectors.toList()));
         }
-
+        
         return dto;
     }
     

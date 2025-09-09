@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:dam_music_streaming/ui/core/ui/custom_snack.dart';
+import 'package:dam_music_streaming/ui/core/user/view_model/user_view_model.dart';
+import 'package:dam_music_streaming/ui/playlists/widgets/playlist_add_song.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -282,40 +284,29 @@ class _SearchPageState extends State<SearchPage> {
                     }
                   },
                 ),
-                if (currentPlaylist?.id != null)
-                  ButtonCustomSheet(
-                    icon: 'Playlist',
-                    text:
-                        'Adicionar à playlist atual (${currentPlaylist!.title ?? "sem título"})',
-                    onTap: () {
-                      Navigator.pop(context);
-                      playlistVM!.addSongsToCurrentPlaylist(
-                        currentPlaylist.id!,
-                        {song},
-                      );
-                      showCustomSnackBar(
-                        context: context,
-                        message: 'Música adicionada!',
-                        backgroundColor: Colors.green,
-                        icon: Icons.check_circle,
-                      );
-                    },
-                  )
-                else
-                  ButtonCustomSheet(
-                    icon: 'Playlist',
-                    text: 'Adicionar a uma playlist',
-                    onTap: () {
-                      Navigator.pop(context);
-                      showCustomSnackBar(
-                        context: context,
-                        message:
-                            'Abra uma playlist para adicionar rapidamente, ou implemente o seletor.',
-                        backgroundColor: Colors.orange,
-                        icon: Icons.info,
-                      );
-                    },
-                  ),
+                ButtonCustomSheet(
+                  icon: 'Playlist',
+                  text: 'Adicionar a uma playlist',
+                  onTap: () {
+                    Navigator.pop(context);
+                    if (song.id == null) return;
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ChangeNotifierProvider(
+                          create: (context) {
+                            final UserViewModel userViewModel = context.read<UserViewModel>();
+                            final playlistVm = PlaylistViewModel(userViewModel);
+                            playlistVm.setSongToInsert(song.id!);
+                            return playlistVm;
+                          },
+                          child: const AddSongToPlaylistView(),
+                        ),
+                      ),
+                    );
+                  },
+                ),
                 ButtonCustomSheet(
                   icon: 'Fila',
                   iconColor: Colors.green,
@@ -388,7 +379,7 @@ class _GenresDiscover extends StatelessWidget {
       future: api.fetchAll(),
       builder: (context, snap) {
         if (snap.connectionState != ConnectionState.done) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CustomLoadingIndicator());
         }
         if (snap.hasError) {
           return Center(child: Text('Falha ao carregar gêneros'));

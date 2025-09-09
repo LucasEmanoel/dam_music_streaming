@@ -1,8 +1,17 @@
+import 'package:dam_music_streaming/data/services/genre_service.dart';
 import 'package:dam_music_streaming/domain/models/artist_data.dart';
+import 'package:dam_music_streaming/domain/models/song_data.dart';
+import 'package:dam_music_streaming/ui/album/view_model/album_view_model.dart';
 import 'package:dam_music_streaming/ui/album/widgets/album_detail.dart';
 import 'package:dam_music_streaming/ui/core/ui/album_tile.dart';
+import 'package:dam_music_streaming/ui/core/ui/button_sheet.dart';
+import 'package:dam_music_streaming/ui/core/ui/custom_snack.dart';
 import 'package:dam_music_streaming/ui/core/ui/info_tile.dart';
 import 'package:dam_music_streaming/ui/core/ui/loading.dart';
+import 'package:dam_music_streaming/ui/core/user/view_model/user_view_model.dart';
+import 'package:dam_music_streaming/ui/genre/widgets/genre_detail.dart';
+import 'package:dam_music_streaming/ui/playlists/view_model/playlist_view_model.dart';
+import 'package:dam_music_streaming/ui/playlists/widgets/playlist_add_song.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -95,7 +104,7 @@ class ArtistDetailView extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ),
-        )
+        ),
       ],
     );
   }
@@ -143,10 +152,11 @@ class ArtistDetailView extends StatelessWidget {
               return InfoTile(
                 imageUrl: song.urlCover ?? '',
                 title: song.title ?? 'Música desconhecida',
-                subtitle: 'Single', //TODO: alguma informacao util que nao seja o nome do artista
+                subtitle:
+                    'Single', //TODO: alguma informacao util que nao seja o nome do artista
                 trailing: IconButton(
                   icon: const Icon(Icons.more_vert),
-                  onPressed: () => print('oi'),
+                  onPressed: () => _showSongActions(context, song),
                 ),
                 onTap: () {},
               );
@@ -199,7 +209,7 @@ class ArtistDetailView extends StatelessWidget {
               itemBuilder: (context, index) {
                 final album = artist.albums?[index];
 
-                if(album == null) {
+                if (album == null) {
                   return Container();
                 }
 
@@ -220,7 +230,7 @@ class ArtistDetailView extends StatelessWidget {
                           ),
                         );
                       }
-                    }
+                    },
                   ),
                 );
               },
@@ -230,4 +240,122 @@ class ArtistDetailView extends StatelessWidget {
       ),
     );
   }
+}
+
+void _showSongActions(BuildContext context, SongData song) {
+  showModalBottomSheet(
+    context: context,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (BuildContext context) {
+      return Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            InfoTile(
+              imageUrl: song.urlCover ?? '',
+              title: song.title ?? '',
+              subtitle: song.artist?.name ?? '',
+            ),
+            const SizedBox(height: 20),
+            ButtonCustomSheet(
+              icon: 'Profile',
+              text: 'Ver Artista',
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ButtonCustomSheet(
+              icon: 'Playlist',
+              text: 'Adicionar a uma playlist',
+              onTap: () {
+                Navigator.pop(context);
+                if (song.id == null) return;
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ChangeNotifierProvider(
+                      create: (context) {
+                        final UserViewModel userViewModel = context.read<UserViewModel>();
+                        final playlistVm = PlaylistViewModel(userViewModel);
+                        playlistVm.setSongToInsert(song.id!);
+                        return playlistVm;
+                      },
+                      child: const AddSongToPlaylistView(),
+                    ),
+                  ),
+                );
+              },
+            ),
+            ButtonCustomSheet(
+              icon: 'Genre',
+              text: 'Ver gênero',
+              onTap: () async {
+                Navigator.pop(context);
+
+                if (song.id == null) {
+                  showCustomSnackBar(
+                    context: context,
+                    message: "Id da música inválido.",
+                    backgroundColor: Colors.red,
+                    icon: Icons.error,
+                  );
+
+                  return;
+                }
+
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (_) => const Center(child: CustomLoadingIndicator()),
+                );
+
+                try {
+                  final genre = await GenreApiService().fetchBySong(song.id!);
+                  Navigator.pop(context);
+
+                  if (genre == null) {
+                    showCustomSnackBar(
+                      context: context,
+                      message: "Esta música não possui gênero associado.",
+                      backgroundColor: Colors.red,
+                      icon: Icons.error,
+                    );
+                    return;
+                  }
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => GenreDetailPage(genreId: genre.id),
+                    ),
+                  );
+                } catch (_) {
+                  Navigator.pop(context);
+                  showCustomSnackBar(
+                    context: context,
+                    message: "Falha ao carregar gênero.",
+                    backgroundColor: Colors.red,
+                    icon: Icons.error,
+                  );
+                }
+              },
+            ),
+            ButtonCustomSheet(
+              icon: 'Fila',
+              iconColor: Colors.green,
+              text: 'Adicionar à fila de reprodução',
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
 }

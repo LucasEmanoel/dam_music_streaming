@@ -142,7 +142,7 @@ class HomeScaffold extends StatelessWidget {
             WeatherSuggestionsView(),
             const SearchPage(),
             PlayerView(context: context), //context apenas para debug
-            PlaylistsView(docsDir: docsDir),
+            PlaylistsView(),
           ],
         ),
         bottomNavigationBar: const TabBar(

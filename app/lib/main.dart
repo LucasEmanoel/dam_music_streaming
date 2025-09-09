@@ -141,8 +141,8 @@ class HomeScaffold extends StatelessWidget {
             ),
             WeatherSuggestionsView(),
             const SearchPage(),
-            PlayerView(context: context), //context apenas para debug
-            PlaylistsView(),
+            PlayerView(),
+            PlaylistsView(docsDir: docsDir),
           ],
         ),
         bottomNavigationBar: const TabBar(
@@ -151,10 +151,7 @@ class HomeScaffold extends StatelessWidget {
               height: 60,
               icon: SvgIcon(assetName: 'assets/icons/Home.svg', size: 35),
             ),
-            Tab(
-              height: 60,
-              icon: Icon(Icons.cloud_outlined, size: 35),
-            ),
+            Tab(height: 60, icon: Icon(Icons.cloud_outlined, size: 35)),
             Tab(
               height: 60,
               icon: SvgIcon(assetName: 'assets/icons/Search.svg', size: 35),

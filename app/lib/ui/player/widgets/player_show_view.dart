@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dam_music_streaming/data/services/genre_service.dart';
 import 'package:dam_music_streaming/domain/models/song_data.dart';
+import 'package:dam_music_streaming/ui/album/widgets/album_detail.dart';
+import 'package:dam_music_streaming/ui/artist/widgets/artist_detail.dart';
 import 'package:dam_music_streaming/ui/core/player/view_model/player_view_model.dart';
 import 'package:dam_music_streaming/ui/core/ui/button_sheet.dart';
 import 'package:dam_music_streaming/ui/core/ui/info_tile.dart';
@@ -17,21 +19,21 @@ class PlayerShowView extends StatelessWidget {
       builder: (context, vm, child) {
         final PlayerScreenViewModel playerScreenViewModel = context
             .read<PlayerScreenViewModel>();
-        SongData? song = vm.current;
 
-        //VALIDAR ESTADO CASO NÃO TENHA MÚSICA CURRENT
         return Scaffold(
           appBar: AppBar(
-            leading: IconButton(
-              icon: Icon(
-                Icons.keyboard_arrow_down_outlined,
-                size: 30,
-                color: Color(0xFF000000),
-              ),
-              onPressed: () {
-                //
-              },
-            ),
+            leading: Navigator.canPop(context)
+                ? IconButton(
+                    icon: Icon(
+                      Icons.keyboard_arrow_down_outlined,
+                      size: 30,
+                      color: Color(0xFF000000),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  )
+                : null,
             title: const Text(
               'Tocando',
               style: TextStyle(
@@ -48,7 +50,9 @@ class PlayerShowView extends StatelessWidget {
                   color: Color(0xFF000000),
                 ),
                 onPressed: () {
-                  // _showSongActions(context, song);
+                  vm.current == null
+                      ? null
+                      : _showSongActions(context, vm.current!);
                 },
               ),
             ],
@@ -82,8 +86,7 @@ class PlayerShowView extends StatelessWidget {
                         ],
                       ),
                     ),
-                    placeholder: (context, url) =>
-                        new CustomLoadingIndicator(),
+                    placeholder: (context, url) => new CustomLoadingIndicator(),
                     errorWidget: (context, url, error) => Container(
                       width: 250,
                       height: 250,
@@ -135,11 +138,20 @@ class PlayerShowView extends StatelessWidget {
                   spacing: 9.5,
                   children: [
                     Padding(
-                      padding: EdgeInsetsGeometry.only(right: 15),
+                      padding: EdgeInsetsGeometry.only(left: 15, right: 15),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const SizedBox(height: 35),
+                          IconButton(
+                            icon: Icon(
+                              Icons.heart_broken,
+                              size: 26,
+                              color: Color(0xFF000000),
+                            ),
+                            onPressed: () {
+                              //
+                            },
+                          ),
                           IconButton(
                             icon: Icon(
                               Icons.queue_music_outlined,
@@ -295,7 +307,7 @@ class PlayerShowView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               InfoTile(
-                imageUrl: song.urlCover ?? '',
+                imageUrl: song?.album?.urlCover ?? '',
                 title: song.title ?? '',
                 subtitle: song.artist?.name ?? '',
               ),
@@ -306,6 +318,15 @@ class PlayerShowView extends StatelessWidget {
                 text: 'Ver Artista',
                 onTap: () {
                   Navigator.pop(context);
+                  if (song.artist?.id != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            ArtistDetailView(artistId: song.artist!.id!),
+                      ),
+                    );
+                  }
                 },
               ),
               ButtonCustomSheet(
@@ -313,6 +334,15 @@ class PlayerShowView extends StatelessWidget {
                 text: 'Ver Album',
                 onTap: () {
                   Navigator.pop(context);
+                  if (song.album?.id != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            AlbumDetailView(albumId: song.album!.id!),
+                      ),
+                    );
+                  }
                 },
               ),
               ButtonCustomSheet(
@@ -320,57 +350,6 @@ class PlayerShowView extends StatelessWidget {
                 text: 'Adicionar a playlist',
                 onTap: () {
                   Navigator.pop(context);
-                },
-              ),
-              ButtonCustomSheet(
-                icon: 'Genre',
-                text: 'Ver gênero',
-                onTap: () async {
-                  Navigator.pop(context);
-
-                  if (song.id == null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Id da música inválido.')),
-                    );
-                    return;
-                  }
-
-                  showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (_) =>
-                        const Center(child: CustomLoadingIndicator()),
-                  );
-
-                  try {
-                    final genre = await GenreApiService().fetchBySong(song.id!);
-                    Navigator.pop(context);
-
-                    if (genre == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Esta música não possui gênero associado.',
-                          ),
-                        ),
-                      );
-                      return;
-                    }
-
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => GenreDetailPage(genreId: genre.id),
-                      ),
-                    );
-                  } catch (_) {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Falha ao carregar gênero.'),
-                      ),
-                    );
-                  }
                 },
               ),
             ],

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:dam_music_streaming/ui/core/ui/custom_snack.dart';
 import 'package:dam_music_streaming/ui/core/user/view_model/user_view_model.dart';
+import 'package:dam_music_streaming/ui/player/widgets/player_view.dart';
 import 'package:dam_music_streaming/ui/playlists/widgets/playlist_add_song.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -94,6 +95,7 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final PlayerViewModel playerVM = context.watch<PlayerViewModel>();
 
     return ChangeNotifierProvider(
       create: (_) => SearchViewModel2(SongRepository()),
@@ -158,8 +160,19 @@ class _SearchPageState extends State<SearchPage> {
                       imageUrl: s.urlCover ?? '',
                       title: s.title ?? 'Título desconhecido',
                       subtitle: s.artist?.name ?? 'Artista desconhecido',
-                      trailing: const Icon(Icons.more_vert, size: 20),
-                      onTap: () => _showSongActions(context, s),
+                      trailing: GestureDetector(
+                        onTap: () {
+                          _showSongActions(context, playerVM, s);
+                        },
+                        child: const Icon(Icons.more_vert, size: 20),
+                      ),
+                      onTap: () {
+                        playerVM.playOneSong(s);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => PlayerView()),
+                        );
+                      },
                     );
                   },
                 );
@@ -171,7 +184,11 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  void _showSongActions(BuildContext context, SongData song) {
+  void _showSongActions(
+    BuildContext context,
+    PlayerViewModel playerVM,
+    SongData song,
+  ) {
     final playlistVM = context.read<PlaylistViewModel?>();
     final PlaylistData? currentPlaylist = playlistVM?.entityBeingVisualized;
 
@@ -296,7 +313,8 @@ class _SearchPageState extends State<SearchPage> {
                       MaterialPageRoute(
                         builder: (_) => ChangeNotifierProvider(
                           create: (context) {
-                            final UserViewModel userViewModel = context.read<UserViewModel>();
+                            final UserViewModel userViewModel = context
+                                .read<UserViewModel>();
                             final playlistVm = PlaylistViewModel(userViewModel);
                             playlistVm.setSongToInsert(song.id!);
                             return playlistVm;
@@ -312,36 +330,14 @@ class _SearchPageState extends State<SearchPage> {
                   iconColor: Colors.green,
                   text: 'Adicionar à fila de reprodução',
                   onTap: () async {
+                    playerVM.addSongToQueue(song);
                     Navigator.pop(context);
-                    final player = context.read<PlayerViewModel>();
-                    final url = '${player.songBaseUrl}${song.id}.mp3';
-
-                    final ok = await _urlOk(url);
-                    if (!ok) {
-                      showCustomSnackBar(
-                        context: context,
-                        message: 'Não foi possível acessar o áudio.',
-                        backgroundColor: Colors.red,
-                        icon: Icons.error,
-                      );
-
-                      return;
-                    }
-
-                    if (!player.hasTrack) {
-                      player.playOneSong(song);
-                      await player.toggle();
-                      showCustomSnackBar(
-                        context: context,
-                        message: 'Reproduzindo a música selecionada.',
-                      );
-                    } else {
-                      player.addSongToQueue(song);
-                      showCustomSnackBar(
-                        context: context,
-                        message: 'Música adicionada à fila.',
-                      );
-                    }
+                    showCustomSnackBar(
+                      context: context,
+                      message: 'Música adicionada a fila',
+                      backgroundColor: Colors.green,
+                      icon: Icons.check_circle,
+                    );
                   },
                 ),
               ],

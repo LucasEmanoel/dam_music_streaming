@@ -14,7 +14,7 @@ class GenreMiniDto {
 class GenreApiService {
   final Dio _dio;
   GenreApiService({ApiClient? apiClient})
-      : _dio = apiClient?.dio ?? ApiClient().dio;
+    : _dio = apiClient?.dio ?? ApiClient().dio;
 
   Future<GenreMiniDto?> fetchBySong(int songId) async {
     final r = await _dio.get('/genres/by-song/$songId');
@@ -39,5 +39,4 @@ class GenreApiService {
     }
     throw Exception('Erro ao carregar detalhes do gênero');
   }
-
 }

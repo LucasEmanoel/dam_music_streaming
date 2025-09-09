@@ -50,7 +50,7 @@ class ProfileViewModel extends ChangeNotifier {
     notifyListeners();
 
     int id = _userViewModel.loggedUser!.id!;
-    
+
     try {
       userProfile = await repository.getProfile(id);
       _userViewModel.setLoggedUser(userProfile!);
@@ -71,12 +71,13 @@ class ProfileViewModel extends ChangeNotifier {
 
     int id = userProfile!.id!;
 
-    final imageUrl = await storageService.uploadUserProfilePicture(
-      profileId: id,
-      imageFile: _pickedImageFile!,
-    );
-
-    entityBeingEdited!.profilePicUrl = imageUrl;
+    if (_pickedImageFile != null) {
+      final imageUrl = await storageService.uploadUserProfilePicture(
+        profileId: id,
+        imageFile: _pickedImageFile!,
+      );
+      entityBeingEdited!.profilePicUrl = imageUrl;
+    }
 
     UsuarioData responseUser = await repository.updateProfile(
       id,

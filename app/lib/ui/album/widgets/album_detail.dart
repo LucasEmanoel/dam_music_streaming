@@ -1,7 +1,9 @@
 import 'package:dam_music_streaming/domain/models/song_data.dart';
+import 'package:dam_music_streaming/ui/core/player/view_model/player_view_model.dart';
 import 'package:dam_music_streaming/ui/core/ui/button_sheet.dart';
 import 'package:dam_music_streaming/ui/core/ui/custom_snack.dart';
 import 'package:dam_music_streaming/ui/core/ui/loading.dart';
+import 'package:dam_music_streaming/ui/player/widgets/player_view.dart';
 import 'package:dam_music_streaming/ui/core/user/view_model/user_view_model.dart';
 import 'package:dam_music_streaming/ui/playlists/view_model/playlist_view_model.dart';
 import 'package:dam_music_streaming/ui/playlists/widgets/playlist_add_song.dart';
@@ -27,6 +29,7 @@ class AlbumDetailView extends StatelessWidget {
       },
       child: Consumer<AlbumViewModel>(
         builder: (context, vm, child) {
+          final PlayerViewModel playerVM = context.watch<PlayerViewModel>();
           final album = vm.albumBeingViewed;
 
           if (vm.isLoading || album == null) {
@@ -218,9 +221,21 @@ class AlbumDetailView extends StatelessWidget {
                           imageUrl: song.urlCover ?? 'Sem imagem',
                           title: song.title ?? 'Sem titulo',
                           subtitle: song.artist?.name ?? 'Artista Desconhecido',
-                          trailing: const Icon(Icons.more_vert, size: 20),
+                          trailing: GestureDetector(
+                            onTap: () async {
+                              _showSongActions(context, vm, playerVM, song);
+                            },
+                            child: const Icon(Icons.more_vert, size: 20),
+                          ),
                           onTap: () async {
-                            _showSongActions(context, vm, song);
+                            playerVM.addListToQueue(
+                              list: album!.songs!,
+                              index: index,
+                            );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => PlayerView()),
+                            );
                           },
                         );
                       },
@@ -236,7 +251,12 @@ class AlbumDetailView extends StatelessWidget {
   }
 }
 
-void _showSongActions(BuildContext context, AlbumViewModel vm, SongData song) {
+void _showSongActions(
+  BuildContext context,
+  AlbumViewModel vm,
+  PlayerViewModel playerVM,
+  SongData song,
+) {
   showModalBottomSheet(
     context: context,
     shape: const RoundedRectangleBorder(
@@ -274,7 +294,8 @@ void _showSongActions(BuildContext context, AlbumViewModel vm, SongData song) {
                   MaterialPageRoute(
                     builder: (_) => ChangeNotifierProvider(
                       create: (context) {
-                        final UserViewModel userViewModel = context.read<UserViewModel>();
+                        final UserViewModel userViewModel = context
+                            .read<UserViewModel>();
                         final playlistVm = PlaylistViewModel(userViewModel);
                         playlistVm.setSongToInsert(song.id!);
                         return playlistVm;
@@ -344,7 +365,14 @@ void _showSongActions(BuildContext context, AlbumViewModel vm, SongData song) {
               iconColor: Colors.green,
               text: 'Adicionar à fila de reprodução',
               onTap: () {
+                playerVM.addSongToQueue(song);
                 Navigator.pop(context);
+                showCustomSnackBar(
+                  context: context,
+                  message: 'Música adicionada a fila',
+                  backgroundColor: Colors.green,
+                  icon: Icons.check_circle,
+                );
               },
             ),
           ],

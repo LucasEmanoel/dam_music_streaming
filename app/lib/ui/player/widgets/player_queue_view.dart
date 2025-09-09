@@ -47,7 +47,7 @@ class PlayerQueueView extends StatelessWidget {
               children: [
                 Container(
                   alignment: Alignment.topRight,
-                  padding: EdgeInsets.only(right: 25),
+                  padding: EdgeInsets.all(15),
                   child: GestureDetector(
                     onTap: () {
                       playerVm.clearQueue();
@@ -58,34 +58,34 @@ class PlayerQueueView extends StatelessWidget {
                     ),
                   ),
                 ),
-                ReorderableListView.builder(
-                  shrinkWrap: true,
-                  itemCount: playerVm.songsQueue.length,
-                  padding: EdgeInsets.only(left: 20, right: 20),
-                  itemBuilder: (context, index) {
-                    final SongData song = playerVm.songsQueue.elementAt(index);
-                    return ReorderableDragStartListener(
-                      key: Key('${song.id}'),
-                      index: index,
-                      child: InfoTile(
+                Expanded(
+                  child: ReorderableListView.builder(
+                    shrinkWrap: true,
+                    itemCount: playerVm.songsQueue.length,
+                    padding: EdgeInsets.only(left: 20, right: 20),
+                    itemBuilder: (context, index) {
+                      final SongData song = playerVm.songsQueue.elementAt(
+                        index,
+                      );
+                      return InfoTile(
+                        key: Key('${song.id}'),
                         imageUrl: song.album?.urlCover ?? '',
                         title: song.title ?? '',
                         subtitle: song.artist?.name ?? '',
-                        trailing: IconButton(
-                          icon: const Icon(Icons.list),
-                          onPressed: () => {
-                            //
-                          },
+                        trailing: ReorderableDragStartListener(
+                          key: ValueKey<String>('${song.id}'),
+                          index: index,
+                          child: const Icon(Icons.drag_handle),
                         ),
                         onTap: () {
                           playerVm.setQueueAtIndex(index);
                         },
-                      ),
-                    );
-                  },
-                  onReorder: (int oldIndex, int newIndex) {
-                    playerVm.reorderQueue(oldIndex, newIndex);
-                  },
+                      );
+                    },
+                    onReorder: (int oldIndex, int newIndex) {
+                      playerVm.reorderQueue(oldIndex, newIndex);
+                    },
+                  ),
                 ),
               ],
             ),

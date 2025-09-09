@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:dam_music_streaming/ui/core/player/view_model/player_view_model.dart';
 import 'package:dam_music_streaming/ui/core/ui/loading.dart';
+import 'package:dam_music_streaming/ui/player/widgets/player_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:dam_music_streaming/ui/artist/widgets/artist_detail.dart';
@@ -60,9 +61,7 @@ class _GenreDetailPageState extends State<GenreDetailPage> {
       future: _future,
       builder: (_, snap) {
         if (snap.connectionState != ConnectionState.done) {
-          return const Scaffold(
-            body: Center(child: CustomLoadingIndicator()),
-          );
+          return const Scaffold(body: Center(child: CustomLoadingIndicator()));
         }
         if (snap.hasError || snap.data == null) {
           return Scaffold(
@@ -81,6 +80,8 @@ class _GenreDetailPageState extends State<GenreDetailPage> {
             ? g.coverUrl!
             : _genreCovers[g.name.toLowerCase()] ??
                   'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400';
+
+        final PlayerViewModel playerVM = context.watch<PlayerViewModel>();
 
         return Scaffold(
           body: CustomScrollView(
@@ -345,9 +346,13 @@ class _GenreDetailPageState extends State<GenreDetailPage> {
                         title: s.title,
                         subtitle: s.artist?.name ?? '',
                         trailing: const Icon(Icons.play_arrow),
-                        onTap: () => context.read<PlayerViewModel>().play(
-                          _toSongData(s),
-                        ),
+                        onTap: () {
+                          playerVM.playOneSong(SongData.fromDto(s));
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => PlayerView()),
+                          );
+                        },
                       ),
                     );
                   }, childCount: data.topSongs.length),

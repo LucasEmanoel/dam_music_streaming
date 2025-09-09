@@ -3,6 +3,7 @@ import 'package:dam_music_streaming/domain/models/artist_data.dart';
 import 'package:dam_music_streaming/domain/models/song_data.dart';
 import 'package:dam_music_streaming/ui/album/view_model/album_view_model.dart';
 import 'package:dam_music_streaming/ui/album/widgets/album_detail.dart';
+import 'package:dam_music_streaming/ui/core/player/view_model/player_view_model.dart';
 import 'package:dam_music_streaming/ui/core/ui/album_tile.dart';
 import 'package:dam_music_streaming/ui/core/ui/button_sheet.dart';
 import 'package:dam_music_streaming/ui/core/ui/custom_snack.dart';
@@ -10,6 +11,7 @@ import 'package:dam_music_streaming/ui/core/ui/info_tile.dart';
 import 'package:dam_music_streaming/ui/core/ui/loading.dart';
 import 'package:dam_music_streaming/ui/core/user/view_model/user_view_model.dart';
 import 'package:dam_music_streaming/ui/genre/widgets/genre_detail.dart';
+import 'package:dam_music_streaming/ui/player/widgets/player_view.dart';
 import 'package:dam_music_streaming/ui/playlists/view_model/playlist_view_model.dart';
 import 'package:dam_music_streaming/ui/playlists/widgets/playlist_add_song.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +35,7 @@ class ArtistDetailView extends StatelessWidget {
       child: Consumer<ArtistViewModel>(
         builder: (context, vm, child) {
           final artist = vm.artistBeingViewed;
+          final PlayerViewModel playerVM = context.watch<PlayerViewModel>();
 
           if (vm.isLoading || artist == null) {
             return Scaffold(
@@ -57,7 +60,7 @@ class ArtistDetailView extends StatelessWidget {
                   _buildHeader(context, artist),
                   _buildStats(context, artist),
                   _buildAlbums(context, artist),
-                  _buildTopSongs(context, vm, artist),
+                  _buildTopSongs(context, vm, playerVM, artist),
                 ],
               ),
             ),
@@ -126,6 +129,7 @@ class ArtistDetailView extends StatelessWidget {
   Widget _buildTopSongs(
     BuildContext context,
     ArtistViewModel vm,
+    PlayerViewModel playerVM,
     ArtistData artist,
   ) {
     return Padding(
@@ -152,13 +156,17 @@ class ArtistDetailView extends StatelessWidget {
               return InfoTile(
                 imageUrl: song.urlCover ?? '',
                 title: song.title ?? 'Música desconhecida',
-                subtitle:
-                    'Single', //TODO: alguma informacao util que nao seja o nome do artista
                 trailing: IconButton(
                   icon: const Icon(Icons.more_vert),
-                  onPressed: () => _showSongActions(context, song),
+                  onPressed: () => _showSongActions(context, playerVM, song),
                 ),
-                onTap: () {},
+                onTap: () {
+                  playerVM.playOneSong(song);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => PlayerView()),
+                  );
+                },
               );
             },
           ),
@@ -185,16 +193,6 @@ class ArtistDetailView extends StatelessWidget {
                 Text(
                   "Álbuns",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                RichText(
-                  text: TextSpan(
-                    text: 'Ver todos',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
                 ),
               ],
             ),
@@ -242,7 +240,11 @@ class ArtistDetailView extends StatelessWidget {
   }
 }
 
-void _showSongActions(BuildContext context, SongData song) {
+void _showSongActions(
+  BuildContext context,
+  PlayerViewModel playerVM,
+  SongData song,
+) {
   showModalBottomSheet(
     context: context,
     shape: const RoundedRectangleBorder(
@@ -262,13 +264,6 @@ void _showSongActions(BuildContext context, SongData song) {
             ),
             const SizedBox(height: 20),
             ButtonCustomSheet(
-              icon: 'Profile',
-              text: 'Ver Artista',
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ButtonCustomSheet(
               icon: 'Playlist',
               text: 'Adicionar a uma playlist',
               onTap: () {
@@ -280,7 +275,8 @@ void _showSongActions(BuildContext context, SongData song) {
                   MaterialPageRoute(
                     builder: (_) => ChangeNotifierProvider(
                       create: (context) {
-                        final UserViewModel userViewModel = context.read<UserViewModel>();
+                        final UserViewModel userViewModel = context
+                            .read<UserViewModel>();
                         final playlistVm = PlaylistViewModel(userViewModel);
                         playlistVm.setSongToInsert(song.id!);
                         return playlistVm;
@@ -350,7 +346,14 @@ void _showSongActions(BuildContext context, SongData song) {
               iconColor: Colors.green,
               text: 'Adicionar à fila de reprodução',
               onTap: () {
+                playerVM.addSongToQueue(song);
                 Navigator.pop(context);
+                showCustomSnackBar(
+                  context: context,
+                  message: 'Música adicionada a fila',
+                  backgroundColor: Colors.green,
+                  icon: Icons.check_circle,
+                );
               },
             ),
           ],

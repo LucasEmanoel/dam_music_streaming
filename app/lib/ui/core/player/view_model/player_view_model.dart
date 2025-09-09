@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:developer';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import '../../../../domain/models/song_data.dart';
@@ -41,6 +42,10 @@ class PlayerViewModel extends ChangeNotifier {
     _initStreams();
   }
 
+  void clearCurrent() {
+    _current = null;
+  }
+
   void _initStreams() {
     _durationSubscription = _player.onDurationChanged.listen((Duration d) {
       _duration = d;
@@ -60,7 +65,6 @@ class PlayerViewModel extends ChangeNotifier {
   }
 
   void play(SongData s) {
-
     for (var song in _queue) {
       print(song.deezerId);
       break;
@@ -123,11 +127,12 @@ class PlayerViewModel extends ChangeNotifier {
     _previousStack.clear();
 
     _setCurrentSong(song);
+    toggle();
   }
 
   void addListToQueue({List<SongData>? list, int? index}) {
     if (list == null || list.isEmpty) return;
-  
+
     _player.stop();
     _position = Duration.zero;
     _duration = Duration.zero;
@@ -145,9 +150,8 @@ class PlayerViewModel extends ChangeNotifier {
     } else {
       SongData firstSong = _queue.removeFirst();
       _current = firstSong;
+      _setCurrentSong(_current!);
     }
-
-    _player.setSource(UrlSource('$songBaseUrl${_current!.id}.mp3'));
   }
 
   void jumpNextSong() {
@@ -209,8 +213,11 @@ class PlayerViewModel extends ChangeNotifier {
 
     final after = _queue.skip(index + 1).toList();
 
-    _previousStack.addAll(before);
-    _previousStack.addLast(_current!);
+    _previousStack.addAll(before.reversed);
+
+    if (current != null) {
+      _previousStack.addLast(_current!);
+    }
 
     _queue
       ..clear()

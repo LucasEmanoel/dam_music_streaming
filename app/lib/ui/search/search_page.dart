@@ -140,7 +140,7 @@ class _SearchPageState extends State<SearchPage> {
                   return Center(child: Text(vm.error!));
                 }
                 if (vm.query.isEmpty) {
-                  return const _EmptySearchHint();
+                  return const _GenresDiscover();
                 }
                 if (vm.results.isEmpty) {
                   return const Center(child: Text('Nenhum resultado.'));
@@ -374,6 +374,133 @@ Future<bool> _urlOk(String url) async {
     return g.statusCode == 206 || (g.statusCode >= 200 && g.statusCode < 300);
   } catch (_) {
     return false;
+  }
+}
+
+class _GenresDiscover extends StatelessWidget {
+  const _GenresDiscover();
+
+  @override
+  Widget build(BuildContext context) {
+    final api = GenreApiService();
+
+    return FutureBuilder<List<GenreMiniDto>>(
+      future: api.fetchAll(),
+      builder: (context, snap) {
+        if (snap.connectionState != ConnectionState.done) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (snap.hasError) {
+          return Center(child: Text('Falha ao carregar gêneros'));
+        }
+
+        final raw = snap.data ?? const <GenreMiniDto>[];
+
+        final genres = raw
+            .fold<Map<String, GenreMiniDto>>({}, (map, g) {
+              map[g.name.toLowerCase()] = g;
+              return map;
+            })
+            .values
+            .toList();
+
+        if (genres.isEmpty) {
+          return const Center(child: Text('Nenhuma categoria por enquanto.'));
+        }
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Descobrir categorias',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(height: 12),
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 2.4,
+                ),
+                itemCount: genres.length,
+                itemBuilder: (_, i) {
+                  final g = genres[i];
+                  final color = _genreColors[i % _genreColors.length];
+                  return _GenreCard(
+                    label: g.name,
+                    color: color,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => GenreDetailPage(genreId: g.id),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+const _genreColors = <Color>[
+  Color(0xFF16A34A),
+  Color(0xFF7C3AED),
+  Color(0xFFE11D48),
+  Color(0xFF2563EB),
+  Color(0xFF059669),
+  Color(0xFF0EA5E9),
+  Color(0xFFF59E0B),
+  Color(0xFF9333EA),
+];
+
+class _GenreCard extends StatelessWidget {
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _GenreCard({
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: onTap,
+      child: Ink(
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Center(
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w800,
+              letterSpacing: .2,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 

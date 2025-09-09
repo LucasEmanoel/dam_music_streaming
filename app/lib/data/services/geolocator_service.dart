@@ -44,8 +44,6 @@ class LocationService {
     try {
       List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
       if (placemarks.isNotEmpty) {
-        print('CIDADEEEEE ${placemarks}');
-        
         var locality = null;
         for (var placemark in placemarks) {
             if (placemark.locality != null && placemark.locality!.isNotEmpty) {

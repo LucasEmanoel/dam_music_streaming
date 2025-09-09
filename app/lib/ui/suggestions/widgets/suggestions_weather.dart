@@ -1,5 +1,6 @@
 import 'package:dam_music_streaming/domain/models/playlist_data.dart';
 import 'package:dam_music_streaming/domain/models/song_data.dart';
+import 'package:dam_music_streaming/domain/models/user_data_l.dart';
 import 'package:dam_music_streaming/ui/album/widgets/album_detail.dart';
 import 'package:dam_music_streaming/ui/artist/widgets/artist_detail.dart';
 import 'package:dam_music_streaming/ui/core/player/view_model/player_view_model.dart';
@@ -362,7 +363,6 @@ class WeatherSuggestionsView extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (BuildContext context) {
-
         return Padding(
           padding: EdgeInsets.all(20.0),
           child: Column(
@@ -378,26 +378,35 @@ class WeatherSuggestionsView extends StatelessWidget {
               ButtonCustomSheet(
                 icon: 'Profile',
                 text: 'Ver Author',
-                onTap: () => {},
-                /*onTap: () {
-                  Navigator.pop(context);
-                  if (playlist.author != null) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            //ProfileShowView(),
-                      
-                      ),
-                    );
+                onTap: () {
+                  if (playlist.author != null && playlist.author!.id != null) {
+                    //
                   }
-                },*/
+                },
               ),
               ButtonCustomSheet(
                 icon: 'Music',
                 text: 'Ver Musicas',
                 onTap: () {
-                  if (playlist.id != null) {}
+                  if (playlist.id != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ChangeNotifierProvider(
+                          create: (_) {
+                            final userVm = Provider.of<UserViewModel>(
+                              context,
+                              listen: false,
+                            );
+                            final vm = PlaylistViewModel(userVm);
+                            vm.setEntityBeingVisualized(playlist);
+                            return vm;
+                          },
+                          child: const PlaylistSongs(),
+                        ),
+                      ),
+                    );
+                  }
                 },
               ),
               ButtonCustomSheet(

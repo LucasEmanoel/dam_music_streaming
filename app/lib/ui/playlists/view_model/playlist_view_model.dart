@@ -25,9 +25,8 @@ class PlaylistViewModel extends ChangeNotifier {
   PlaylistData? entityBeingVisualized;
   PlaylistData? entityBeingEdited;
   File? _pickedImageFile;
-  final Directory docsDir;
-
-  PlaylistViewModel(this.docsDir, this._userViewModel) {
+  
+  PlaylistViewModel(this._userViewModel) {
     loadPlaylists();
   }
 
@@ -188,6 +187,12 @@ class PlaylistViewModel extends ChangeNotifier {
 
   void setPickedImage(File? file) {
     _pickedImageFile = file;
+    notifyListeners();
+  }
+
+  void setEntityBeingVisualized(PlaylistData playlist) {
+    entityBeingVisualized = playlist;
+    _checkOwnership();
     notifyListeners();
   }
 }

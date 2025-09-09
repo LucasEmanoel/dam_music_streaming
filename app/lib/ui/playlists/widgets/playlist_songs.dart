@@ -5,6 +5,7 @@ import 'package:dam_music_streaming/ui/core/player/view_model/player_view_model.
 import 'package:dam_music_streaming/ui/core/ui/custom_snack.dart';
 import 'package:dam_music_streaming/ui/core/ui/info_tile.dart';
 import 'package:dam_music_streaming/ui/core/ui/loading.dart';
+import 'package:dam_music_streaming/ui/playlists/widgets/playlist_add_song.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -67,7 +68,12 @@ class PlaylistSongs extends StatelessWidget {
       elevation: 0,
       leading: IconButton(
         icon: Icon(Icons.arrow_back, color: theme.iconTheme.color, size: 25),
-        onPressed: () => vm.setStackIndex(0),
+        onPressed: () => {
+          if (Navigator.canPop(context))
+            {Navigator.pop(context)}
+          else
+            {vm.setStackIndex(0)},
+        },
       ),
       actions: [
         if (vm.isOwner)
@@ -407,7 +413,6 @@ class PlaylistSongs extends StatelessWidget {
                 icon: 'Playlist',
                 text: 'Adicionar a outra playlist',
                 onTap: () {
-                  Navigator.pop(context);
                 },
               ),
               ButtonCustomSheet(

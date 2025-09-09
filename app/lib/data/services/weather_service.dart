@@ -1,4 +1,3 @@
-import 'package:geolocator/geolocator.dart';
 import 'package:weather/weather.dart';
 
 class WeatherService {

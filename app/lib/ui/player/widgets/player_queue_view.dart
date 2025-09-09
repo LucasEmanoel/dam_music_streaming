@@ -78,7 +78,7 @@ class PlayerQueueView extends StatelessWidget {
                           },
                         ),
                         onTap: () {
-                          // playerVm.setQueueAtIndex(index);
+                          playerVm.setQueueAtIndex(index);
                         },
                       ),
                     );

@@ -136,6 +136,7 @@ class PlayerViewModel extends ChangeNotifier {
     });
 
     if (index != null) {
+      setQueueAtIndex(index);
     } else {
       SongData firstSong = _queue.removeFirst();
       _current = firstSong;
@@ -192,24 +193,28 @@ class PlayerViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // void setQueueAtIndex(int index) {
-  //   _player.stop();
-  //   _position = Duration.zero;
-  //   _duration = Duration.zero;
-  //
-  //   _previousStack.addFirst(_current!);
-  //
-  //   for (int i = 0; i < _queue.length; i++) {
-  //     if (index == i) {
-  //       SongData tempSong = _queue.removeFirst();
-  //       _setCurrentSong(tempSong);
-  //     }
-  //
-  //     SongData tempSong = _queue.removeFirst();
-  //     _previousStack.addFirst(tempSong);
-  //   }
-  //   notifyListeners();
-  // }
+  void setQueueAtIndex(int index) {
+    _player.stop();
+    _position = Duration.zero;
+    _duration = Duration.zero;
+
+    final newCurrent = _queue.elementAt(index);
+
+    final before = _queue.take(index).toList();
+
+    final after = _queue.skip(index + 1).toList();
+
+    _previousStack.addAll(before);
+    _previousStack.addLast(_current!);
+
+    _queue
+      ..clear()
+      ..addAll(after);
+
+    _setCurrentSong(newCurrent);
+
+    notifyListeners();
+  }
 
   @override
   void dispose() {

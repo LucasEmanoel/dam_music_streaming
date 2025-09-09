@@ -83,7 +83,22 @@ class PlayerShowView extends StatelessWidget {
                     ),
                     placeholder: (context, url) =>
                         new CircularProgressIndicator(),
-                    errorWidget: (context, url, error) => new Icon(Icons.error),
+                    errorWidget: (context, url, error) => Container(
+                      width: 250,
+                      height: 250,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: Color(0xFFAFACE8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0x591A1662),
+                            spreadRadius: 3,
+                            blurRadius: 14,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                   Container(
                     padding: EdgeInsets.only(left: 30, right: 30),
@@ -91,7 +106,7 @@ class PlayerShowView extends StatelessWidget {
                       spacing: 5,
                       children: [
                         Text(
-                          vm.current?.title ?? '',
+                          vm.current?.title ?? 'Música não selecionada',
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -216,9 +231,9 @@ class PlayerShowView extends StatelessWidget {
                             await vm.toggle();
                           },
                           style: ButtonStyle(
-                            backgroundColor: WidgetStateProperty.all(
-                              Color(0xFF6C63FF),
-                            ),
+                            backgroundColor: vm.current == null
+                                ? WidgetStateProperty.all(Color(0xFFBBB7EF))
+                                : WidgetStateProperty.all(Color(0xFF6C63FF)),
                             shape: WidgetStateProperty.all(CircleBorder()),
                             iconSize: WidgetStateProperty.all(35),
                             minimumSize: WidgetStateProperty.all(Size(60, 60)),

@@ -18,12 +18,11 @@ class InfoTile extends StatelessWidget {
     this.subtitle,
     this.leading,
     this.trailing,
-    this.onTap
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-
     final bool hasImage = imageUrl != null && imageUrl!.isNotEmpty;
 
     return ListTile(
@@ -38,24 +37,29 @@ class InfoTile extends StatelessWidget {
                   fit: BoxFit.cover,
                 )
               : null,
-              color: hasImage ? null : Colors.grey[800],
+          color: hasImage ? null : Colors.grey[800],
         ),
         child: hasImage
-          ? null
-          : Center(
-            child: SvgIcon(assetName: 'assets/icons/Music.svg', size: 30,color: Colors.white,)
-          )
+            ? null
+            : Center(
+                child: SvgIcon(
+                  assetName: 'assets/icons/Music.svg',
+                  size: 30,
+                  color: Colors.white,
+                ),
+              ),
       ),
 
       title: Text(title ?? ''),
-      subtitle: Text(subtitle ?? '',
+      subtitle: Text(
+        subtitle ?? '',
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
       contentPadding: EdgeInsets.only(left: 7),
       trailing: trailing,
       onTap: onTap,
-      shape: null
+      shape: null,
     );
   }
 }

@@ -24,6 +24,14 @@ class GenreApiService {
     return null;
   }
 
+  Future<List<GenreMiniDto>> fetchAll() async {
+    final r = await _dio.get('/genres/');
+    final list = (r.data as List).cast<dynamic>();
+    return list
+        .map((e) => GenreMiniDto.fromMap(e as Map<String, dynamic>))
+        .toList();
+  }
+
   Future<GenreDetailDto> fetchGenreDetail(int genreId) async {
     final r = await _dio.get('/genres/$genreId');
     if (r.statusCode == 200 && r.data != null) {

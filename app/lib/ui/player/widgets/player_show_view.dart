@@ -18,21 +18,23 @@ class PlayerShowView extends StatelessWidget {
       builder: (context, vm, child) {
         final PlayerScreenViewModel playerScreenViewModel = context
             .read<PlayerScreenViewModel>();
-        SongData? song = vm.current;
 
-        //VALIDAR ESTADO CASO NÃO TENHA MÚSICA CURRENT
+        // vm.clearCurrent();
+
         return Scaffold(
           appBar: AppBar(
-            leading: IconButton(
-              icon: Icon(
-                Icons.keyboard_arrow_down_outlined,
-                size: 30,
-                color: Color(0xFF000000),
-              ),
-              onPressed: () {
-                //
-              },
-            ),
+            leading: Navigator.canPop(context)
+                ? IconButton(
+                    icon: Icon(
+                      Icons.keyboard_arrow_down_outlined,
+                      size: 30,
+                      color: Color(0xFF000000),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  )
+                : null,
             title: const Text(
               'Tocando',
               style: TextStyle(
@@ -309,13 +311,15 @@ class PlayerShowView extends StatelessWidget {
                 text: 'Ver Artista',
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) =>
-                          ArtistDetailView(artistId: song.artist!.id!),
-                    ),
-                  );
+                  if (song.artist?.id != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            ArtistDetailView(artistId: song.artist!.id!),
+                      ),
+                    );
+                  }
                 },
               ),
               ButtonCustomSheet(
@@ -323,12 +327,15 @@ class PlayerShowView extends StatelessWidget {
                 text: 'Ver Album',
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => AlbumDetailView(albumId: song.album!.id!),
-                    ),
-                  );
+                  if (song.album?.id != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            AlbumDetailView(albumId: song.album!.id!),
+                      ),
+                    );
+                  }
                 },
               ),
               ButtonCustomSheet(

@@ -26,9 +26,7 @@ class AlbumDto {
   });
 
   factory AlbumDto.fromMap(Map<String, dynamic> map) {
-
     final albumCoverUrl = map['url_cover'] as String?;
-
 
     return AlbumDto(
       id: map['id'] ?? -1,
@@ -49,9 +47,26 @@ class AlbumDto {
           ? ArtistDto.fromMap(map['artist'] as Map<String, dynamic>)
           : null,
 
-      songs: (map['songs'] as List<dynamic>?)
-          ?.map((s) => SongDto.fromMap(s as Map<String, dynamic>, albumCoverUrl: albumCoverUrl))
-          .toList(),
+      songs: (map['songs'] as List<dynamic>?)?.map((s) {
+        Map<String, dynamic> album = {
+          'id': map['id'],
+          'url_cover': albumCoverUrl,
+          'title': map['title'],
+        };
+
+        Map<String, dynamic> artist = {
+          'id': map['artist']['id'],
+          'name': map['artist']['name'],
+        };
+
+        s['album'] = album;
+        s['artist'] = artist;
+
+        return SongDto.fromMap(
+          s as Map<String, dynamic>,
+          albumCoverUrl: albumCoverUrl,
+        );
+      }).toList(),
     );
   }
 

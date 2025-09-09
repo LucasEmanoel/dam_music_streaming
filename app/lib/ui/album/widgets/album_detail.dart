@@ -1,7 +1,9 @@
 import 'package:dam_music_streaming/domain/models/song_data.dart';
+import 'package:dam_music_streaming/ui/core/player/view_model/player_view_model.dart';
 import 'package:dam_music_streaming/ui/core/ui/button_sheet.dart';
 import 'package:dam_music_streaming/ui/core/ui/custom_snack.dart';
 import 'package:dam_music_streaming/ui/core/ui/loading.dart';
+import 'package:dam_music_streaming/ui/player/widgets/player_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../data/services/genre_service.dart';
@@ -24,6 +26,7 @@ class AlbumDetailView extends StatelessWidget {
       },
       child: Consumer<AlbumViewModel>(
         builder: (context, vm, child) {
+          final PlayerViewModel playerVM = context.watch<PlayerViewModel>();
           final album = vm.albumBeingViewed;
 
           if (vm.isLoading || album == null) {
@@ -215,9 +218,21 @@ class AlbumDetailView extends StatelessWidget {
                           imageUrl: song.urlCover ?? 'Sem imagem',
                           title: song.title ?? 'Sem titulo',
                           subtitle: song.artist?.name ?? 'Artista Desconhecido',
-                          trailing: const Icon(Icons.more_vert, size: 20),
+                          trailing: GestureDetector(
+                            onTap: () async {
+                              _showSongActions(context, vm, song);
+                            },
+                            child: const Icon(Icons.more_vert, size: 20),
+                          ),
                           onTap: () async {
-                            _showSongActions(context, vm, song);
+                            playerVM.addListToQueue(
+                              list: album!.songs!,
+                              index: index,
+                            );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => PlayerView()),
+                            );
                           },
                         );
                       },
@@ -287,8 +302,7 @@ void _showSongActions(BuildContext context, AlbumViewModel vm, SongData song) {
                 showDialog(
                   context: context,
                   barrierDismissible: false,
-                  builder: (_) =>
-                      const Center(child: CustomLoadingIndicator()),
+                  builder: (_) => const Center(child: CustomLoadingIndicator()),
                 );
 
                 try {

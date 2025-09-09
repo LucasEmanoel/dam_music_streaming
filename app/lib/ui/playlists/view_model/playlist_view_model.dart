@@ -1,6 +1,7 @@
 import 'package:dam_music_streaming/data/services/storage_service.dart';
 import 'package:dam_music_streaming/domain/models/playlist_data.dart';
 import 'package:dam_music_streaming/domain/models/song_data.dart';
+import 'package:dam_music_streaming/ui/core/user/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 
@@ -10,6 +11,11 @@ class PlaylistViewModel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  bool _isOwner = false;
+  bool get isOwner => _isOwner;
+
+  final UserViewModel _userViewModel;
+  
   final StorageService storageService = StorageService();
   final PlaylistRepository repository = PlaylistRepository();
 
@@ -19,9 +25,20 @@ class PlaylistViewModel extends ChangeNotifier {
   PlaylistData? entityBeingVisualized;
   PlaylistData? entityBeingEdited;
   File? _pickedImageFile;
-  final Directory docsDir;
+  
+  PlaylistViewModel(this._userViewModel) {
+    loadPlaylists();
+  }
 
-  PlaylistViewModel(this.docsDir);
+  void _checkOwnership() {
+    final currentUserId = _userViewModel.loggedUser?.id;
+
+    if (entityBeingVisualized == null || currentUserId == null) {
+      _isOwner = false;
+    } else {
+      _isOwner = entityBeingVisualized!.author?.id == currentUserId;
+    }
+  }
 
   Future<void> loadPlaylists() async {
     _isLoading = true;
@@ -44,6 +61,7 @@ class PlaylistViewModel extends ChangeNotifier {
     }
 
     _isLoading = true;
+    notifyListeners();
 
     try {
       if (playlistToSave.id == null) {
@@ -78,6 +96,7 @@ class PlaylistViewModel extends ChangeNotifier {
       _pickedImageFile = null;
       setStackIndex(0);
       _isLoading = false;
+      notifyListeners();
     }
   }
 
@@ -133,6 +152,7 @@ class PlaylistViewModel extends ChangeNotifier {
     if (index == 0) {
       entityBeingEdited = null;
       _pickedImageFile = null;
+      _isOwner = false;
     }
     notifyListeners();
   }
@@ -142,16 +162,21 @@ class PlaylistViewModel extends ChangeNotifier {
     entityBeingEdited =
         playlist ??
         PlaylistData(title: '', urlCover: '', numSongs: 0, description: '');
+    _checkOwnership();
     notifyListeners();
   }
 
   void startView({required int id}) async {
+    entityBeingVisualized = null;
+    _isOwner = false;
     _isLoading = true;
+
     notifyListeners();
 
     try {
       final playlistComMusicas = await repository.getPlaylistWithSongs(id);
       entityBeingVisualized = playlistComMusicas;
+      _checkOwnership();
     } catch (e) {
       print(e);
     } finally {
@@ -162,6 +187,12 @@ class PlaylistViewModel extends ChangeNotifier {
 
   void setPickedImage(File? file) {
     _pickedImageFile = file;
+    notifyListeners();
+  }
+
+  void setEntityBeingVisualized(PlaylistData playlist) {
+    entityBeingVisualized = playlist;
+    _checkOwnership();
     notifyListeners();
   }
 }

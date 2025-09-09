@@ -1,3 +1,4 @@
+import 'package:dam_music_streaming/ui/core/ui/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -77,7 +78,7 @@ class _HomeFeedState extends State<HomeFeed> {
               if (snap.connectionState != ConnectionState.done) {
                 return const SizedBox(
                   height: 168,
-                  child: Center(child: CircularProgressIndicator()),
+                  child: Center(child: CustomLoadingIndicator()),
                 );
               }
               if (snap.hasError) {
@@ -138,7 +139,7 @@ class _HomeFeedState extends State<HomeFeed> {
               if (snap.connectionState != ConnectionState.done) {
                 return const SizedBox(
                   height: 320,
-                  child: Center(child: CircularProgressIndicator()),
+                  child: Center(child: CustomLoadingIndicator()),
                 );
               }
               if (snap.hasError) {

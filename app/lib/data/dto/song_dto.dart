@@ -5,6 +5,7 @@ import 'package:dam_music_streaming/utils/duration_conversor.dart';
 
 class SongDto {
   int id;
+  int? deezerId;
   String title;
 
   ArtistDto? artist;
@@ -14,6 +15,7 @@ class SongDto {
 
   SongDto({
     required this.id,
+    this.deezerId,
     required this.title,
     this.artist,
     this.album,
@@ -29,6 +31,7 @@ class SongDto {
     
     return SongDto(
       id: map['id'] ?? -1,
+      deezerId: map['deezer_id'],
       title: map['title'] ?? '',
       duration: map['duration'] != null
           ? parseIso8601Duration(map['duration'])
@@ -46,6 +49,7 @@ class SongDto {
   factory SongDto.fromData(SongData data) {
     return SongDto(
       id: data.id ?? -1,
+      deezerId: data.deezerId ?? -1,
       title: data.title ?? '',
       artist: data.artist != null ? ArtistDto.fromData(data.artist!) : null,
       album: data.album != null ? AlbumDto.fromData(data.album!) : null,

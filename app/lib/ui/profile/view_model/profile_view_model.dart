@@ -50,7 +50,7 @@ class ProfileViewModel extends ChangeNotifier {
     notifyListeners();
 
     int id = _userViewModel.loggedUser!.id!;
-
+    
     try {
       userProfile = await repository.getProfile(id);
       _userViewModel.setLoggedUser(userProfile!);

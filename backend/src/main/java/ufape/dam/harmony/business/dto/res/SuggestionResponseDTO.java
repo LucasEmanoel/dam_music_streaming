@@ -18,7 +18,7 @@ public class SuggestionResponseDTO {
 
         if (playlists != null) {
             dto.setPlaylists(playlists.stream()
-                .map(p -> PlaylistResponseDTO.fromEntity(p, null))
+                .map(p -> PlaylistResponseDTO.fromEntity(p, p.getSongs()))
                 .collect(Collectors.toList()));
         }
 

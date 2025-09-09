@@ -39,4 +39,6 @@ class GenreApiService {
     }
     throw Exception('Erro ao carregar detalhes do gênero');
   }
+
+  fetchAll() {}
 }

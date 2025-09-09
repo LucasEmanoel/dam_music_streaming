@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:dam_music_streaming/domain/models/user_data_l.dart';
+import 'package:dam_music_streaming/ui/core/ui/custom_snack.dart';
+import 'package:dam_music_streaming/ui/core/ui/loading.dart';
 import 'package:dam_music_streaming/ui/core/user/view_model/user_view_model.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/gestures.dart';
@@ -401,7 +403,12 @@ class _CadastroPageState extends State<CadastroPage> {
   }
 
   void _toast(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    showCustomSnackBar(
+      context: context,
+      message: msg,
+      backgroundColor: Colors.red,
+      icon: Icons.error,
+    );
   }
 
   String _mapAuthError(FirebaseAuthException e) {

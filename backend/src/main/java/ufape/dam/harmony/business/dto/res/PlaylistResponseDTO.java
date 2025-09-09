@@ -77,6 +77,8 @@ public class PlaylistResponseDTO {
     @Data
     public static class SongInPlaylistResponseDTO {
         private Long id;
+        @JsonProperty("deezer_id")
+        private Long deezerId;
         private String title;
         private Duration duration;
        
@@ -89,6 +91,7 @@ public class PlaylistResponseDTO {
             var dto = new SongInPlaylistResponseDTO();
             
             dto.setId(entity.getId());
+            dto.setDeezerId(entity.getIdDeezer());
             dto.setTitle(entity.getTitle());
             dto.setAlbum(AlbumInSongPlaylistResponseDTO.fromEntity(entity.getAlbum()));
             dto.setArtist(ArtistInSongPlaylistResponseDTO.fromEntity(entity.getArtist()));

@@ -1,4 +1,5 @@
 import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 
 class LocationService {
   Future<Position?> getCurrentPosition() async {
@@ -27,10 +28,36 @@ class LocationService {
 
     try {
       final position = await Geolocator.getCurrentPosition();
+
+      if (position == null) {
+        return null;
+      }
+
       return position;
     } catch (e) {
       print('An error occurred while getting the position: $e');
       return null;
     }
   }
+
+  Future<String?> getCityFromPosition(Position position) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+      if (placemarks.isNotEmpty) {
+        var locality = null;
+        for (var placemark in placemarks) {
+            if (placemark.locality != null && placemark.locality!.isNotEmpty) {
+              locality = placemark.locality;
+              break;
+            }
+        }
+        return locality;
+      }
+      return null;
+    } catch (e) {
+      print('An error occurred while getting the city: $e');
+      return null;
+    }
+  }
+
 }

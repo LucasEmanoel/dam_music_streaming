@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dam_music_streaming/data/services/api_service.dart';
 import 'package:dam_music_streaming/domain/models/user_data_l.dart';
+import 'package:dam_music_streaming/ui/core/ui/custom_snack.dart';
 import 'package:dam_music_streaming/ui/core/ui/image_edit.dart';
 import 'package:dam_music_streaming/ui/core/ui/input_global.dart';
 import 'package:dam_music_streaming/ui/core/user/view_model/user_view_model.dart';
@@ -166,13 +167,13 @@ class ProfileEntryView extends StatelessWidget {
   ) async {
     await profileViewModel.updateLoggedUser();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
-        content: Text("Usuário  Atualizado"),
-      ),
+    showCustomSnackBar(
+      context: context,
+      message: 'Usuário Atualizado',
+      backgroundColor: Colors.green,
+      icon: Icons.check_circle,
     );
+    
 
     profileViewModel.setStackIndex(0);
   }

@@ -1,8 +1,5 @@
-import 'package:dam_music_streaming/data/dto/song_dto.dart';
 import 'package:dam_music_streaming/data/dto/user_dto_l.dart';
-import 'package:dam_music_streaming/data/services/playlist_service.dart';
 import 'package:dam_music_streaming/data/services/usuario_service.dart';
-import 'package:dam_music_streaming/domain/models/song_data.dart';
 import 'package:dam_music_streaming/domain/models/user_data_l.dart';
 
 class UserRepository {

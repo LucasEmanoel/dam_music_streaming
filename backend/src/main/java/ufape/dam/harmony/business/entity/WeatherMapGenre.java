@@ -9,12 +9,14 @@ import org.springframework.stereotype.Component;
 public class WeatherMapGenre {
 	
 	public final Map<Weather, Set<String>> mapWeatherGenre = Map.of(
-			Weather.CLEAR, Set.of("pop", "dance", "reggae"),
-			Weather.CLOUDS, Set.of("rock", "indie", "alternative"),
-			Weather.SNOW, Set.of("classical", "ambient"),
-			Weather.RAIN, Set.of("mpb", "jazz", "blues"),
-			Weather.DRIZZLE, Set.of("acoustic", "lofi"),
-			Weather.THUNDERSTORM, Set.of("metal", "drum_and_bass", "industrial")
+			Weather.CLEAR, Set.of("pop", "alt"),
+			Weather.CLOUDS, Set.of("pop", "alt"),
+			
+			Weather.SNOW, Set.of("classical", "ambient"), //vou deixar de exemplo mas nunca vai cair mesmo
+			
+			Weather.RAIN, Set.of("rock", "mpb", "rAndb"),
+			Weather.DRIZZLE, Set.of("rock", "mpb", "lofi"),
+			Weather.THUNDERSTORM, Set.of("rock", "metal")
 	);
 		
 	private WeatherMapGenre() {}

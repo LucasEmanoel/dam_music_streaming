@@ -1,4 +1,5 @@
 import 'package:dam_music_streaming/domain/models/artist_data.dart';
+import 'package:dam_music_streaming/ui/album/widgets/album_detail.dart';
 import 'package:dam_music_streaming/ui/core/ui/album_tile.dart';
 import 'package:dam_music_streaming/ui/core/ui/info_tile.dart';
 import 'package:dam_music_streaming/ui/core/ui/loading.dart';
@@ -94,16 +95,7 @@ class ArtistDetailView extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          child: Center(
-            child: Text(
-              'Descricao do artista',
-              textAlign: TextAlign.start,
-            ), //TODO: retornar na api
-          ),
-        ),
+        )
       ],
     );
   }
@@ -115,11 +107,7 @@ class ArtistDetailView extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           Text(
-            '123.000 ouvintes mensais', //TODO: Nao entra no escopo
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-          ),
-          Text(
-            '14 álbums - 136 músicas lançadas',
+            '${artist.albums?.length ?? 0} álbums - ${artist.songs?.length ?? 0} músicas lançadas',
           ), //TODO: retornar quantidade de albums / musicas.
         ],
       ),
@@ -223,7 +211,15 @@ class ArtistDetailView extends StatelessWidget {
                     title: album.title ?? 'Álbum desconhecido',
                     subtitle: album.releaseDate?.year.toString() ?? '',
                     onTap: () {
-                      print('Clicou no álbum:');
+                      if (album.id != null) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                AlbumDetailView(albumId: album.id!),
+                          ),
+                        );
+                      }
                     }
                   ),
                 );

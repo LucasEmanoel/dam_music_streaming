@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:dam_music_streaming/ui/core/ui/custom_snack.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -230,9 +231,13 @@ class _SearchPageState extends State<SearchPage> {
                     Navigator.pop(context);
 
                     if (song.id == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Id da música inválido.')),
+                      showCustomSnackBar(
+                        context: context,
+                        message: 'Id da música inválido.',
+                        backgroundColor: Colors.red,
+                        icon: Icons.error,
                       );
+
                       return;
                     }
 
@@ -240,7 +245,7 @@ class _SearchPageState extends State<SearchPage> {
                       context: context,
                       barrierDismissible: false,
                       builder: (_) =>
-                          const Center(child: CircularProgressIndicator()),
+                          const Center(child: CustomLoadingIndicator()),
                     );
 
                     try {
@@ -250,12 +255,11 @@ class _SearchPageState extends State<SearchPage> {
                       Navigator.pop(context);
 
                       if (genre == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Esta música não possui gênero associado.',
-                            ),
-                          ),
+                        showCustomSnackBar(
+                          context: context,
+                          message: 'Esta música não possui gênero associado.',
+                          backgroundColor: Colors.red,
+                          icon: Icons.error,
                         );
                         return;
                       }
@@ -268,11 +272,13 @@ class _SearchPageState extends State<SearchPage> {
                       );
                     } catch (_) {
                       Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Falha ao carregar gênero.'),
-                        ),
+                      showCustomSnackBar(
+                        context: context,
+                        message: 'Falha ao carregar gênero.',
+                        backgroundColor: Colors.red,
+                        icon: Icons.error,
                       );
+                      return;
                     }
                   },
                 ),
@@ -287,8 +293,11 @@ class _SearchPageState extends State<SearchPage> {
                         currentPlaylist.id!,
                         {song},
                       );
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Música adicionada!')),
+                      showCustomSnackBar(
+                        context: context,
+                        message: 'Música adicionada!',
+                        backgroundColor: Colors.green,
+                        icon: Icons.check_circle,
                       );
                     },
                   )
@@ -298,12 +307,12 @@ class _SearchPageState extends State<SearchPage> {
                     text: 'Adicionar a uma playlist',
                     onTap: () {
                       Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
+                      showCustomSnackBar(
+                        context: context,
+                        message:
                             'Abra uma playlist para adicionar rapidamente, ou implemente o seletor.',
-                          ),
-                        ),
+                        backgroundColor: Colors.orange,
+                        icon: Icons.info,
                       );
                     },
                   ),
@@ -318,30 +327,28 @@ class _SearchPageState extends State<SearchPage> {
 
                     final ok = await _urlOk(url);
                     if (!ok) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Não foi possível acessar o áudio (${song.id}).',
-                          ),
-                        ),
+                      showCustomSnackBar(
+                        context: context,
+                        message: 'Não foi possível acessar o áudio.',
+                        backgroundColor: Colors.red,
+                        icon: Icons.error,
                       );
+
                       return;
                     }
 
                     if (!player.hasTrack) {
                       player.playOneSong(song);
                       await player.toggle();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Reproduzindo a música selecionada.'),
-                        ),
+                      showCustomSnackBar(
+                        context: context,
+                        message: 'Reproduzindo a música selecionada.',
                       );
                     } else {
                       player.addSongToQueue(song);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Música adicionada à fila.'),
-                        ),
+                      showCustomSnackBar(
+                        context: context,
+                        message: 'Música adicionada à fila.',
                       );
                     }
                   },

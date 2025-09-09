@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:dam_music_streaming/domain/models/user_data_l.dart';
+import 'package:dam_music_streaming/ui/core/user/view_model/user_view_model.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +10,7 @@ import 'package:dam_music_streaming/data/services/api_service.dart';
 import 'package:dam_music_streaming/ui/core/ui/svg_icon.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:provider/provider.dart';
 
 import 'widgets/cover_carousel.dart';
 
@@ -20,21 +23,21 @@ class CadastroPage extends StatefulWidget {
 }
 
 class _CadastroPageState extends State<CadastroPage> {
-  final nomeCtrl  = TextEditingController();
+  final nomeCtrl = TextEditingController();
   final emailCtrl = TextEditingController();
-  final passCtrl  = TextEditingController();
+  final passCtrl = TextEditingController();
 
   bool obscure = true;
   bool aceitouTermos = false;
   bool _loading = false;
 
-  static const _webClientId = '940448057923-jbu82iq5eutmg54kfiphcgl9q8kfgrr5.apps.googleusercontent.com';
+  static const _webClientId =
+      '940448057923-jbu82iq5eutmg54kfiphcgl9q8kfgrr5.apps.googleusercontent.com';
 
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     serverClientId: _webClientId,
     scopes: <String>['email'],
   );
-
 
   @override
   void dispose() {
@@ -51,148 +54,214 @@ class _CadastroPageState extends State<CadastroPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: LayoutBuilder(builder: (context, c) {
-          final maxW = c.maxWidth > 520 ? 420.0 : c.maxWidth;
-          return Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: maxW),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(18, 16, 18, 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const CoverCarousel(covers: _covers),
-                    const SizedBox(height: 24),
+        child: LayoutBuilder(
+          builder: (context, c) {
+            final maxW = c.maxWidth > 520 ? 420.0 : c.maxWidth;
+            return Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: maxW),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(18, 16, 18, 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const CoverCarousel(covers: _covers),
+                      const SizedBox(height: 24),
 
-                    const Text('Bem-vindo ao Harmony!',
+                      const Text(
+                        'Bem-vindo ao Harmony!',
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
-                    const SizedBox(height: 6),
-                    Text('Milhões de músicas para ouvir agora.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.grey, fontSize: 13)),
-                    const SizedBox(height: 18),
-                    Text('Cadastre-se para entrar no sistema',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.grey[600], fontSize: 12)),
-                    const SizedBox(height: 14),
-
-                    _input(controller: nomeCtrl, hint: 'Nome Completo', icon: Icons.person_outline),
-                    const SizedBox(height: 10),
-                    _input(controller: emailCtrl, hint: 'Email', icon: Icons.alternate_email),
-                    const SizedBox(height: 10),
-                    _input(
-                      controller: passCtrl,
-                      hint: 'Senha',
-                      icon: Icons.lock_outline,
-                      obscure: obscure,
-                      onToggleObscure: () => setState(() => obscure = !obscure),
-                    ),
-
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: aceitouTermos,
-                          onChanged: (v) => setState(() => aceitouTermos = v ?? false),
-                          visualDensity: VisualDensity.compact,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
                         ),
-                        Expanded(
-                          child: RichText(
-                            text: TextSpan(
-                              style: const TextStyle(fontSize: 12.5, color: Colors.black87),
-                              children: [
-                                const TextSpan(text: 'Ao marcar, você concorda com os '),
-                                TextSpan(
-                                  text: 'Termos',
-                                  style: TextStyle(color: scheme.primary, fontWeight: FontWeight.w600),
-                                  recognizer: TapGestureRecognizer()..onTap = () {/* abrir termos */},
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Milhões de músicas para ouvir agora.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.grey, fontSize: 13),
+                      ),
+                      const SizedBox(height: 18),
+                      Text(
+                        'Cadastre-se para entrar no sistema',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                      ),
+                      const SizedBox(height: 14),
+
+                      _input(
+                        controller: nomeCtrl,
+                        hint: 'Nome Completo',
+                        icon: Icons.person_outline,
+                      ),
+                      const SizedBox(height: 10),
+                      _input(
+                        controller: emailCtrl,
+                        hint: 'Email',
+                        icon: Icons.alternate_email,
+                      ),
+                      const SizedBox(height: 10),
+                      _input(
+                        controller: passCtrl,
+                        hint: 'Senha',
+                        icon: Icons.lock_outline,
+                        obscure: obscure,
+                        onToggleObscure: () =>
+                            setState(() => obscure = !obscure),
+                      ),
+
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: aceitouTermos,
+                            onChanged: (v) =>
+                                setState(() => aceitouTermos = v ?? false),
+                            visualDensity: VisualDensity.compact,
+                          ),
+                          Expanded(
+                            child: RichText(
+                              text: TextSpan(
+                                style: const TextStyle(
+                                  fontSize: 12.5,
+                                  color: Colors.black87,
                                 ),
-                                const TextSpan(text: ' e '),
-                                TextSpan(
-                                  text: 'Condições',
-                                  style: TextStyle(color: scheme.primary, fontWeight: FontWeight.w600),
-                                  recognizer: TapGestureRecognizer()..onTap = () {/* abrir condições */},
-                                ),
-                              ],
+                                children: [
+                                  const TextSpan(
+                                    text: 'Ao marcar, você concorda com os ',
+                                  ),
+                                  TextSpan(
+                                    text: 'Termos',
+                                    style: TextStyle(
+                                      color: scheme.primary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        /* abrir termos */
+                                      },
+                                  ),
+                                  const TextSpan(text: ' e '),
+                                  TextSpan(
+                                    text: 'Condições',
+                                    style: TextStyle(
+                                      color: scheme.primary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        /* abrir condições */
+                                      },
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
 
-                    const SizedBox(height: 10),
-                    SizedBox(
-                      height: 48,
-                      child: FilledButton(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: scheme.primary,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        height: 48,
+                        child: FilledButton(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: scheme.primary,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          onPressed: (!aceitouTermos || _loading)
+                              ? null
+                              : _cadastrar,
+                          child: _loading
+                              ? const SizedBox(
+                                  height: 22,
+                                  width: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Cadastrar',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    SizedBox(width: 6),
+                                    Icon(
+                                      Icons.arrow_right_alt_rounded,
+                                      size: 22,
+                                    ),
+                                  ],
+                                ),
                         ),
-                        onPressed: (!aceitouTermos || _loading) ? null : _cadastrar,
-                        child: _loading
-                            ? const SizedBox(height: 22, width: 22,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                            : const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                      ),
+
+                      const SizedBox(height: 16),
+                      OutlinedButton(
+                        onPressed: _loading ? null : _cadastrarComGoogle,
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          side: BorderSide(color: Colors.grey.shade300),
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.black87,
+                        ),
+                        child: Stack(
+                          alignment: Alignment.center,
                           children: [
-                            Text('Cadastrar', style: TextStyle(fontWeight: FontWeight.w700)),
-                            SizedBox(width: 6),
-                            Icon(Icons.arrow_right_alt_rounded, size: 22),
+                            const Text('Continue with Google'),
+                            const Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding: EdgeInsets.only(left: 16),
+                                child: SvgIcon(
+                                  assetName: 'assets/icons/google.svg',
+                                  size: 20,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
-                    ),
 
-                    const SizedBox(height: 16),
-                  OutlinedButton(
-                    onPressed: _loading ? null : _cadastrarComGoogle,
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      side: BorderSide(color: Colors.grey.shade300),
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.black87,
-                    ),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        const Text('Continue with Google'),
-                        const Align(
-                          alignment: Alignment.centerLeft,
-                          child: Padding(
-                            padding: EdgeInsets.only(left: 16),
-                            child: SvgIcon(assetName: 'assets/icons/google.svg', size: 20),
+                      const SizedBox(height: 18),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Já possui conta?',
+                            style: TextStyle(color: Colors.grey[700]),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 18),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('Já possui conta?', style: TextStyle(color: Colors.grey[700])),
-                        const SizedBox(width: 6),
-                        GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: Text('Faça Login',
+                          const SizedBox(width: 6),
+                          GestureDetector(
+                            onTap: () => Navigator.pop(context),
+                            child: Text(
+                              'Faça Login',
                               style: TextStyle(
                                 color: scheme.primary,
                                 fontWeight: FontWeight.w700,
                                 decoration: TextDecoration.underline,
-                              )),
-                        ),
-                      ],
-                    ),
-                  ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
-        }),
+            );
+          },
+        ),
       ),
     );
   }
@@ -210,7 +279,6 @@ class _CadastroPageState extends State<CadastroPage> {
     Navigator.pushReplacementNamed(context, '/home');
   }
 
-
   Future<void> _exchangeGoogleIdToken(String googleIdToken) async {
     if (googleIdToken.isEmpty) throw Exception('Google ID Token vazio.');
     final res = await ApiClient().dio.post(
@@ -227,13 +295,13 @@ class _CadastroPageState extends State<CadastroPage> {
     await saveToken(jwt);
   }
 
-
   Future<void> _cadastrar() async {
-    final username = nomeCtrl.text.trim();
-    final email    = emailCtrl.text.trim();
+    final UserViewModel userViewModel = context.read<UserViewModel>();
+    final fullName = nomeCtrl.text.trim();
+    final email = emailCtrl.text.trim();
     final password = passCtrl.text;
 
-    if (username.isEmpty || email.isEmpty || password.isEmpty) {
+    if (fullName.isEmpty || email.isEmpty || password.isEmpty) {
       _toast('Preencha todos os campos.');
       return;
     }
@@ -246,7 +314,7 @@ class _CadastroPageState extends State<CadastroPage> {
     try {
       final res = await ApiClient().dio.post(
         '/auth/register',
-        data: {'username': username, 'email': email, 'password': password},
+        data: {'fullName': fullName, 'email': email, 'password': password},
         options: Options(
           headers: {'Content-Type': 'application/json'},
           extra: {'auth': false},
@@ -258,13 +326,25 @@ class _CadastroPageState extends State<CadastroPage> {
       if (jwt.isEmpty) throw Exception('Backend não retornou o campo "token".');
 
       await saveToken(jwt);
+
+      var userData = await getTokenData(jwt);
+      final UsuarioData user = UsuarioData(
+        id: userData['id'],
+        fullName: userData['fullName'],
+        username: userData['username'],
+        email: userData['email'],
+        role: userData['role'],
+      );
+      userViewModel.setLoggedUser(user);
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushNamedAndRemoveUntil(context, '/home', (_) => false);
     } on DioException catch (e) {
       if (e.response?.statusCode == 409) {
         _toast('Este e-mail já está em uso.');
       } else {
-        _toast('Falha ao cadastrar (${e.type}) ${e.response?.statusCode ?? ''}');
+        _toast(
+          'Falha ao cadastrar (${e.type}) ${e.response?.statusCode ?? ''}',
+        );
       }
     } catch (_) {
       _toast('Não foi possível criar sua conta. Tente novamente.');
@@ -273,12 +353,13 @@ class _CadastroPageState extends State<CadastroPage> {
     }
   }
 
-
   Future<void> _cadastrarComGoogle() async {
     setState(() => _loading = true);
     try {
       if (kIsWeb) {
-        final cred = await FirebaseAuth.instance.signInWithPopup(GoogleAuthProvider());
+        final cred = await FirebaseAuth.instance.signInWithPopup(
+          GoogleAuthProvider(),
+        );
         if (cred.user == null) throw Exception('Cadastro cancelado.');
 
         final oauthCred = cred.credential as OAuthCredential?;
@@ -319,7 +400,6 @@ class _CadastroPageState extends State<CadastroPage> {
     }
   }
 
-
   void _toast(String msg) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
@@ -357,9 +437,12 @@ Widget _input({
       prefixIcon: Icon(icon, size: 20),
       suffixIcon: onToggleObscure != null
           ? IconButton(
-        icon: Icon(obscure ? Icons.visibility_off : Icons.visibility, size: 18),
-        onPressed: onToggleObscure,
-      )
+              icon: Icon(
+                obscure ? Icons.visibility_off : Icons.visibility,
+                size: 18,
+              ),
+              onPressed: onToggleObscure,
+            )
           : null,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),

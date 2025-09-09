@@ -12,7 +12,8 @@ class PlayerViewModel extends ChangeNotifier {
   bool _isPlaying = false;
 
   final Queue<SongData> _previousStack = Queue<SongData>();
-  final Queue<SongData> _queue = Queue<SongData>();
+  Queue<SongData> _queue = Queue<SongData>();
+  Queue<SongData> get songsQueue => _queue;
 
   Duration? _position;
   Duration? _duration;
@@ -172,6 +173,43 @@ class PlayerViewModel extends ChangeNotifier {
   bool hasPreviousSong() {
     return _previousStack.isNotEmpty;
   }
+
+  void clearQueue() {
+    _queue.clear();
+    _previousStack.clear();
+
+    notifyListeners();
+  }
+
+  void reorderQueue(int oldIndex, int newIndex) {
+    if (newIndex > oldIndex) newIndex -= 1;
+
+    SongData temp = _queue.elementAt(oldIndex);
+    List<SongData> tempList = _queue.toList();
+    tempList.removeAt(oldIndex);
+    tempList.insert(newIndex, temp);
+    _queue = ListQueue.of(tempList);
+    notifyListeners();
+  }
+
+  // void setQueueAtIndex(int index) {
+  //   _player.stop();
+  //   _position = Duration.zero;
+  //   _duration = Duration.zero;
+  //
+  //   _previousStack.addFirst(_current!);
+  //
+  //   for (int i = 0; i < _queue.length; i++) {
+  //     if (index == i) {
+  //       SongData tempSong = _queue.removeFirst();
+  //       _setCurrentSong(tempSong);
+  //     }
+  //
+  //     SongData tempSong = _queue.removeFirst();
+  //     _previousStack.addFirst(tempSong);
+  //   }
+  //   notifyListeners();
+  // }
 
   @override
   void dispose() {

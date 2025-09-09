@@ -2,8 +2,13 @@ package ufape.dam.harmony.business.service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
 import ufape.dam.harmony.business.dto.res.SongResponseDTO;
 import ufape.dam.harmony.data.SongRepository;
 
@@ -20,13 +25,17 @@ public class SongService {
     }
 
     public List<SongResponseDTO> searchSongs(String q) {
-        return songRepository.findByTitleContainingIgnoreCase(q).stream()
+    	PageRequest limit = PageRequest.of(0, 50);
+    	
+        return songRepository.findByTitleContainingIgnoreCase(q, limit).stream()
                 .map(SongResponseDTO::fromEntity)
                 .collect(Collectors.toList());
     }
 
     public List<SongResponseDTO> findAlbumSongs(Long albumId) {
-        return songRepository.findAllByAlbumId(albumId).stream()
+        Pageable limit = PageRequest.of(0, 10, Sort.by("title").ascending());
+        
+        return songRepository.findAllByAlbumId(albumId, limit).stream()
                 .map(SongResponseDTO::fromEntity)
                 .collect(Collectors.toList());
     }

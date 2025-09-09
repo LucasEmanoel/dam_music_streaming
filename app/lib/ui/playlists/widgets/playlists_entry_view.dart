@@ -9,8 +9,7 @@ import "package:provider/provider.dart";
 import "../../core/ui/image_edit.dart";
 import "../view_model/playlist_view_model.dart";
 
-class PlaylistEntryView extends StatelessWidget{
-
+class PlaylistEntryView extends StatelessWidget {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -19,7 +18,6 @@ class PlaylistEntryView extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-
     final theme = Theme.of(context);
 
     return Consumer<PlaylistViewModel>(
@@ -36,14 +34,10 @@ class PlaylistEntryView extends StatelessWidget{
             appBar: AppBar(),
             body: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                CustomLoadingIndicator(),
-                Text('Salvando...'),
-              ],
+              children: const [CustomLoadingIndicator(), Text('Salvando...')],
             ),
           );
         }
-
 
         return Scaffold(
           appBar: AppBar(
@@ -68,7 +62,7 @@ class PlaylistEntryView extends StatelessWidget{
                   borderRadius: BorderRadius.circular(30),
                 ),
               ),
-            
+
               onPressed: vm.isLoading ? null : () => _save(context, vm),
               child: vm.isLoading
                   ? SizedBox(
@@ -77,13 +71,13 @@ class PlaylistEntryView extends StatelessWidget{
                       child: CustomLoadingIndicator(),
                     )
                   : const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text("Criar playlist"),
-                  SizedBox(width: 8),
-                  Icon(Icons.arrow_forward_ios_outlined, size: 25,),
-                ],
-              ),
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text("Criar playlist"),
+                        SizedBox(width: 8),
+                        Icon(Icons.arrow_forward_ios_outlined, size: 25),
+                      ],
+                    ),
             ),
           ),
           body: Form(
@@ -91,7 +85,6 @@ class PlaylistEntryView extends StatelessWidget{
             child: LayoutBuilder(
               builder: (context, constraints) {
                 return SingleChildScrollView(
-
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
                       minHeight: constraints.maxHeight,
@@ -124,14 +117,14 @@ class PlaylistEntryView extends StatelessWidget{
                             controller: _descController,
                             hintText: 'Descrição',
                             iconData: Icons.description,
-                            onChanged: (v) => vm.entityBeingEdited?.description = v,
+                            onChanged: (v) =>
+                                vm.entityBeingEdited?.description = v,
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
                                 return 'A descrição é obrigatória.';
                               }
                               return null;
                             },
-
                           ),
                         ],
                       ),
@@ -146,7 +139,10 @@ class PlaylistEntryView extends StatelessWidget{
     );
   }
 
-  Future<void> _selectCoverPlaylist(BuildContext context, PlaylistViewModel vm) async {
+  Future<void> _selectCoverPlaylist(
+    BuildContext context,
+    PlaylistViewModel vm,
+  ) async {
     await showDialog(
       context: context,
       builder: (ctx) {
@@ -157,7 +153,10 @@ class PlaylistEntryView extends StatelessWidget{
                 GestureDetector(
                   child: Text("Take a picture"),
                   onTap: () async {
-                    final image = await ImagePicker().pickImage(source: ImageSource.camera, imageQuality: 80);
+                    final image = await ImagePicker().pickImage(
+                      source: ImageSource.camera,
+                      imageQuality: 80,
+                    );
                     if (image != null) {
                       final file = File(image.path);
                       vm.setPickedImage(file);
@@ -169,7 +168,9 @@ class PlaylistEntryView extends StatelessWidget{
                 GestureDetector(
                   child: Text("Select From Gallery"),
                   onTap: () async {
-                    final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+                    final image = await ImagePicker().pickImage(
+                      source: ImageSource.gallery,
+                    );
                     if (image != null) {
                       final file = File(image.path);
                       vm.setPickedImage(file);
@@ -187,7 +188,9 @@ class PlaylistEntryView extends StatelessWidget{
 
   void _save(BuildContext context, PlaylistViewModel vm) async {
     final bool hasLocalImage = vm.pickedImageFile != null;
-    final bool hasNetworkImage = vm.entityBeingEdited?.urlCover != null && vm.entityBeingEdited!.urlCover!.isNotEmpty;
+    final bool hasNetworkImage =
+        vm.entityBeingEdited?.urlCover != null &&
+        vm.entityBeingEdited!.urlCover!.isNotEmpty;
 
     if (!hasLocalImage && !hasNetworkImage) {
       showCustomSnackBar(
@@ -196,13 +199,13 @@ class PlaylistEntryView extends StatelessWidget{
         backgroundColor: Colors.red,
         icon: Icons.error,
       );
-      return; 
+      return;
     }
 
     if (!_formKey.currentState!.validate()) return;
 
     _formKey.currentState!.save();
-    
+
     await vm.savePlaylist();
 
     _nameController.clear();
@@ -215,4 +218,5 @@ class PlaylistEntryView extends StatelessWidget{
       icon: Icons.check,
     );
   }
+  
 }

@@ -5,7 +5,6 @@ import 'package:dam_music_streaming/ui/core/player/view_model/player_view_model.
 import 'package:dam_music_streaming/ui/core/ui/custom_snack.dart';
 import 'package:dam_music_streaming/ui/core/ui/info_tile.dart';
 import 'package:dam_music_streaming/ui/core/ui/loading.dart';
-import 'package:dam_music_streaming/ui/playlists/widgets/playlist_add_song.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -413,6 +412,11 @@ class PlaylistSongs extends StatelessWidget {
                 icon: 'Playlist',
                 text: 'Adicionar a outra playlist',
                 onTap: () {
+                  Navigator.pop(context);
+                  if (song.id != null) {
+                    vm.setSongToInsert(song.id!);
+                    vm.setStackIndex(3);
+                  }
                 },
               ),
               ButtonCustomSheet(

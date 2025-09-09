@@ -14,18 +14,27 @@ class PlaylistViewModel extends ChangeNotifier {
   bool _isOwner = false;
   bool get isOwner => _isOwner;
 
+  List<PlaylistData> selectedPlaylistIds = [];
+  int songToInsertId = -1;
+
   final UserViewModel _userViewModel;
-  
+  UserViewModel get userViewModel => _userViewModel;
+
   final StorageService storageService = StorageService();
   final PlaylistRepository repository = PlaylistRepository();
 
   int _stackIndex = 0;
+  int get stackIndex => _stackIndex;
 
-  List<PlaylistData> _playlists = [];
   PlaylistData? entityBeingVisualized;
   PlaylistData? entityBeingEdited;
+
+  List<PlaylistData> _playlists = [];
+  List<PlaylistData> get playlists => _playlists;
+
   File? _pickedImageFile;
-  
+  File? get pickedImageFile => _pickedImageFile;
+
   PlaylistViewModel(this._userViewModel) {
     loadPlaylists();
   }
@@ -143,10 +152,6 @@ class PlaylistViewModel extends ChangeNotifier {
     }
   }
 
-  int get stackIndex => _stackIndex;
-  List<PlaylistData> get playlists => _playlists;
-  File? get pickedImageFile => _pickedImageFile;
-
   void setStackIndex(int index) {
     _stackIndex = index;
     if (index == 0) {
@@ -194,5 +199,37 @@ class PlaylistViewModel extends ChangeNotifier {
     entityBeingVisualized = playlist;
     _checkOwnership();
     notifyListeners();
+  }
+
+  // ### INSERINDO EM PLAYLISTS ###
+
+  void togglePlaylistSelection(PlaylistData p) {
+    if (selectedPlaylistIds.contains(p)) {
+      selectedPlaylistIds.remove(p);
+    } else {
+      selectedPlaylistIds.add(p);
+    }
+    notifyListeners();
+  }
+
+  void clearPlaylistSelections() {
+    selectedPlaylistIds.clear();
+  }
+
+  Future<void> addSongToSelectedPlaylists({required int songId}) async {
+    if (selectedPlaylistIds.isEmpty) return;
+
+    final songToAdd = SongData(id: songId);
+
+    for (var playlist in selectedPlaylistIds) {
+      await addSongsToCurrentPlaylist(playlist.id!, {songToAdd});
+    }
+
+    clearPlaylistSelections();
+    notifyListeners();
+  }
+
+  void setSongToInsert(int songId) {
+    songToInsertId = songId;
   }
 }

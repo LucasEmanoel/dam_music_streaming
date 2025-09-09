@@ -48,8 +48,9 @@ public class GenreService {
         PageRequest top10 = PageRequest.of(0, 10);
         
         List<Artist> topArtists = artistRepository.findTopArtistsBySongCountInGenre(id, top10);
-        List<Album> recentAlbums = albumRepository.findTop10ByGenreIdOrderByReleasedDateDesc(id);
-        List<Song> topSongs = songRepository.findAllByArtistId(id); //TODO: Otimizar com paginacao
+        List<Album> recentAlbums = albumRepository.findTop10ByGenreIdOrderByReleasedDateDesc(id, top10);
+        
+        List<Song> topSongs = songRepository.findAllByArtistId(id, top10); //TODO: Otimizar com paginacao
 
         GenreResponseDTO response = GenreResponseDTO.fromEntity(genre, recentAlbums, topSongs, topArtists);
 

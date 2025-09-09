@@ -1,15 +1,51 @@
 services:
+  backend-harmony:
+    build: . 
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - harmony-network 
+    depends_on:
+      db-harmony:
+        condition: service_healthy 
+
   db-harmony:
     image: postgres
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 1234 
-      POSTGRES_DB: harmony
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
-      interval: 20s
-      timeout: 20s
-      retries: 10
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 15s
+      retries: 20
     ports:
-      - 5454:5432
+      - "5454:5432"
+    volumes:
+      - db-harmony-data:/var/lib/postgresql/data
+    networks:
+      - harmony-network
+
+
+  cloudflared:
+    image: cloudflare/cloudflared
+    restart: unless-stopped
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARED_TOKEN}
+    command: tunnel --no-autoupdate run
+    depends_on:
+      - backend-harmony 
+    networks:
+      - harmony-network
+
+volumes:
+  db-harmony-data: {}
+
+networks:
+  harmony-network: {}

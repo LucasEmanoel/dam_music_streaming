@@ -35,6 +35,7 @@ public class UsuarioController {
 	@PatchMapping("/{userId}")
     public ResponseEntity updateUser(@PathVariable long userId, @RequestBody UpdateUserRequestDTO request) {
 		try {
+			
 			UserResponseDTO userResponse = userService.updateUserProfile(userId, request.getFullName(), request.getUsername(), request.getProfilePictureUrl() );
 
 			return ResponseEntity.status(HttpStatus.OK).body(userResponse);

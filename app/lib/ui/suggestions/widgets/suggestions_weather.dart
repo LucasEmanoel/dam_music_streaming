@@ -10,6 +10,7 @@ import 'package:dam_music_streaming/ui/core/ui/custom_snack.dart';
 import 'package:dam_music_streaming/ui/core/ui/info_tile.dart';
 import 'package:dam_music_streaming/ui/core/ui/loading.dart';
 import 'package:dam_music_streaming/ui/core/user/view_model/user_view_model.dart';
+import 'package:dam_music_streaming/ui/player/widgets/player_view.dart';
 import 'package:dam_music_streaming/ui/playlists/view_model/playlist_view_model.dart';
 import 'package:dam_music_streaming/ui/playlists/widgets/playlist_add_song.dart';
 import 'package:dam_music_streaming/ui/playlists/widgets/playlist_songs.dart';
@@ -376,14 +377,13 @@ class WeatherSuggestionsView extends StatelessWidget {
                 subtitle: playlist.description ?? '',
               ),
               SizedBox(height: 20),
-              ButtonCustomSheet(
+              /*ButtonCustomSheet(
                 icon: 'Profile',
                 text: 'Ver Author',
                 onTap: () {
-                  if (playlist.author != null && playlist.author!.id != null) {
-                  }
+                  if (playlist.author != null && playlist.author!.id != null) {}
                 },
-              ),
+              ),*/
               ButtonCustomSheet(
                 icon: 'Music',
                 text: 'Ver Musicas',
@@ -394,7 +394,8 @@ class WeatherSuggestionsView extends StatelessWidget {
                       MaterialPageRoute(
                         builder: (_) => ChangeNotifierProvider(
                           create: (_) {
-                            final UserViewModel userViewModel = context.read<UserViewModel>();
+                            final UserViewModel userViewModel = context
+                                .read<UserViewModel>();
                             final vm = PlaylistViewModel(userViewModel);
                             vm.entityBeingVisualized = playlist;
                             vm.startView(id: playlist.id!);
@@ -424,6 +425,10 @@ class WeatherSuggestionsView extends StatelessWidget {
 
                     vm.addListToQueue(list: playlist.songs!);
                     vm.play(playlist.songs![0]);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => PlayerView()),
+                    );
                   } else {
                     showCustomSnackBar(
                       // acho que nunca vai acontecer
@@ -464,7 +469,18 @@ class WeatherSuggestionsView extends StatelessWidget {
               ButtonCustomSheet(
                 icon: 'Song',
                 text: 'Tocar agora',
-                onTap: () {
+                onTap: () async {
+                  final vm = Provider.of<PlayerViewModel>(
+                    context,
+                    listen: false,
+                  );
+                  vm.playOneSong(song);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => PlayerView()),
+                  );
+                },
+                /*onTap: () {
                   if (song != null) {
                     final vm = Provider.of<PlayerViewModel>(
                       context,
@@ -473,7 +489,7 @@ class WeatherSuggestionsView extends StatelessWidget {
                     vm.playOneSong(song);
                     Navigator.pop(context);
                   }
-                },
+                },*/
               ),
               ButtonCustomSheet(
                 icon: 'Profile',

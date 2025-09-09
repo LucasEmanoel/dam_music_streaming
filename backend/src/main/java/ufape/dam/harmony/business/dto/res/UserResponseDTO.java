@@ -10,7 +10,7 @@ public class UserResponseDTO {
     private String username;
     private String email;
     private String role;
-    private String profilePicUrl;
+    private String profilePictureUrl;
 
     public static UserResponseDTO fromEntity(Usuario entity) {
         if (entity == null) return null;
@@ -20,7 +20,7 @@ public class UserResponseDTO {
         dto.setUsername(entity.getUsername());
         dto.setEmail(entity.getEmail());
         dto.setRole(entity.getRole());
-        dto.setProfilePicUrl(entity.getProfilePicUrl());
+        dto.setProfilePictureUrl(entity.getProfilePicUrl());
         return dto;
     }
 }

@@ -1,4 +1,5 @@
 import "dart:io";
+import "package:dam_music_streaming/ui/core/user/view_model/user_view_model.dart";
 import "package:dam_music_streaming/ui/playlists/widgets/playlist_songs.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
@@ -14,11 +15,14 @@ class PlaylistsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final userViewModel = Provider.of<UserViewModel>(context, listen: false);
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<PlaylistViewModel>(
           create: (context) {
-            final vm = PlaylistViewModel(_docsDir);
+            final vm = PlaylistViewModel(_docsDir, userViewModel);
             vm.loadPlaylists();
             return vm;
           },

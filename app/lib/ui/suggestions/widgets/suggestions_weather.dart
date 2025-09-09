@@ -8,6 +8,7 @@ import 'package:dam_music_streaming/ui/core/ui/button_sheet.dart';
 import 'package:dam_music_streaming/ui/core/ui/custom_snack.dart';
 import 'package:dam_music_streaming/ui/core/ui/info_tile.dart';
 import 'package:dam_music_streaming/ui/core/ui/loading.dart';
+import 'package:dam_music_streaming/ui/core/user/view_model/user_view_model.dart';
 import 'package:dam_music_streaming/ui/playlists/view_model/playlist_view_model.dart';
 import 'package:dam_music_streaming/ui/playlists/widgets/playlist_songs.dart';
 import 'package:dam_music_streaming/ui/profile/widgets/profile_show_view.dart';
@@ -36,7 +37,7 @@ class WeatherSuggestionsView extends StatelessWidget {
             return Scaffold(
               appBar: AppBar(
                 leading: Container(),
-                backgroundColor: Colors.transparent
+                backgroundColor: Colors.transparent,
               ),
               body: const Center(child: CustomLoadingIndicator()),
             );
@@ -78,17 +79,41 @@ class WeatherSuggestionsView extends StatelessWidget {
 
     switch (vm.currentWeather) {
       case 'CLEAR':
-        return _buildWeatherHeader('assets/animations/foggy.json', 'Dia ensolarado', 'Aproveite o sol com essas playlists!');
+        return _buildWeatherHeader(
+          'assets/animations/foggy.json',
+          'Dia ensolarado',
+          'Aproveite o sol com essas playlists!',
+        );
       case 'CLOUDS':
-        return _buildWeatherHeader('assets/animations/windy.json', 'Dia nublado', 'Um dia perfeito para relaxar com música.');
+        return _buildWeatherHeader(
+          'assets/animations/windy.json',
+          'Dia nublado',
+          'Um dia perfeito para relaxar com música.',
+        );
       case 'SNOW':
-        return _buildWeatherHeader('assets/animations/snow.json', 'Dia de neve', 'Aqueça-se com essas músicas aconchegantes.');
+        return _buildWeatherHeader(
+          'assets/animations/snow.json',
+          'Dia de neve',
+          'Aqueça-se com essas músicas aconchegantes.',
+        );
       case 'RAIN':
-        return _buildWeatherHeader('assets/animations/rain.json', 'Dia de chuva', 'Perfeito para ouvir músicas calmas.');
+        return _buildWeatherHeader(
+          'assets/animations/rain.json',
+          'Dia de chuva',
+          'Perfeito para ouvir músicas calmas.',
+        );
       case 'DRIZZLE':
-        return _buildWeatherHeader('assets/animations/rain.json', 'Dia de garoa', 'Uma trilha sonora suave para um dia tranquilo.');
+        return _buildWeatherHeader(
+          'assets/animations/rain.json',
+          'Dia de garoa',
+          'Uma trilha sonora suave para um dia tranquilo.',
+        );
       case 'THUNDERSTORM':
-        return _buildWeatherHeader('assets/animations/storm.json', 'Dia de tempestade', 'Aproveite a intensidade com essas músicas.');
+        return _buildWeatherHeader(
+          'assets/animations/storm.json',
+          'Dia de tempestade',
+          'Aproveite a intensidade com essas músicas.',
+        );
       default:
         return Container();
     }
@@ -129,7 +154,11 @@ class WeatherSuggestionsView extends StatelessWidget {
     );
   }
 
-  Widget _buildWeatherHeader(String animationFile, String title, String subtitle) {
+  Widget _buildWeatherHeader(
+    String animationFile,
+    String title,
+    String subtitle,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Column(
@@ -166,7 +195,6 @@ class WeatherSuggestionsView extends StatelessWidget {
   }
 
   Widget _buildPlaylists(BuildContext context, List<PlaylistData> playlists) {
-
     if (playlists.isEmpty) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -250,7 +278,6 @@ class WeatherSuggestionsView extends StatelessWidget {
   }
 
   Widget _buildSongs(BuildContext context, List<SongData> songs) {
-
     if (songs.isEmpty) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -329,17 +356,13 @@ class WeatherSuggestionsView extends StatelessWidget {
   }
 
   void _showPlaylistActions(BuildContext context, PlaylistData playlist) {
-    
-    
-
     showModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (BuildContext context) {
-        //final playlistViewModel = context.read<PlaylistViewModel>();
-        
+
         return Padding(
           padding: EdgeInsets.all(20.0),
           child: Column(
@@ -356,15 +379,15 @@ class WeatherSuggestionsView extends StatelessWidget {
                 icon: 'Profile',
                 text: 'Ver Author',
                 onTap: () => {},
-                /* // chamar tela de visualizar perfil
-                onTap: () {
+                /*onTap: () {
                   Navigator.pop(context);
                   if (playlist.author != null) {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) =>
-                            //ProfileShowView(artistId: playlist.author!.id ?? -1),
+                            //ProfileShowView(),
+                      
                       ),
                     );
                   }
@@ -374,21 +397,11 @@ class WeatherSuggestionsView extends StatelessWidget {
                 icon: 'Music',
                 text: 'Ver Musicas',
                 onTap: () {
-                  if (playlist.id != null) {
-                    //playlistViewModel.entityBeingVisualized = playlist;
-                    
-                    //Navigator.push(
-                    //  context,
-                    //  MaterialPageRoute(
-                    //    builder: (context) => const PlaylistSongs(),
-                    //  ),
-                    //);
-                  }
+                  if (playlist.id != null) {}
                 },
               ),
               ButtonCustomSheet(
                 icon: 'Fila',
-                iconColor: Colors.green,
                 text: 'Adicionar a fila de reprodução',
                 onTap: () {
                   for (var song in playlist.songs ?? []) {
@@ -404,13 +417,13 @@ class WeatherSuggestionsView extends StatelessWidget {
                     vm.addListToQueue(list: playlist.songs!);
                     vm.play(playlist.songs![0]);
                   } else {
-                    showCustomSnackBar( // acho que nunca vai acontecer
+                    showCustomSnackBar(
+                      // acho que nunca vai acontecer
                       context: context,
                       message: 'A playlist está vazia.',
                       backgroundColor: Colors.red,
                       icon: Icons.error,
                     );
-
                   }
                 },
               ),
@@ -443,7 +456,6 @@ class WeatherSuggestionsView extends StatelessWidget {
 
               ButtonCustomSheet(
                 icon: 'Song',
-                iconColor: Colors.green,
                 text: 'Tocar agora',
                 onTap: () {
                   if (song != null) {
@@ -458,7 +470,7 @@ class WeatherSuggestionsView extends StatelessWidget {
               ),
               ButtonCustomSheet(
                 icon: 'Profile',
-                text: 'Ver Author', // chamar tela de visualizar perfil
+                text: 'Ver Artista', // chamar tela de visualizar perfil
                 onTap: () {
                   Navigator.pop(context);
                   if (song.artist != null) {
@@ -490,9 +502,17 @@ class WeatherSuggestionsView extends StatelessWidget {
               ),
               ButtonCustomSheet(
                 icon: 'Fila',
-                iconColor: Colors.green,
                 text: 'Adicionar a fila de reprodução',
-                onTap: () {},
+                onTap: () {
+                  Navigator.pop(context);
+                  if (song != null) {
+                    final vm = Provider.of<PlayerViewModel>(
+                      context,
+                      listen: false,
+                    );
+                    vm.addSongToQueue(song);
+                  }
+                },
               ),
             ],
           ),

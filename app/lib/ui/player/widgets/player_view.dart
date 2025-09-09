@@ -8,6 +8,7 @@ import 'package:dam_music_streaming/ui/core/player/view_model/player_view_model.
 import 'package:dam_music_streaming/ui/core/ui/button_sheet.dart';
 import 'package:dam_music_streaming/ui/core/ui/custom_snack.dart';
 import 'package:dam_music_streaming/ui/core/ui/info_tile.dart';
+import 'package:dam_music_streaming/ui/core/ui/loading.dart';
 import 'package:dam_music_streaming/ui/genre/widgets/genre_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -155,8 +156,7 @@ class PlayerView extends StatelessWidget {
                         ],
                       ),
                     ),
-                    placeholder: (context, url) =>
-                        new CircularProgressIndicator(),
+                    placeholder: (context, url) => new CustomLoadingIndicator(),
                     errorWidget: (context, url, error) => new Icon(Icons.error),
                   ),
                   Column(
@@ -377,7 +377,7 @@ class PlayerView extends StatelessWidget {
                     context: context,
                     barrierDismissible: false,
                     builder: (_) =>
-                        const Center(child: CircularProgressIndicator()),
+                        const Center(child: CustomLoadingIndicator()),
                   );
 
                   try {

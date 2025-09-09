@@ -288,7 +288,7 @@ void _showSongActions(BuildContext context, AlbumViewModel vm, SongData song) {
                   context: context,
                   barrierDismissible: false,
                   builder: (_) =>
-                      const Center(child: CircularProgressIndicator()),
+                      const Center(child: CustomLoadingIndicator()),
                 );
 
                 try {

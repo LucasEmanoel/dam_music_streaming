@@ -63,33 +63,35 @@ class PlaylistSongs extends StatelessWidget {
     return SliverAppBar.large(
       expandedHeight: 200.0,
       pinned: true,
+      floating: true,
       elevation: 0,
       leading: IconButton(
         icon: Icon(Icons.arrow_back, color: theme.iconTheme.color, size: 25),
         onPressed: () => vm.setStackIndex(0),
       ),
       actions: [
-        IconButton(
-          icon: Icon(Icons.add, color: theme.iconTheme.color, size: 25),
-          onPressed: () async {
-            if (playlist.id == null) {
-              showCustomSnackBar(
-                context: context,
-                message: "Erro: ID da playlist é nulo.",
-                backgroundColor: Colors.red,
-                icon: Icons.error,
+        if (vm.isOwner)
+          IconButton(
+            icon: Icon(Icons.add, color: theme.iconTheme.color, size: 25),
+            onPressed: () async {
+              if (playlist.id == null) {
+                showCustomSnackBar(
+                  context: context,
+                  message: "Erro: ID da playlist é nulo.",
+                  backgroundColor: Colors.red,
+                  icon: Icons.error,
+                );
+                return;
+              }
+
+              final searchVM = Provider.of<SearchViewModel>(
+                context,
+                listen: false,
               );
-              return;
-            }
 
-            final searchVM = Provider.of<SearchViewModel>(
-              context,
-              listen: false,
-            );
-
-            await handleSearch(context, searchVM, playlist.id!, vm);
-          },
-        ),
+              await handleSearch(context, searchVM, playlist.id!, vm);
+            },
+          ),
       ],
       flexibleSpace: FlexibleSpaceBar(
         background: Stack(
@@ -367,7 +369,7 @@ class PlaylistSongs extends StatelessWidget {
                     context: context,
                     barrierDismissible: false,
                     builder: (_) =>
-                        const Center(child: CircularProgressIndicator()),
+                        const Center(child: CustomLoadingIndicator()),
                   );
 
                   try {
@@ -410,7 +412,6 @@ class PlaylistSongs extends StatelessWidget {
               ),
               ButtonCustomSheet(
                 icon: 'Fila',
-                iconColor: Colors.green,
                 text: 'Adicionar à fila de reprodução',
                 onTap: () {
                   Navigator.pop(context);
@@ -422,8 +423,24 @@ class PlaylistSongs extends StatelessWidget {
                 text: 'Remover desta playlist',
                 onTap: () {
                   if (currentPlaylist.id != null && song.id != null) {
-                    print('remover');
-                    vm.removeSongFromPlaylist(currentPlaylist.id!, song.id!);
+                    vm
+                        .removeSongFromPlaylist(currentPlaylist.id!, song.id!)
+                        .then((_) {
+                          showCustomSnackBar(
+                            context: context,
+                            message: 'Música removida da playlist.',
+                            backgroundColor: Colors.green,
+                            icon: Icons.check,
+                          );
+                        })
+                        .catchError((error) {
+                          showCustomSnackBar(
+                            context: context,
+                            message: 'Erro ao remover música: $error',
+                            backgroundColor: Colors.red,
+                            icon: Icons.error,
+                          );
+                        });
                   }
 
                   Navigator.pop(context);
@@ -545,13 +562,24 @@ class CustomSearchDelegate extends SearchDelegate<Set<SongData>> {
                 );
               },
             ),
-            floatingActionButton: FloatingActionButton.extended(
-              onPressed: () {
-                close(context, viewModel.selectedSongs);
-              },
-              icon: Icon(Icons.check, color: Colors.white),
-              label: Text('Salvar', style: TextStyle(color: Colors.white)),
-            ),
+
+            floatingActionButton: searchVM.selectedSongs.isNotEmpty
+                ? FloatingActionButton.extended(
+                    onPressed: () {
+                      if (searchVM.selectedSongs.isEmpty) {
+                        null;
+                      } else {
+                        close(context, searchVM.selectedSongs);
+                      }
+                    },
+                    icon: Icon(Icons.check, color: Colors.white),
+                    label: Text(
+                      'Salvar',
+                      style: TextStyle(color: Colors.white),
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                : null,
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerFloat,
           );

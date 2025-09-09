@@ -245,7 +245,7 @@ class _SearchPageState extends State<SearchPage> {
                       context: context,
                       barrierDismissible: false,
                       builder: (_) =>
-                          const Center(child: CircularProgressIndicator()),
+                          const Center(child: CustomLoadingIndicator()),
                     );
 
                     try {

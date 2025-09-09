@@ -1,4 +1,5 @@
 import 'package:dam_music_streaming/ui/core/ui/loading.dart';
+import 'package:dam_music_streaming/ui/player/widgets/player_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -35,7 +36,6 @@ List<SongDto> _capByArtist(List<SongDto> songs, {int perArtist = 5}) {
   return out;
 }
 
-
 class _HomeFeedState extends State<HomeFeed> {
   final _api = PlaylistApiService();
 
@@ -67,6 +67,8 @@ class _HomeFeedState extends State<HomeFeed> {
 
   @override
   Widget build(BuildContext context) {
+    final PlayerViewModel playerVm = context.watch<PlayerViewModel>();
+
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
       child: Column(
@@ -168,8 +170,15 @@ class _HomeFeedState extends State<HomeFeed> {
                   final s = visible[i];
                   return _SongCard(
                     song: s,
-                    onTap: () =>
-                        context.read<PlayerViewModel>().play(_toSongData(s)),
+                    onTap: () {
+                      print("MUSICA ${s.title}");
+                      playerVm.playOneSong(SongData.fromDto(s));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => PlayerView()),
+                      );
+                      // context.read<PlayerViewModel>().play(_toSongData(s))
+                    },
                   );
                 },
               );

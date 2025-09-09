@@ -88,8 +88,7 @@ class PlayerShowView extends StatelessWidget {
                         ],
                       ),
                     ),
-                    placeholder: (context, url) =>
-                        new CustomLoadingIndicator(),
+                    placeholder: (context, url) => new CustomLoadingIndicator(),
                     errorWidget: (context, url, error) => Container(
                       width: 250,
                       height: 250,

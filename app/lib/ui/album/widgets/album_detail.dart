@@ -223,7 +223,7 @@ class AlbumDetailView extends StatelessWidget {
                           subtitle: song.artist?.name ?? 'Artista Desconhecido',
                           trailing: GestureDetector(
                             onTap: () async {
-                              _showSongActions(context, vm, song);
+                              _showSongActions(context, vm, playerVM, song);
                             },
                             child: const Icon(Icons.more_vert, size: 20),
                           ),
@@ -251,7 +251,12 @@ class AlbumDetailView extends StatelessWidget {
   }
 }
 
-void _showSongActions(BuildContext context, AlbumViewModel vm, SongData song) {
+void _showSongActions(
+  BuildContext context,
+  AlbumViewModel vm,
+  PlayerViewModel playerVM,
+  SongData song,
+) {
   showModalBottomSheet(
     context: context,
     shape: const RoundedRectangleBorder(
@@ -289,7 +294,8 @@ void _showSongActions(BuildContext context, AlbumViewModel vm, SongData song) {
                   MaterialPageRoute(
                     builder: (_) => ChangeNotifierProvider(
                       create: (context) {
-                        final UserViewModel userViewModel = context.read<UserViewModel>();
+                        final UserViewModel userViewModel = context
+                            .read<UserViewModel>();
                         final playlistVm = PlaylistViewModel(userViewModel);
                         playlistVm.setSongToInsert(song.id!);
                         return playlistVm;
@@ -359,7 +365,14 @@ void _showSongActions(BuildContext context, AlbumViewModel vm, SongData song) {
               iconColor: Colors.green,
               text: 'Adicionar à fila de reprodução',
               onTap: () {
+                playerVM.addSongToQueue(song);
                 Navigator.pop(context);
+                showCustomSnackBar(
+                  context: context,
+                  message: 'Música adicionada a fila',
+                  backgroundColor: Colors.green,
+                  icon: Icons.check_circle,
+                );
               },
             ),
           ],

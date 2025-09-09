@@ -127,6 +127,7 @@ class PlayerViewModel extends ChangeNotifier {
     _previousStack.clear();
 
     _setCurrentSong(song);
+    toggle();
   }
 
   void addListToQueue({List<SongData>? list, int? index}) {

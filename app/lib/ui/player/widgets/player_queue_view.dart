@@ -77,13 +77,6 @@ class PlayerQueueView extends StatelessWidget {
                           index: index,
                           child: const Icon(Icons.drag_handle),
                         ),
-
-                        // IconButton(
-                        //   icon: const Icon(Icons.list),
-                        //   onPressed: () => {
-                        //     //
-                        //   },
-                        // ),
                         onTap: () {
                           playerVm.setQueueAtIndex(index);
                         },

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dam_music_streaming/data/dto/user_dto_l.dart';
 import 'package:dam_music_streaming/data/repositories/user_repository.dart';
 import 'package:dam_music_streaming/data/services/storage_service.dart';
 import 'package:dam_music_streaming/domain/models/user_data_l.dart';
@@ -36,12 +37,15 @@ class ProfileViewModel extends ChangeNotifier {
 
   void startEditing() {
     _pickedImageFile = null;
-    entityBeingEdited = UsuarioData(
-      username: '',
-      fullName: '',
-      role: '',
-      email: '',
-    );
+    entityBeingEdited =
+        userProfile ??
+        UsuarioData(
+          username: '',
+          fullName: '',
+          role: '',
+          email: '',
+          profilePicUrl: '',
+        );
     notifyListeners();
   }
 
@@ -63,34 +67,49 @@ class ProfileViewModel extends ChangeNotifier {
   }
 
   Future<void> updateLoggedUser() async {
+    print('updateLoggedUser called $entityBeingEdited');
     if (entityBeingEdited == null) return;
 
+    _isLoading = true;
+    notifyListeners();
+
     if (entityBeingEdited!.fullName!.isEmpty &&
-        entityBeingEdited!.username!.isEmpty)
+        entityBeingEdited!.username!.isEmpty) {
+      _isLoading = false;
+      notifyListeners();
       return;
+    }
 
     int id = userProfile!.id!;
 
     if (_pickedImageFile != null) {
+      print('Uploading image...');
       final imageUrl = await storageService.uploadUserProfilePicture(
         profileId: id,
         imageFile: _pickedImageFile!,
       );
       entityBeingEdited!.profilePicUrl = imageUrl;
+      print('Image uploaded: ${entityBeingEdited!}');
     }
 
     UsuarioData responseUser = await repository.updateProfile(
       id,
       entityBeingEdited!,
     );
+    
+    _userViewModel.setLoggedUser(responseUser);
 
-    userProfile = responseUser;
-    notifyListeners();
-    _userViewModel.loggedUser = responseUser;
+    print('responseUser: $responseUser');
+
+
+    _isLoading = false;
     notifyListeners();
   }
 
   Future<void> deleteUser() async {
+    _isLoading = true;
+    notifyListeners();
+    
     await repository.deleteUser(userProfile!.id!);
 
     try {
@@ -100,6 +119,9 @@ class ProfileViewModel extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       print('error: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 

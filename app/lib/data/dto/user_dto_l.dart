@@ -24,7 +24,7 @@ class UsuarioDto {
       username: map['username'] ?? '',
       email: map['email'] ?? '',
       role: map['role'] ?? '',
-      profilePicUrl: map['profilePicUrl'] ?? '',
+      profilePicUrl: map['profilePictureUrl'] ?? '',
     );
   }
 
@@ -60,7 +60,7 @@ class UsuarioDto {
     return {
       'fullName': full_name,
       'username': user_name,
-      'profilePicUrl': profile_pic_url,
+      'profilePictureUrl': profile_pic_url,
     };
   }
 }

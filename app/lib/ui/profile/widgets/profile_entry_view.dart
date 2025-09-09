@@ -5,6 +5,7 @@ import 'package:dam_music_streaming/domain/models/user_data_l.dart';
 import 'package:dam_music_streaming/ui/core/ui/custom_snack.dart';
 import 'package:dam_music_streaming/ui/core/ui/image_edit.dart';
 import 'package:dam_music_streaming/ui/core/ui/input_global.dart';
+import 'package:dam_music_streaming/ui/core/ui/loading.dart';
 import 'package:dam_music_streaming/ui/core/user/view_model/user_view_model.dart';
 import 'package:dam_music_streaming/ui/profile/view_model/profile_view_model.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +31,33 @@ class ProfileEntryView extends StatelessWidget {
       builder: (context, profileViewModel, child) {
         _fullNameController.text = userProfile?.fullName ?? '';
         _usernameController.text = userProfile?.username ?? '';
+
+        if(profileViewModel.isLoading) {
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text(
+                'Editar Perfil',
+                style: TextStyle(
+                  color: Color(0xFF000000),
+                  fontSize: 17,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+              elevation: 0,
+              centerTitle: true,
+            ),
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CustomLoadingIndicator(),
+                  SizedBox(height: 16),
+                  Text('Salvando...'),
+                ],
+              ),
+            ),
+          );
+        }
 
         return Scaffold(
           appBar: AppBar(
@@ -165,17 +193,18 @@ class ProfileEntryView extends StatelessWidget {
     ProfileViewModel profileViewModel,
     UserViewModel userViewModel,
   ) async {
+    print('updateProfileInfo ${profileViewModel.entityBeingEdited}');
     await profileViewModel.updateLoggedUser();
 
+    profileViewModel.setStackIndex(0);
+    
     showCustomSnackBar(
       context: context,
       message: 'Usuário Atualizado',
       backgroundColor: Colors.green,
       icon: Icons.check_circle,
     );
-    
 
-    profileViewModel.setStackIndex(0);
   }
 }
 

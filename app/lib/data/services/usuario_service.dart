@@ -12,17 +12,15 @@ class UserApiService {
   Future<UsuarioDto> updateProfile(int id, UsuarioDto user) async {
     String token = await getToken() ?? '';
 
+    print('Updating profile for user ID: $user');
+    print('mapping');
+    print(user.toProfileMap());
+
     final response = await _dio.patch(
       '/user/$id',
       data: user.toProfileMap(),
-      options: Options(
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      ),
     );
-
+    
     return UsuarioDto.fromMap(response.data);
   }
 

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +33,8 @@ public class AlbumService {
         }
 
         Album album = albumOptional.get();
-        List<Song> songs = songRepository.findAllByAlbumId(album.getId());
+        
+        List<Song> songs = songRepository.findAllByAlbumId(album.getId(), null);//traz tudo logo
         AlbumResponseDTO dto = AlbumResponseDTO.fromEntity(album, songs);
         
         return Optional.of(dto);

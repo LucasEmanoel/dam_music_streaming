@@ -15,7 +15,8 @@ class PlaylistsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userViewModel = Provider.of<UserViewModel>(context, listen: false);
+
+    final UserViewModel userViewModel = context.read<UserViewModel>();
 
     return MultiProvider(
       providers: [

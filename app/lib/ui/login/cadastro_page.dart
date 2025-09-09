@@ -181,10 +181,7 @@ class _CadastroPageState extends State<CadastroPage> {
                               ? const SizedBox(
                                   height: 22,
                                   width: 22,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  ),
+                                  child: CustomLoadingIndicator(),
                                 )
                               : const Row(
                                   mainAxisAlignment: MainAxisAlignment.center,

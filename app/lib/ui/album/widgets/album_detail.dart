@@ -4,6 +4,9 @@ import 'package:dam_music_streaming/ui/core/ui/button_sheet.dart';
 import 'package:dam_music_streaming/ui/core/ui/custom_snack.dart';
 import 'package:dam_music_streaming/ui/core/ui/loading.dart';
 import 'package:dam_music_streaming/ui/player/widgets/player_view.dart';
+import 'package:dam_music_streaming/ui/core/user/view_model/user_view_model.dart';
+import 'package:dam_music_streaming/ui/playlists/view_model/playlist_view_model.dart';
+import 'package:dam_music_streaming/ui/playlists/widgets/playlist_add_song.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../data/services/genre_service.dart';
@@ -267,7 +270,6 @@ void _showSongActions(BuildContext context, AlbumViewModel vm, SongData song) {
               subtitle: song.artist?.name ?? '',
             ),
             const SizedBox(height: 20),
-
             ButtonCustomSheet(
               icon: 'Profile',
               text: 'Ver Artista',
@@ -277,9 +279,25 @@ void _showSongActions(BuildContext context, AlbumViewModel vm, SongData song) {
             ),
             ButtonCustomSheet(
               icon: 'Playlist',
-              text: 'Adicionar a playlist',
+              text: 'Adicionar a uma playlist',
               onTap: () {
                 Navigator.pop(context);
+                if (song.id == null) return;
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ChangeNotifierProvider(
+                      create: (context) {
+                        final UserViewModel userViewModel = context.read<UserViewModel>();
+                        final playlistVm = PlaylistViewModel(userViewModel);
+                        playlistVm.setSongToInsert(song.id!);
+                        return playlistVm;
+                      },
+                      child: const AddSongToPlaylistView(),
+                    ),
+                  ),
+                );
               },
             ),
             ButtonCustomSheet(

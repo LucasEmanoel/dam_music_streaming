@@ -5,6 +5,7 @@ import 'package:dam_music_streaming/ui/core/player/view_model/player_view_model.
 import 'package:dam_music_streaming/ui/core/ui/custom_snack.dart';
 import 'package:dam_music_streaming/ui/core/ui/info_tile.dart';
 import 'package:dam_music_streaming/ui/core/ui/loading.dart';
+import 'package:dam_music_streaming/ui/player/widgets/player_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -208,7 +209,6 @@ class PlaylistSongs extends StatelessWidget {
                       );
 
                       vm.addListToQueue(list: songs);
-                      vm.play(songs[0]);
                     } else {
                       showCustomSnackBar(
                         context: context,
@@ -288,9 +288,23 @@ class PlaylistSongs extends StatelessWidget {
             imageUrl: song.urlCover ?? '',
             title: song.title ?? 'Título desconhecido',
             subtitle: song.artist?.name ?? 'Artista desconhecido',
-            trailing: Icon(Icons.more_vert, size: 20),
+            trailing: GestureDetector(
+              onTap: () async {
+                _showSongActions(context, vm, song, playlist);
+              },
+              child: const Icon(Icons.more_vert, size: 20),
+            ),
             onTap: () {
-              _showSongActions(context, vm, song, playlist);
+              final playerVM = Provider.of<PlayerViewModel>(
+                context,
+                listen: false,
+              );
+
+              playerVM.addListToQueue(list: songs, index: index);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => PlayerView()),
+              );
             },
           ),
         );

@@ -96,6 +96,7 @@ public class GenreResponseDTO {
 		private Long deezerId;
 	    private String title;
 	    private Duration duration;
+	    private AlbumInGenreResponseDTO album;
 
 	    public static SongInsideGenreDTO fromEntity(Song entity) {
 	        if (entity == null) return null;
@@ -104,6 +105,10 @@ public class GenreResponseDTO {
 	        dto.setDeezerId(entity.getIdDeezer());
 	        dto.setTitle(entity.getTitle());
 	        dto.setDuration(Duration.ofSeconds(entity.getDuration()));
+	        
+	        if(entity.getAlbum() != null) {
+	        	dto.setAlbum(AlbumInGenreResponseDTO.fromEntity(entity.getAlbum()));
+	        }
 	        return dto;
 	    }
 	}

@@ -5,12 +5,14 @@ import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ufape.dam.harmony.business.entity.Song;
 
 public interface SongRepository extends JpaRepository<Song, Long>{
-
+	@EntityGraph(attributePaths = {"album"})
+	List<Song> findAllByGenreId(Long genreId, Pageable limit);
 	List<Song> findAllByArtistId(Long artistId, Pageable limit);
 	List<Song> findAllByAlbumId(Long id, Pageable limit);
 	//title

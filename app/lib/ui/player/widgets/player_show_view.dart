@@ -20,8 +20,6 @@ class PlayerShowView extends StatelessWidget {
         final PlayerScreenViewModel playerScreenViewModel = context
             .read<PlayerScreenViewModel>();
 
-        // vm.clearCurrent();
-
         return Scaffold(
           appBar: AppBar(
             leading: Navigator.canPop(context)
@@ -140,11 +138,20 @@ class PlayerShowView extends StatelessWidget {
                   spacing: 9.5,
                   children: [
                     Padding(
-                      padding: EdgeInsetsGeometry.only(right: 15),
+                      padding: EdgeInsetsGeometry.only(left: 15, right: 15),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const SizedBox(height: 35),
+                          IconButton(
+                            icon: Icon(
+                              Icons.heart_broken,
+                              size: 26,
+                              color: Color(0xFF000000),
+                            ),
+                            onPressed: () {
+                              //
+                            },
+                          ),
                           IconButton(
                             icon: Icon(
                               Icons.queue_music_outlined,

@@ -13,5 +13,5 @@ import ufape.dam.harmony.business.entity.Artist;
 public interface ArtistRepository extends JpaRepository<Artist, Long> {
 
 	@Query("SELECT a FROM Artist a JOIN a.songs s WHERE s.genre.id = :genreId GROUP BY a ORDER BY COUNT(s) DESC")
-    List<Artist> findTopArtistsBySongCountInGenre(@Param("genreId") Long genreId, PageRequest top10);
+    List<Artist> findTopArtistsBySongCountInGenre(@Param("genreId") Long genreId, PageRequest limit);
 }

@@ -11,6 +11,7 @@ import 'package:dam_music_streaming/ui/core/ui/info_tile.dart';
 import 'package:dam_music_streaming/ui/core/ui/loading.dart';
 import 'package:dam_music_streaming/ui/core/user/view_model/user_view_model.dart';
 import 'package:dam_music_streaming/ui/playlists/view_model/playlist_view_model.dart';
+import 'package:dam_music_streaming/ui/playlists/widgets/playlist_add_song.dart';
 import 'package:dam_music_streaming/ui/playlists/widgets/playlist_songs.dart';
 import 'package:dam_music_streaming/ui/profile/widgets/profile_show_view.dart';
 import 'package:dam_music_streaming/ui/suggestions/view_model/sugestions_view_model.dart';
@@ -380,7 +381,6 @@ class WeatherSuggestionsView extends StatelessWidget {
                 text: 'Ver Author',
                 onTap: () {
                   if (playlist.author != null && playlist.author!.id != null) {
-                    //
                   }
                 },
               ),
@@ -394,21 +394,20 @@ class WeatherSuggestionsView extends StatelessWidget {
                       MaterialPageRoute(
                         builder: (_) => ChangeNotifierProvider(
                           create: (_) {
-                            final userVm = Provider.of<UserViewModel>(
-                              context,
-                              listen: false,
-                            );
-                            final vm = PlaylistViewModel(userVm);
-                            vm.setEntityBeingVisualized(playlist);
+                            final UserViewModel userViewModel = context.read<UserViewModel>();
+                            final vm = PlaylistViewModel(userViewModel);
+                            vm.entityBeingVisualized = playlist;
+                            vm.startView(id: playlist.id!);
                             return vm;
                           },
-                          child: const PlaylistSongs(),
+                          child: PlaylistSongs(),
                         ),
                       ),
                     );
                   }
                 },
               ),
+
               ButtonCustomSheet(
                 icon: 'Fila',
                 text: 'Adicionar a fila de reprodução',
@@ -462,7 +461,6 @@ class WeatherSuggestionsView extends StatelessWidget {
                 subtitle: song.artist?.name ?? '',
               ),
               SizedBox(height: 20),
-
               ButtonCustomSheet(
                 icon: 'Song',
                 text: 'Tocar agora',
@@ -479,7 +477,7 @@ class WeatherSuggestionsView extends StatelessWidget {
               ),
               ButtonCustomSheet(
                 icon: 'Profile',
-                text: 'Ver Artista', // chamar tela de visualizar perfil
+                text: 'Ver Artista',
                 onTap: () {
                   Navigator.pop(context);
                   if (song.artist != null) {
@@ -507,6 +505,32 @@ class WeatherSuggestionsView extends StatelessWidget {
                       ),
                     );
                   }
+                },
+              ),
+              ButtonCustomSheet(
+                icon: 'Playlist',
+                text: 'Adicionar a uma playlist',
+                onTap: () {
+                  Navigator.pop(context);
+                  if (song.id == null) return;
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ChangeNotifierProvider(
+                        create: (context) {
+                          final userVm = Provider.of<UserViewModel>(
+                            context,
+                            listen: false,
+                          );
+                          final playlistVm = PlaylistViewModel(userVm);
+                          playlistVm.setSongToInsert(song.id!);
+                          return playlistVm;
+                        },
+                        child: const AddSongToPlaylistView(),
+                      ),
+                    ),
+                  );
                 },
               ),
               ButtonCustomSheet(

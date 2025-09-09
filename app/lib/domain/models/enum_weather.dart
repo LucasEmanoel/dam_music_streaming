@@ -1,8 +1,10 @@
 enum EnumWeather {
+  THUNDERSTORM,
+  DRIZZLE,
+  RAIN,
+  SNOW,
   CLEAR,
   CLOUDS,
-  SNOW,
-  RAIN,
-  DRIZZLE,
-  THUNDERSTORM
+
+  
 }

@@ -14,6 +14,7 @@ class UserViewModel extends ChangeNotifier {
   UserViewModel(this.docsDir);
 
   void setLoggedUser(UsuarioData userData) {
+    print( 'setting logged user: ${userData.username}, ${userData.email}' );
     loggedUser = userData;
     notifyListeners();
   }

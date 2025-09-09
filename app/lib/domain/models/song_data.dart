@@ -4,6 +4,7 @@ import '../../data/dto/song_dto.dart';
 
 class SongData {
   int? id;
+  int? deezerId;
   String? title;
   String? urlCover;
 
@@ -12,6 +13,7 @@ class SongData {
 
   SongData({
     this.id,
+    this.deezerId,
     this.title,
     this.urlCover,
     this.artist,
@@ -21,6 +23,7 @@ class SongData {
   factory SongData.fromDto(SongDto dto) {
     return SongData(
       id: dto.id,
+      deezerId: dto.deezerId,
       title: dto.title,
       urlCover: dto.urlCover,
       artist: dto.artist != null ? ArtistData.fromDto(dto.artist!) : null,

@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:dam_music_streaming/ui/core/player/view_model/player_view_model.dart';
+import 'package:dam_music_streaming/ui/core/ui/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:dam_music_streaming/ui/artist/widgets/artist_detail.dart';
@@ -60,7 +61,7 @@ class _GenreDetailPageState extends State<GenreDetailPage> {
       builder: (_, snap) {
         if (snap.connectionState != ConnectionState.done) {
           return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+            body: Center(child: CustomLoadingIndicator()),
           );
         }
         if (snap.hasError || snap.data == null) {

@@ -18,6 +18,8 @@ import ufape.dam.harmony.business.entity.Song;
 public class SongResponseDTO {
 
     private Long id;
+    @JsonProperty("deezer_id")
+    private Long deezerId;
     private String title;
     private Duration duration; 
     
@@ -32,6 +34,7 @@ public class SongResponseDTO {
     	SongResponseDTO dto = new SongResponseDTO();
         
     	dto.setId(entity.getId());
+    	dto.setDeezerId(entity.getIdDeezer());
         dto.setTitle(entity.getTitle());
         dto.setDuration(Duration.ofSeconds(entity.getDuration()));
         dto.setArtist(ArtistInSongResponseDTO.fromEntity(entity.getArtist()));

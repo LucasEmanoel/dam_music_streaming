@@ -1,6 +1,7 @@
 import "package:dam_music_streaming/domain/models/playlist_data.dart";
 import "package:dam_music_streaming/ui/core/themes/light.dart";
 import "package:dam_music_streaming/ui/core/ui/button_sheet.dart";
+import "package:dam_music_streaming/ui/core/ui/custom_snack.dart";
 import "package:dam_music_streaming/ui/core/ui/loading.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
@@ -166,12 +167,29 @@ class PlaylistListView extends StatelessWidget {
       builder: (ctx) => ConfirmationDialog(
         title: "Atenção!",
         content:
-            "Apagar a playlist irá remover permanentemente essa seleção do sistema. Essa ação não é reversível.",
+            "Apagar a playlist irá remover permanentemente do app. Essa ação não é reversível.",
         txtBtn: "Apagar",
         corBtn: Color(0xFFFF3951),
         onConfirm: () {
           if (playlist.id != null) {
-            vm.deletePlaylist(playlist.id!);
+            vm
+                .deletePlaylist(playlist.id!)
+                .then((_) {
+                  showCustomSnackBar(
+                    context: context,
+                    message: 'playlist deletada com sucesso.',
+                    backgroundColor: Colors.green,
+                    icon: Icons.check,
+                  );
+                })
+                .catchError((error) {
+                  showCustomSnackBar(
+                    context: context,
+                    message: 'Erro ao remover playlist',
+                    backgroundColor: Colors.red,
+                    icon: Icons.error,
+                  );
+                });
             print("Playlist apagada!");
           }
         },

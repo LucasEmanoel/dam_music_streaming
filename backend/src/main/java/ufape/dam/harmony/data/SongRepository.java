@@ -20,7 +20,7 @@ public interface SongRepository extends JpaRepository<Song, Long>{
 	//title
 	List<Song> findByTitleContainingIgnoreCase(String q);
 	//trackPosition
-	@Query("SELECT s FROM Song s JOIN s.genre g WHERE g.name IN :preferredGenres ORDER BY s.trackPosition DESC")
+	@Query("SELECT s FROM Song s JOIN s.genre g WHERE g.name IN :preferredGenres ORDER BY s.rank DESC")
 	Page<Song> findByGenreName(Set<String> preferredGenres, Pageable pageable);
 	
 	

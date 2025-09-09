@@ -1,3 +1,5 @@
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dam_music_streaming/ui/core/ui/svg_icon.dart';
 import 'package:flutter/material.dart';
 
@@ -31,7 +33,7 @@ class InfoTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(8.0),
           image: hasImage
               ? DecorationImage(
-                  image: NetworkImage(imageUrl!),
+                  image: CachedNetworkImageProvider(imageUrl!),
                   fit: BoxFit.cover,
                 )
               : null,

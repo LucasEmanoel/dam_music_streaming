@@ -37,6 +37,7 @@ public class SuggestionService {
 	
 	@Transactional
 	public SuggestionResponseDTO getPlaylistsAndSongsByWeather(Weather weather) { // ficou muito verboso, vou refatorar
+		System.out.println(weather);
 		// a ideia aqui é fazer uma media de bpm e gain da playlist
 		// falta essa informacao nas entities
 		Set<String> preferredGenres = weatherMapGenre.mapWeatherGenre.get(weather); 																		
